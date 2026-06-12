@@ -107,9 +107,9 @@ gh pr diff 1 > pr1.diff
 radar check --adr-dir docs/adr --diff pr1.diff
 ```
 
-> 🇬🇧 Let's run the radar on it. The technique in one sentence: extract machine-checkable constraints from the ADRs, retrieve only those whose scope matches the changed files, then ground the model with the rule, the business driver and examples, forcing a structured verdict — no guessing; if the evidence is thin, it must answer *unknown*. …There: ADR-001 — **violated**, confidence 0.99 — and the reason cuts straight to it: this **re-introduces** the exact lock contention that caused the eightfold checkout slowdown. Second line, ADR-002: **aligned**. It doesn't cry wolf.
+> 🇬🇧 Let's run the radar. Here's the method, in three quick steps. **One:** it pulls the constraints out of the ADRs. **Two:** it keeps only the ones that cover the files we changed. **Three:** it asks the model — does this diff break them? — grounded in the rule and the business reason. And the model must answer clearly: **aligned**, **violated**, or **unknown**. No guessing. …And here we go. ADR-001: **violated**. Confidence, 0.99. The reason cuts straight to it — this brings back the exact locking problem that made checkout eight times slower last time. Second line, ADR-002: **aligned**. It doesn't cry wolf.
 >
-> 🇨🇳 跑一下 radar。技术上一句话：从 ADR 提取机器可检查的约束，只检索作用域命中变更文件的，把规则、业务动因和正反例一起灌给模型，强制输出结构化裁定——不许猜，证据不足必须答 unknown。结果出来了：ADR-001，violated，0.99——理由直指要害：重新引入了当年造成八倍结账变慢的锁竞争。第二行 ADR-002：aligned。它不乱咬。
+> 🇨🇳 跑一下 radar。方法分三步：一，从 ADR 里把约束抽出来；二，只留下覆盖我们改动文件的那些；三，问模型——这个 diff 违反它们吗——并用规则和业务理由作锚。模型必须明确回答：aligned、violated、或者 unknown。不许猜。结果出来了：ADR-001——violated，置信度 0.99。理由直指要害——它把当年让结账慢八倍的那个锁问题又带回来了。第二行 ADR-002：aligned。它不乱咬。
 
 **Fallback** (check fails / >30 s; identical output, instant):
 ```bash
