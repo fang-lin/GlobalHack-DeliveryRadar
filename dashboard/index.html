@@ -61,10 +61,12 @@
     <line x1="580" y1="71" x2="644" y2="71" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
     <text x="612" y="60" text-anchor="middle" fill="#64748b" font-size="10" font-family="JetBrains Mono">extract</text>
 
-    <!-- fan-out to the three operations -->
-    <path d="M 765 100 V 135 H 190 V 184" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
-    <path d="M 765 100 V 135 H 490 V 184" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
-    <path d="M 765 100 V 135 H 790 V 184" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
+    <!-- fan-out to the three operations: feed runs to the horizontal center (x=490),
+         then splits symmetrically over the three branches -->
+    <path d="M 765 100 V 120 H 490 V 148" fill="none" stroke="#94a3b8" stroke-width="2"/>
+    <path d="M 490 148 H 190 V 184" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
+    <path d="M 490 148 V 184" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
+    <path d="M 490 148 H 790 V 184" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
 
     <!-- row 1: the three detection operations -->
     <rect x="75" y="190" width="230" height="64" rx="12" fill="#11182e" stroke="#34d399" stroke-width="2"/>
