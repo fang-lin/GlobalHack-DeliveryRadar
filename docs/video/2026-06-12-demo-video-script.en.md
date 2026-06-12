@@ -1,8 +1,8 @@
-# Zoom Showcase Operating Script — Delivery Radar (~5 min, single take)
+# Zoom Showcase Operating Script (~5 min, single take)
 
-> **Authoritative version: Chinese (`2026-06-12-demo-video-script.zh.md`) · This file: synchronized English translation · Last synced: 2026-06-12 · On conflict, the Chinese version prevails.**
+> **Authoritative version: Chinese (`2026-06-12-demo-video-script.zh.md`) · This file: synchronized English translation — use this one when narrating in English · Last synced: 2026-06-12 · On conflict, the Chinese version prevails.**
 
-> **Structure: first half (0:00–2:45) tight demo; second half (2:45–5:00) the project's bigger vision.**
+> Narrative spine: pose the problem (humans can't review at AI speed; vibe review won't do) → quick Conformance showcase → reveal the method, IIAC (three methods in logical progression) → the vision (not a review tool — convergence of AI-driven development) → three eras → roadmap + the ask.
 
 ---
 
@@ -33,9 +33,9 @@
 | ② PR | `https://github.com/fang-lin/shop-demo/pull/1` |
 | ③ Contrast | `file:///Users/linfang/Projects/intent-impl-align/dashboard/contrast.html` |
 | ④ Dashboard | `file:///Users/linfang/Projects/intent-impl-align/dashboard/dashboard.html` |
-| ⑤ Slides | `file:///Users/linfang/Projects/intent-impl-align/dashboard/index.html` (four screens: loop / system map / three eras + audit / roadmap; scroll to switch) |
+| ⑤ Slides | `file:///Users/linfang/Projects/intent-impl-align/dashboard/index.html` (four screens: IIAC Loop / system map / three eras / roadmap) |
 
-- [ ] Hide bookmarks bar `Cmd+Shift+B`; zoom each tab to 125%
+- [ ] Hide bookmarks bar `Cmd+Shift+B`; zoom the two GitHub tabs to 125%
 - [ ] Park tab ② (PR) on **Conversation**, top
 
 ### A3. System & Zoom
@@ -47,70 +47,76 @@
 
 ---
 
-## B. Walkthrough
+## B. Walkthrough (finish the current line before switching screens)
 
-> Finish the current line before switching screens.
+### ① 0:00–0:40 · Pose the problem (camera only; share screen afterwards)
 
-### First half · Tight demo (0:00–2:45)
+**Actions**: deliver the whole passage to the camera, then Share Screen → entire screen → Share.
 
-#### ① 0:00–0:20 · Opening (camera; share screen after the line)
+> When humans wrote the code, humans could review it — a colleague would read your PR and ask: does this match how we build things, and *why* we build them that way? In the AI era, that breaks: code now arrives faster than any team can review it. So — let AI review it? Point an agent at the PR and let it vibe-review? That can't be the answer. If agents are going to review code, they need a **method**. We built one.
 
-> Hi, I'm Lin. This is **Delivery Radar** — it keeps code changes aligned with your architectural decisions, and the business reasons behind them. A quick live demo first — then the bigger picture.
+### ② 0:40–1:10 · Tab ① (ADR-001)
 
-#### ② 0:20–0:50 · Tab ① (ADR): sweep the €400k sentence → rest on the constraints block
+**Actions**: scroll to the Context section, sweep the "€400k" sentence → scroll to the `constraints` block, rest on the `driver: EPIC-512` line.
 
-> This demo shop records decisions as ADRs. ADR-001: inventory reads tolerate five minutes of staleness — a business decision: fresh reads would melt the primary DB during peak sales; last peak cost €400k. The key part: this **machine-readable constraint block** — rule, scope, and the business driver. Checks run against this.
+> This is the demo repo; its architectural decisions live in ADRs. ADR-001: inventory reads tolerate five minutes of staleness — a business decision: fresh reads would melt the primary database during peak sales; last peak cost four hundred thousand euros. The key part is this **machine-readable constraint block**: a rule, a scope, and the business driver.
 
-#### ③ 0:50–1:15 · Tab ② (PR): title/description → green ✅ → glance at Files changed → back to Conversation
+### ③ 1:10–1:30 · Tab ② (PR #1)
 
-> A developer fixes a real complaint — stale stock counts — by reading the primary directly and locking the row. Well-intentioned, **tests pass, CI is green**. This merges.
+**Actions**: title + description for 3 seconds → point at the green ✅ → glance at `FOR UPDATE` in Files changed → back to Conversation.
 
-#### ④ 1:15–2:00 · Terminal: run 3 commands (recall with ↑)
+> Now a perfectly normal PR: fixing a customer complaint about stale stock counts — by reading the primary directly, with a row lock. Tests pass, CI is green. Busy reviewers? This merges.
 
-```bash
-.venv/bin/radar extract --adr-dir ~/Projects/shop-demo/docs/adr
-gh pr diff 1 -R fang-lin/shop-demo > pr1.diff
-.venv/bin/radar check --adr-dir ~/Projects/shop-demo/docs/adr --diff pr1.diff
-```
+### ④ 1:30–2:10 · Terminal (3 commands, recall with ↑)
 
-Actions: at extract say "constraints, extracted from the ADRs"; the 20–30 s wait after the check is for the first half of the line; when results appear, highlight the `violated` line and the `aligned` line and read each.
+**Actions**: run extract → `gh pr diff` → check; the 20–30 s wait after check is exactly for the technique sentence; when results appear, highlight the `violated` line and the `aligned` line and read each.
 
-> Radar pulls the diff, retrieves **only the constraints whose scope matches the changed files**, and checks each one — grounded with the rule *and* the driver. …There: **ADR-001 — violated, 0.99** — it reintroduces the exact lock contention from the €400k incident. And ADR-002 — **aligned**. No false alarm.
+> Let's run the radar on it. The technique in one sentence: extract machine-checkable constraints from the ADRs, retrieve only those whose scope matches the changed files, then ground the model with the rule, the business driver and examples, forcing a structured verdict — no guessing; insufficient evidence must come back as *unknown*. …There: ADR-001 — **violated**, confidence 0.99, and the reason names the exact lock contention that caused the 8x checkout degradation. Second line, ADR-002: **aligned**. It doesn't cry wolf.
 
-**Fallback** (check fails / >30 s):
+**Fallback** (check fails / >30 s; identical output, instant):
 ```bash
 .venv/bin/radar check --adr-dir ~/Projects/shop-demo/docs/adr --diff pr1.diff --replay artifacts/pr1-verdicts.json
 ```
 
-#### ⑤ 2:00–2:25 · Tab ②: scroll to the 🛰️ comment; sweep Rule / Why / Evidence / Direction
+### ⑤ 2:10–2:30 · Tab ② (the review on the PR)
 
-> On the PR it lands as this comment: the rule — **why the rule exists, quoting the business rationale** — the exact lines, and the fix direction. **Advisory**: machine drafts, human decides.
+**Actions**: scroll to the 🛰️ review; sweep Rule / Why this rule exists / Evidence / Direction.
 
-#### ⑥ 2:25–2:45 · Tab ③ (contrast): point at the yellow highlight on the left → then the right panel
+> On the PR it lands as this review: the rule, why the rule exists — quoting the business rationale — the exact lines, and the direction of the fix. Advisory; it doesn't block the merge. This is **Conformance**: implementation aligning toward intent.
 
-> Same model, no grounding — the left side. It catches the lock as an *opinion* — and then suggests an unlocked primary read, **itself a violation**. Opinion versus a governable verdict.
+### ⑥ 2:30–2:45 · Tab ③ (contrast) — **cut if short on time**
 
-### Second half · The bigger vision (2:45–5:00)
+**Actions**: point at the yellow highlight on the left → then the right panel.
 
-#### ⑦ 2:45–3:15 · Tab ④ (dashboard): KPI → LIVE card → drift trends → AT RISK card → Capture queue
+> And this is the difference from vibe review: same model, same diff, no method — the left side. A decent reviewer — but it treats staleness as a bug to fix, and even proposes an ADR-violating alternative itself. Review without a method is opinion; with a method, it's a verdict.
 
-> And here the demo opens into the vision. What you saw is **one of three operations over one shared object** — the constraint. The architect's view: conformance, live. **Drift** audits the standing codebase — ADR-002 is decaying — and the radar drafts both ways out: remediate the code, or supersede the decision. **Capture** queues unrecorded decisions for triage. Humans confirm; nothing executes on its own.
+### ⑦ 2:45–3:40 · Tab ⑤ screen 1 (IIAC Loop) — the method's formal entrance
 
-#### ⑧ 3:15–3:35 · Tab ⑤ screen 1 (IIAC Loop diagram): point at the three green ops in turn, then the human-confirms gate on the return edge
+**Actions**: point at the middle pipeline for Capture, the right pipeline for Drift, then the human-confirms gate on the return edge.
 
-> The heart is what we call the **IIAC loop** — intent, implementation, alignment, convergence. Recorded intent — carried in ADRs, specs, stories — becomes constraints; conformance enforces, drift audits, capture feeds decisions back. **Alignment makes each change right; convergence makes the whole trajectory settle** — no oscillation, so the process ends in a deterministic, auditable state instead of circling.
+> But reviewing PRs against ADRs is **not enough** — that only aligns implementation toward intent, one direction. Sometimes intent grows out of the code: a PR quietly makes a decision nobody recorded. If you can't detect and record it, there is no real alignment. So, the second method: **Decision Capture** — detect new intent created during integration and turn it into recorded intent documents. Still not done: intent that only grows and never changes is wrong too. Intent should be stable — and still evolve. The third method: **Drift Detection** — periodically scan the standing codebase against all intent, and surface either code that needs fixing, or intent that needs changing. Together, this is our method: **IIAC — intent–implementation alignment and convergence**. Three operations over one shared constraint store; every write-back to intent passes human confirmation. Alignment makes each change right; convergence makes the trajectory settle.
 
-#### ⑨ 3:35–4:00 · Tab ⑤ screen 2 (system map): point at the legend, then sweep the dimmed cards
+### ⑧ 3:40–3:55 · Tab ④ (dashboard glance) — **cut if short on time**
 
-> We've specified the **whole system** — every box carries requirement IDs; **four of thirteen capability groups run today**, and that ratio is the point. Today you saw the lit spine. Around it, sequenced: the behavioral intent layer, deterministic checks, capture triage, the drift engine — and a trust ladder: a replay harness measuring precision on your repo's *own history*, because a check only earns the right to **block** after it proves itself.
+**Actions**: sweep quickly: LIVE card in the conformance feed → drift trends and the AT RISK card → capture queue.
 
-#### ⑩ 4:00–4:40 · Tab ⑤ screen 3 (writing → steering → autonomy, three cards): point left to right, then the audit strip
+> For an architect it looks like this: the live conformance feed — there's our PR; drift decay trends, with remediate-or-supersede drafts; and the capture queue awaiting triage.
 
-> Three eras put this in context. **In the past, humans wrote the code** — intent lived in people's heads, and drift was slow enough for review to keep up. **Today, humans steer coding agents in real time** — agents write the code; alignment holds because a human corrects every step, live. That scales to one person, one session. **The exploration: long-horizon autonomy** — recorded, machine-checkable intent replaces real-time steering. The agent self-checks *before* opening a PR, captures new decisions, escalates only at decision points. The human steps out of the loop — alignment stays in. And one thing is non-negotiable: the whole loop is **designed to be tracked and auditable — because convergence needs memory**. You cannot converge if you don't know where you've been. Every verdict carries evidence and a constraint ID, every confirmation is recorded, intent lives in git — who decided, what changed, why.
+### ⑨ 3:55–4:15 · Tab ⑤ screen 2 (What you saw today is one slice)
 
-#### ⑪ 4:40–5:00 · Tab ⑤ screen 4 (roadmap) → close
+**Actions**: point at the legend and the "4 of 13" stat line, then sweep the dimmed cards.
 
-> The road is sequenced: what you saw runs today; capture and drift next; gating only once precision is proven. **Delivery Radar — keep the why alive.** That's our take on *innovation that AI works*. Thanks!
+> What you saw today is one slice — four of thirteen capability groups run, and every box carries requirement IDs. But the vision is **not a code-review tool**. With IIAC we want AI-driven software development to **converge** under AI supervision — the way it used to converge under human supervision.
+
+### ⑩ 4:15–4:40 · Tab ⑤ screen 3 (From writing, to steering, to autonomy)
+
+**Actions**: point left to right across the three cards, then the audit strip.
+
+> In the past, humans wrote the code and reviewed each other. Today, AI writes the code, and humans review and steer in real time — that doesn't scale: one person, one session. And it shouldn't be the future. Code written by AI should be reviewed by AI; humans should manage what only humans can — **intent**. Govern the intent, ensure convergence — with the whole process tracked and auditable.
+
+### ⑪ 4:40–5:00 · Tab ⑤ screen 4 (Roadmap) → close
+
+> The road is sequenced. If this vision resonates with you, vote for it — let this idea travel down the roadmap. That's our take on innovation that AI works. Thanks!
 
 ---
 
@@ -118,14 +124,14 @@ Actions: at extract say "constraints, extracted from the ADRs"; the 20–30 s wa
 
 1. Zoom transcodes after the meeting ends; the `.mp4` lands under `~/Documents/Zoom/<date-time>.../`
 2. Playback check: duration ≤ 5:00, audio clear, on-screen text readable
-3. Over time: up to ~20 s is usually fine; if far over, shorten dwell time in segments ② and ⑦ and re-record
-4. Submit the `.mp4` through the organizer's channel
+3. Over time: cut ⑥ (contrast, 15 s) first, then ⑧ (dashboard, 15 s)
+4. Submit through the organizer's channel
 
 ## D. Emergency Quick Reference
 
 | Situation | Action |
 |---|---|
-| radar check errors / >30 s | run the replay fallback (segment ④) |
+| radar check errors / >30 s | run the replay fallback in segment ④ |
 | Small stumble | keep going; don't apologize or restart |
 | Major derailment | stop recording, redo the take (it's only 5 minutes) |
 | GitHub pages slow | refresh all tabs right before recording |
