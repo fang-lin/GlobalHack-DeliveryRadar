@@ -1,0 +1,40 @@
+diff --git a/services/inventory/reader.py b/services/inventory/reader.py
+index 3f1c2aa..9b4d7ee 100644
+--- a/services/inventory/reader.py
++++ b/services/inventory/reader.py
+@@ -14,13 +14,15 @@ class StockReader:
+     def __init__(self, cache, replica_db, primary_db):
+         self.cache = cache
+         self.replica_db = replica_db
+         self.primary_db = primary_db
+
+     def get_stock(self, sku: str) -> int:
+-        cached = self.cache.get(f"stock:{sku}")
+-        if cached is not None:
+-            return int(cached)
+-        value = self.replica_db.query_stock(sku)
+-        self.cache.set(f"stock:{sku}", value, ttl=300)
+-        return value
++        # FIX(#1287): customers reported stale stock counts on the product
++        # page. Read the primary directly and lock the row so the displayed
++        # count is always exact.
++        row = self.primary_db.execute(
++            "SELECT quantity FROM stock WHERE sku = %s FOR UPDATE",
++            (sku,),
++        ).fetchone()
++        return int(row[0])
+diff --git a/services/inventory/tests/test_reader.py b/services/inventory/tests/test_reader.py
+index 88aa120..c01dd3e 100644
+--- a/services/inventory/tests/test_reader.py
++++ b/services/inventory/tests/test_reader.py
+@@ -9,10 +9,9 @@ def make_reader(stock=7):
+-    cache = FakeCache()
+-    replica = FakeReplica(stock=stock)
+-    primary = FakePrimary(stock=stock)
+-    return StockReader(cache, replica, primary)
++    return StockReader(FakeCache(), FakeReplica(stock=stock), FakePrimary(stock=stock))
+
+
+ def test_get_stock_returns_quantity():
+     reader = make_reader(stock=7)
+     assert reader.get_stock("SKU-1") == 7
