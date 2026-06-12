@@ -63,60 +63,60 @@
 
     <!-- fan-out to the three operations: feed runs to the horizontal center (x=490),
          then splits symmetrically over the three branches -->
-    <path d="M 765 100 V 120 H 490 V 148" fill="none" stroke="#94a3b8" stroke-width="2"/>
-    <path d="M 490 148 H 190 V 184" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
-    <path d="M 490 148 V 184" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
-    <path d="M 490 148 H 790 V 184" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
+    <path d="M 765 100 V 120 H 530 V 148" fill="none" stroke="#94a3b8" stroke-width="2"/>
+    <path d="M 530 148 H 230 V 184" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
+    <path d="M 530 148 V 184" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
+    <path d="M 530 148 H 830 V 184" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
 
     <!-- row 1: the three detection operations -->
-    <rect x="75" y="190" width="230" height="64" rx="12" fill="#11182e" stroke="#34d399" stroke-width="2"/>
-    <text x="190" y="217" text-anchor="middle" fill="#34d399" font-size="17" font-weight="700" font-family="Space Grotesk">Conformance</text>
-    <text x="190" y="240" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="JetBrains Mono">on PR open + push</text>
+    <rect x="115" y="190" width="230" height="64" rx="12" fill="#11182e" stroke="#34d399" stroke-width="2"/>
+    <text x="230" y="217" text-anchor="middle" fill="#34d399" font-size="17" font-weight="700" font-family="Space Grotesk">Conformance</text>
+    <text x="230" y="240" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="JetBrains Mono">on PR open + push</text>
 
-    <rect x="375" y="190" width="230" height="64" rx="12" fill="#11182e" stroke="#34d399" stroke-width="2"/>
-    <text x="490" y="217" text-anchor="middle" fill="#34d399" font-size="17" font-weight="700" font-family="Space Grotesk">Decision Capture</text>
-    <text x="490" y="240" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="JetBrains Mono">on PR open</text>
+    <rect x="415" y="190" width="230" height="64" rx="12" fill="#11182e" stroke="#34d399" stroke-width="2"/>
+    <text x="530" y="217" text-anchor="middle" fill="#34d399" font-size="17" font-weight="700" font-family="Space Grotesk">Decision Capture</text>
+    <text x="530" y="240" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="JetBrains Mono">on PR open</text>
 
-    <rect x="675" y="190" width="230" height="64" rx="12" fill="#11182e" stroke="#34d399" stroke-width="2"/>
-    <text x="790" y="217" text-anchor="middle" fill="#34d399" font-size="17" font-weight="700" font-family="Space Grotesk">Drift Detection</text>
-    <text x="790" y="240" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="JetBrains Mono">cron · on intent change</text>
+    <rect x="715" y="190" width="230" height="64" rx="12" fill="#11182e" stroke="#34d399" stroke-width="2"/>
+    <text x="830" y="217" text-anchor="middle" fill="#34d399" font-size="17" font-weight="700" font-family="Space Grotesk">Drift Detection</text>
+    <text x="830" y="240" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="JetBrains Mono">cron · on intent change</text>
 
     <!-- arrows ops -> artifacts -->
-    <line x1="190" y1="254" x2="190" y2="296" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
-    <line x1="490" y1="254" x2="490" y2="296" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
-    <line x1="790" y1="254" x2="790" y2="296" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
+    <line x1="230" y1="254" x2="230" y2="296" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
+    <line x1="530" y1="254" x2="530" y2="296" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
+    <line x1="830" y1="254" x2="830" y2="296" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
 
     <!-- row 2: intermediate artifacts -->
-    <rect x="75" y="300" width="230" height="64" rx="12" fill="#141b33" stroke="#475569" stroke-width="1.5"/>
-    <text x="190" y="327" text-anchor="middle" fill="#e2e8f0" font-size="16" font-weight="700" font-family="Space Grotesk">Report</text>
-    <text x="190" y="350" text-anchor="middle" fill="#94a3b8" font-size="11">→ typed PR review, advisory</text>
+    <rect x="115" y="300" width="230" height="64" rx="12" fill="#141b33" stroke="#475569" stroke-width="1.5"/>
+    <text x="230" y="327" text-anchor="middle" fill="#e2e8f0" font-size="16" font-weight="700" font-family="Space Grotesk">Report</text>
+    <text x="230" y="350" text-anchor="middle" fill="#94a3b8" font-size="11">→ typed PR review, advisory</text>
 
-    <rect x="375" y="300" width="230" height="64" rx="12" fill="#141b33" stroke="#475569" stroke-width="1.5"/>
-    <text x="490" y="327" text-anchor="middle" fill="#e2e8f0" font-size="16" font-weight="700" font-family="Space Grotesk">Decision Note</text>
-    <text x="490" y="350" text-anchor="middle" fill="#94a3b8" font-size="11">draft, on the PR · human triage</text>
+    <rect x="415" y="300" width="230" height="64" rx="12" fill="#141b33" stroke="#475569" stroke-width="1.5"/>
+    <text x="530" y="327" text-anchor="middle" fill="#e2e8f0" font-size="16" font-weight="700" font-family="Space Grotesk">Decision Note</text>
+    <text x="530" y="350" text-anchor="middle" fill="#94a3b8" font-size="11">draft, on the PR · human triage</text>
 
-    <rect x="675" y="300" width="230" height="64" rx="12" fill="#141b33" stroke="#475569" stroke-width="1.5"/>
-    <text x="790" y="327" text-anchor="middle" fill="#e2e8f0" font-size="16" font-weight="700" font-family="Space Grotesk">Drift report</text>
-    <text x="790" y="350" text-anchor="middle" fill="#94a3b8" font-size="11">+ decay trend per ADR</text>
+    <rect x="715" y="300" width="230" height="64" rx="12" fill="#141b33" stroke="#475569" stroke-width="1.5"/>
+    <text x="830" y="327" text-anchor="middle" fill="#e2e8f0" font-size="16" font-weight="700" font-family="Space Grotesk">Drift report</text>
+    <text x="830" y="350" text-anchor="middle" fill="#94a3b8" font-size="11">+ decay trend per ADR</text>
 
     <!-- column 2: graduate -->
-    <line x1="490" y1="364" x2="490" y2="406" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
-    <rect x="375" y="410" width="230" height="58" rx="12" fill="#11182e" stroke="#a78bfa" stroke-width="2"/>
-    <text x="490" y="435" text-anchor="middle" fill="#a78bfa" font-size="15" font-weight="700" font-family="Space Grotesk">Graduate → intent</text>
-    <text x="490" y="456" text-anchor="middle" fill="#94a3b8" font-size="11">architectural → ADR · behavioral → story/AC</text>
+    <line x1="530" y1="364" x2="530" y2="406" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
+    <rect x="415" y="410" width="230" height="58" rx="12" fill="#11182e" stroke="#a78bfa" stroke-width="2"/>
+    <text x="530" y="435" text-anchor="middle" fill="#a78bfa" font-size="15" font-weight="700" font-family="Space Grotesk">Graduate → intent</text>
+    <text x="530" y="456" text-anchor="middle" fill="#94a3b8" font-size="11">architectural → ADR · behavioral → story/AC</text>
 
     <!-- column 3: remediation + supersede -->
-    <line x1="790" y1="364" x2="790" y2="406" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
-    <rect x="675" y="410" width="230" height="52" rx="12" fill="#141b33" stroke="#475569" stroke-width="1.5"/>
-    <text x="790" y="442" text-anchor="middle" fill="#e2e8f0" font-size="15" font-weight="600" font-family="Space Grotesk">Remediation issue</text>
+    <line x1="830" y1="364" x2="830" y2="406" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
+    <rect x="715" y="410" width="230" height="52" rx="12" fill="#141b33" stroke="#475569" stroke-width="1.5"/>
+    <text x="830" y="442" text-anchor="middle" fill="#e2e8f0" font-size="15" font-weight="600" font-family="Space Grotesk">Remediation issue</text>
 
-    <path d="M 675 332 H 640 V 513 H 671" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
-    <rect x="675" y="487" width="230" height="52" rx="12" fill="#11182e" stroke="#a78bfa" stroke-width="2"/>
-    <text x="790" y="519" text-anchor="middle" fill="#a78bfa" font-size="15" font-weight="700" font-family="Space Grotesk">Supersede → intent</text>
+    <path d="M 715 332 H 680 V 513 H 711" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
+    <rect x="715" y="487" width="230" height="52" rx="12" fill="#11182e" stroke="#a78bfa" stroke-width="2"/>
+    <text x="830" y="519" text-anchor="middle" fill="#a78bfa" font-size="15" font-weight="700" font-family="Space Grotesk">Supersede → intent</text>
 
     <!-- return loop: updated intent feeds back, gated by human confirmation -->
-    <path d="M 490 468 V 600" fill="none" stroke="#a78bfa" stroke-width="2"/>
-    <path d="M 790 539 V 600 H 60 V 71 H 94" fill="none" stroke="#a78bfa" stroke-width="2" marker-end="url(#mViolet)"/>
+    <path d="M 530 468 V 600" fill="none" stroke="#a78bfa" stroke-width="2"/>
+    <path d="M 830 539 V 600 H 60 V 71 H 94" fill="none" stroke="#a78bfa" stroke-width="2" marker-end="url(#mViolet)"/>
     <rect x="200" y="586" width="180" height="28" rx="8" fill="#0b1020" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="5 4"/>
     <text x="290" y="605" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600" font-family="Space Grotesk">human confirms ✓</text>
     <text x="560" y="588" fill="#a78bfa" font-size="12" font-family="JetBrains Mono">updated intent → constraints re-extracted ↻</text>
