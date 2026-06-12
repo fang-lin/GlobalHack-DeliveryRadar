@@ -32,8 +32,8 @@
 | ① ADR | `https://github.com/fang-lin/shop-demo/blob/main/docs/adr/ADR-001-inventory-eventual-consistency.md` |
 | ② PR | `https://github.com/fang-lin/shop-demo/pull/1` |
 | ③ 对照 | `file:///Users/linfang/Projects/intent-impl-align/dashboard/contrast.html` |
-| ④ 仪表盘 | `file:///Users/linfang/Projects/intent-impl-align/dashboard/index.html` |
-| ⑤ Slides | `file:///Users/linfang/Projects/intent-impl-align/dashboard/slides.html`（四屏：闭环 / 全系统地图 / 双路径+审计 / 路线图，滚动切换） |
+| ④ 仪表盘 | `file:///Users/linfang/Projects/intent-impl-align/dashboard/dashboard.html` |
+| ⑤ Slides | `file:///Users/linfang/Projects/intent-impl-align/dashboard/index.html`（四屏：闭环 / 全系统地图 / 三时代+审计 / 路线图，滚动切换） |
 
 - [ ] 隐藏书签栏 `Cmd+Shift+B`；每个标签缩放 125%
 - [ ] 标签②（PR）停在 **Conversation** 顶部

@@ -64,8 +64,8 @@ recorded: who decided, what changed, why.*
 - **Demo PR with a real verdict**: [fang-lin/shop-demo#1](https://github.com/fang-lin/shop-demo/pull/1) —
   CI-green "bugfix" that violates ADR-001's business driver; the radar's advisory
   review quotes the recorded rationale (€400k peak-sale incident) and the fix direction.
-- **Dashboard & slides**: https://fang-lin.github.io/delivery-radar-pages/
-  ([slides](https://fang-lin.github.io/delivery-radar-pages/slides.html) ·
+- **Showcase (slides)**: https://fang-lin.github.io/delivery-radar-pages/
+  ([dashboard](https://fang-lin.github.io/delivery-radar-pages/dashboard.html) ·
   [grounded-vs-ungrounded contrast](https://fang-lin.github.io/delivery-radar-pages/contrast.html))
 
 ## Quickstart

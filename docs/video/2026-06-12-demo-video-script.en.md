@@ -32,8 +32,8 @@
 | ① ADR | `https://github.com/fang-lin/shop-demo/blob/main/docs/adr/ADR-001-inventory-eventual-consistency.md` |
 | ② PR | `https://github.com/fang-lin/shop-demo/pull/1` |
 | ③ Contrast | `file:///Users/linfang/Projects/intent-impl-align/dashboard/contrast.html` |
-| ④ Dashboard | `file:///Users/linfang/Projects/intent-impl-align/dashboard/index.html` |
-| ⑤ Slides | `file:///Users/linfang/Projects/intent-impl-align/dashboard/slides.html` (four screens: loop / system map / two paths + audit / roadmap; scroll to switch) |
+| ④ Dashboard | `file:///Users/linfang/Projects/intent-impl-align/dashboard/dashboard.html` |
+| ⑤ Slides | `file:///Users/linfang/Projects/intent-impl-align/dashboard/index.html` (four screens: loop / system map / three eras + audit / roadmap; scroll to switch) |
 
 - [ ] Hide bookmarks bar `Cmd+Shift+B`; zoom each tab to 125%
 - [ ] Park tab ② (PR) on **Conversation**, top
