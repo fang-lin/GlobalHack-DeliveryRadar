@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Delivery Radar — Video Slides</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { display: ["Space Grotesk", "sans-serif"], mono: ["JetBrains Mono", "monospace"] },
+        colors: { ink: "#0b1020", panel: "#11182e", edge: "#1f2b4a", beam: "#37e8c2" },
+      },
+    },
+  };
+</script>
+<style>
+  body { background: radial-gradient(1200px 600px at 75% -10%, #16224a 0%, #0b1020 55%); }
+  .slide { min-height: 100vh; scroll-snap-align: start; }
+  html { scroll-snap-type: y mandatory; }
+</style>
+</head>
+<body class="font-display text-slate-200">
+
+<!-- ============ SLIDE 1: THE CLOSED LOOP (scene 5) ============ -->
+<section class="slide flex flex-col items-center justify-center px-8">
+  <div class="text-xs uppercase tracking-[0.3em] text-slate-500 mb-2">one shared contract · three operations</div>
+  <h1 class="text-3xl font-bold mb-10">The Closed Loop</h1>
+
+  <svg viewBox="0 0 980 420" class="w-full max-w-4xl">
+    <defs>
+      <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+      </marker>
+      <marker id="arrBeam" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#37e8c2"/>
+      </marker>
+    </defs>
+
+    <!-- ADR node -->
+    <rect x="40" y="170" width="150" height="80" rx="14" fill="#11182e" stroke="#37e8c2" stroke-width="2"/>
+    <text x="115" y="205" text-anchor="middle" fill="#37e8c2" font-size="22" font-weight="700" font-family="Space Grotesk">ADR</text>
+    <text x="115" y="228" text-anchor="middle" fill="#94a3b8" font-size="12">recorded intent</text>
+
+    <!-- Constraint node -->
+    <rect x="300" y="170" width="190" height="80" rx="14" fill="#11182e" stroke="#1f2b4a" stroke-width="2"/>
+    <text x="395" y="205" text-anchor="middle" fill="#e2e8f0" font-size="20" font-weight="700" font-family="Space Grotesk">Constraint</text>
+    <text x="395" y="228" text-anchor="middle" fill="#94a3b8" font-size="12">addressable · checkable</text>
+
+    <!-- Conformance -->
+    <rect x="620" y="60" width="200" height="72" rx="14" fill="#11182e" stroke="#34d399" stroke-width="2"/>
+    <text x="720" y="92" text-anchor="middle" fill="#34d399" font-size="18" font-weight="700" font-family="Space Grotesk">Conformance</text>
+    <text x="720" y="113" text-anchor="middle" fill="#94a3b8" font-size="12">enforce · every PR</text>
+
+    <!-- Drift -->
+    <rect x="620" y="174" width="200" height="72" rx="14" fill="#11182e" stroke="#f59e0b" stroke-width="2"/>
+    <text x="720" y="206" text-anchor="middle" fill="#f59e0b" font-size="18" font-weight="700" font-family="Space Grotesk">Drift</text>
+    <text x="720" y="227" text-anchor="middle" fill="#94a3b8" font-size="12">audit · standing codebase</text>
+
+    <!-- Capture -->
+    <rect x="620" y="288" width="200" height="72" rx="14" fill="#11182e" stroke="#a78bfa" stroke-width="2"/>
+    <text x="720" y="320" text-anchor="middle" fill="#a78bfa" font-size="18" font-weight="700" font-family="Space Grotesk">Capture</text>
+    <text x="720" y="341" text-anchor="middle" fill="#94a3b8" font-size="12">produce · implicit decisions</text>
+
+    <!-- arrows: ADR -> Constraint -->
+    <line x1="190" y1="210" x2="296" y2="210" stroke="#37e8c2" stroke-width="2.5" marker-end="url(#arrBeam)"/>
+    <text x="243" y="198" text-anchor="middle" fill="#64748b" font-size="11" font-family="JetBrains Mono">extract</text>
+
+    <!-- Constraint -> Conformance / Drift -->
+    <line x1="490" y1="190" x2="616" y2="105" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+    <line x1="490" y1="210" x2="616" y2="210" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+
+    <!-- Capture -> back to ADR (bottom return path) -->
+    <path d="M 720 360 L 720 395 L 115 395 L 115 254" fill="none" stroke="#a78bfa" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arr)"/>
+    <text x="420" y="385" text-anchor="middle" fill="#a78bfa" font-size="12" font-family="JetBrains Mono">graduate → new ADR</text>
+
+    <!-- Drift -> supersede -> ADR (top return path) -->
+    <path d="M 720 174 L 720 28 L 115 28 L 115 166" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arr)"/>
+    <text x="420" y="20" text-anchor="middle" fill="#f59e0b" font-size="12" font-family="JetBrains Mono">supersede → new ADR</text>
+  </svg>
+
+  <div class="mt-10 font-mono text-beam text-lg font-semibold">machine drafts · human confirms</div>
+  <div class="text-xs text-slate-500 mt-2">every ADR change re-extracts constraints — the loop never goes stale</div>
+</section>
+
+<!-- ============ SLIDE 2: ROADMAP (scene 7) ============ -->
+<section class="slide flex flex-col items-center justify-center px-8">
+  <div class="text-xs uppercase tracking-[0.3em] text-slate-500 mb-2">where this goes</div>
+  <h1 class="text-3xl font-bold mb-12">Roadmap</h1>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-5 w-full max-w-5xl">
+    <div class="bg-panel border-2 border-beam/60 rounded-2xl p-6 shadow-[0_0_40px_rgba(55,232,194,.1)]">
+      <div class="flex items-center justify-between">
+        <div class="text-beam font-bold text-lg">Phase 1</div>
+        <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-beam/15 text-beam border border-beam/40">RUNNING TODAY</span>
+      </div>
+      <ul class="mt-4 space-y-2.5 text-sm text-slate-300">
+        <li>✅ ADR constraint blocks → constraint store</li>
+        <li>✅ Advisory conformance on real PRs</li>
+        <li>✅ Driver-grounded semantic checks</li>
+        <li>✅ Evidence-linked review comments</li>
+      </ul>
+    </div>
+
+    <div class="bg-panel border border-edge rounded-2xl p-6">
+      <div class="flex items-center justify-between">
+        <div class="text-amber-400 font-bold text-lg">Phase 2</div>
+        <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/30">NEXT</span>
+      </div>
+      <ul class="mt-4 space-y-2.5 text-sm text-slate-400">
+        <li>◇ Drift engine + this dashboard, live</li>
+        <li>◇ Remediation / supersede drafts</li>
+        <li>◇ Capture → Decision Note triage flow</li>
+        <li>◇ Story/AC behavioral intent layer</li>
+      </ul>
+    </div>
+
+    <div class="bg-panel border border-edge rounded-2xl p-6">
+      <div class="flex items-center justify-between">
+        <div class="text-violet-400 font-bold text-lg">Phase 3</div>
+        <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-violet-500/10 text-violet-300 border border-violet-500/30">EARNED</span>
+      </div>
+      <ul class="mt-4 space-y-2.5 text-sm text-slate-400">
+        <li>◇ Historical-replay precision harness</li>
+        <li>◇ Gate only what proves itself —<br/><span class="text-slate-500 text-xs">deterministic + measured precision</span></li>
+        <li>◇ Pre-PR self-check in agent loops</li>
+        <li>◇ Decay prediction</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="mt-12 text-center">
+    <div class="text-2xl font-bold">🛰️ Delivery Radar</div>
+    <div class="text-beam font-mono mt-2">keep the <span class="italic">why</span> alive</div>
+  </div>
+</section>
+
+</body>
+</html>
