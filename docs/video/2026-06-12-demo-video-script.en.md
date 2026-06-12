@@ -144,9 +144,9 @@ radar check --adr-dir docs/adr --diff pr1.diff --replay ~/Projects/intent-impl-a
 
 **Actions**: sweep quickly: LIVE card in the conformance feed → drift trends and the AT RISK card → capture queue.
 
-> 🇬🇧 For an architect it looks like this: the live conformance feed — there's our PR; drift decay trends — each with a drafted choice: fix the code, or change the intent; and the capture queue waiting for review.
+> 🇬🇧 This is the dashboard — the architect's view. Here's the live **conformance** feed. There's our PR. Here are the **drift** trends. For each one, the radar drafts a choice: fix the code, or change the intent. And here's the **capture** queue, waiting for review.
 >
-> 🇨🇳 给架构师的视角长这样：实时的 conformance 流——刚才那个 PR 就在这；drift 的衰减趋势，每条都带"修代码还是改意图"的草稿；还有 capture 的待审队列。
+> 🇨🇳 这是仪表盘——给架构师看的。这是实时的 conformance 流，刚才那个 PR 就在这。这是 drift 趋势，每一条雷达都起草了一个二选一：修代码，还是改意图。这是 capture 队列，等着审。
 
 ### ⑨ 3:55–4:15 · Tab ⑤ screen 2 (What you saw today is one slice)
 
