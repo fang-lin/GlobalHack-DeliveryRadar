@@ -6,6 +6,28 @@
 
 ---
 
+## 发音小抄（关键术语保留，照拼读念即可；大写=重音）
+
+| 词 | IPA | 拼读 | 含义提示 |
+|---|---|---|---|
+| **Conformance** | /kənˈfɔːrməns/ | kun-**FOR**-muns | 一致性检查（操作①） |
+| **constraint** | /kənˈstreɪnt/ | kun-**STRAYNT** | 约束 |
+| **verdict** | /ˈvɜːrdɪkt/ | **VUR**-dikt | 裁定 |
+| **advisory** | /ədˈvaɪzəri/ | ad-**VY**-zuh-ree | 建议性的（不阻塞） |
+| **retrieve** | /rɪˈtriːv/ | ri-**TREEV** | 检索 |
+| **lock contention** | /kənˈtenʃn/ | kun-**TEN**-shun | 锁竞争（技术细节，要站得住） |
+| **alignment** | /əˈlaɪnmənt/ | uh-**LYNE**-munt | 对齐 |
+| **convergence** | /kənˈvɜːrdʒəns/ | kun-**VUR**-juns | 收敛（核心概念） |
+| **converge** | /kənˈvɜːrdʒ/ | kun-**VURJ** | 收敛（动词） |
+| **trajectory** | /trəˈdʒektəri/ | truh-**JEK**-tuh-ree | 轨迹 |
+| **supervision** | /ˌsuːpərˈvɪʒn/ | soo-per-**VIZH**-un | 监管 |
+| **auditable** | /ˈɔːdɪtəbl/ | **AW**-di-tuh-bul | 可审计的 |
+| **IIAC** | — | 念 "I-I-A-C"（逐字母），或念全称 *Intent–Implementation Alignment and Convergence* | 方法论名 |
+
+> Decision Capture / Drift Detection / intent / scope / drift 这些都好念，未列入。
+
+---
+
 ## A. Pre-recording Setup (10 min, check off each item)
 
 ### A1. Terminal (**run from inside the demo repo** — more natural on screen)
@@ -90,7 +112,7 @@ radar check --adr-dir docs/adr --diff pr1.diff --replay ~/Projects/intent-impl-a
 
 **Actions**: scroll to the 🛰️ review; sweep Rule / Why this rule exists / Evidence / Direction.
 
-> On the PR it lands as this review: the rule, why the rule exists — quoting the business rationale — the exact lines, and the direction of the fix. Advisory; it doesn't block the merge. This is **Conformance**: implementation aligning toward intent.
+> On the PR it lands as this review: the rule, why the rule exists — it quotes the business reason — the exact lines, and the direction of the fix. Advisory; it doesn't block the merge. This is **Conformance**: implementation aligning toward intent.
 
 ### ⑥ 2:30–2:45 · Tab ③ (contrast) — **cut if short on time**
 
@@ -102,13 +124,13 @@ radar check --adr-dir docs/adr --diff pr1.diff --replay ~/Projects/intent-impl-a
 
 **Actions**: point at the middle pipeline for Capture, the right pipeline for Drift, then the human-confirms gate on the return edge.
 
-> But reviewing PRs against ADRs is **not enough** — that only aligns implementation toward intent, one direction. Sometimes intent grows out of the code: a PR quietly makes a decision nobody recorded. If you can't detect and record it, there is no real alignment. So, the second method: **Decision Capture** — detect new intent created during integration, and write it down as recorded intent. Still not done: intent that only grows and never changes is wrong too. Intent should be stable — and still evolve. The third method: **Drift Detection** — periodically scan the standing codebase against all intent, and surface either code that needs fixing, or intent that needs changing. Together, this is our method: **IIAC — intent–implementation alignment and convergence**. Three operations over one shared constraint store; every write-back to intent passes human confirmation. Alignment makes each change right; convergence makes the trajectory settle.
+> But reviewing PRs against ADRs is **not enough** — that only aligns implementation toward intent, one direction. Sometimes intent grows out of the code: a PR quietly makes a decision nobody recorded. If you can't detect and record it, there is no real alignment. So, the second method: **Decision Capture** — detect new intent created as the code is merged, and write it down as recorded intent. Still not done: intent that only grows and never changes is wrong too. Intent should be stable — and still change over time. The third method: **Drift Detection** — on a regular schedule, scan the whole codebase against all intent, and surface either code that needs fixing, or intent that needs changing. Together, this is our method: **IIAC — intent–implementation alignment and convergence**. Three operations over one shared constraint store; every write-back to intent passes human confirmation. Alignment makes each change right; convergence makes the trajectory settle.
 
 ### ⑧ 3:40–3:55 · Tab ④ (dashboard glance) — **cut if short on time**
 
 **Actions**: sweep quickly: LIVE card in the conformance feed → drift trends and the AT RISK card → capture queue.
 
-> For an architect it looks like this: the live conformance feed — there's our PR; drift decay trends — each with a drafted choice: fix the code, or change the intent; and the capture queue awaiting triage.
+> For an architect it looks like this: the live conformance feed — there's our PR; drift decay trends — each with a drafted choice: fix the code, or change the intent; and the capture queue waiting for review.
 
 ### ⑨ 3:55–4:15 · Tab ⑤ screen 2 (What you saw today is one slice)
 
@@ -124,7 +146,7 @@ radar check --adr-dir docs/adr --diff pr1.diff --replay ~/Projects/intent-impl-a
 
 ### ⑪ 4:40–5:00 · Tab ⑤ screen 4 (Roadmap) → close
 
-> The roadmap is laid out. If this vision resonates with you, vote for it — help this idea travel further down the roadmap. That's our take on *Innovation that AI/works*. Thank you!
+> The roadmap is laid out. If you believe in this vision, vote for it — help this idea travel further down the roadmap. That's our take on *Innovation that AI/works*. Thank you!
 
 ---
 
