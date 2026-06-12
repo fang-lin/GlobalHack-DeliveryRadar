@@ -1,33 +1,44 @@
-# Demo Video Script — Delivery Radar (~5 min)
+# Zoom Showcase Run-Sheet — Delivery Radar (~5 min, 一镜到底)
 
-> 画面指引中文，旁白英文（照读即可）。目标时长 4:45–5:00（约 730 词，常速）。
-> 录屏建议：1080p、浏览器 125% 缩放、深色终端主题、关闭通知（勿扰模式）。
+> 形式：Zoom meeting 录制（共享屏幕 + 你的摄像头小窗），像给同事做 live demo 一样讲。
+> 台词是**口语化提示**，不必逐字背——每段记住加粗的钩子句即可。
 
-| # | 时长 | 画面 | 旁白（English, verbatim） |
-|---|------|------|---------------------------|
-| 1 | 0:00–0:30 | 快切蒙太奇：绿色 CI ✓、PR merged、`git log` 滚动；最后定格一个 "All checks have passed" | AI writes code faster than humans can review it — and the review that's drowning first is not "does it work", but "does it match *why* the system is built this way". Pull requests pass every test, every linter — and still quietly violate the architectural decisions your team already made. Each one is invisible on its own. Together, they're how architecture rots. We built Delivery Radar to keep intent and implementation aligned — continuously. |
-| 2 | 0:30–1:10 | `shop-demo` 仓库 → 打开 `docs/adr/ADR-001-...md`，停在 Context 的 €400k 段落 → 滚动到 `constraints` 块 → 切终端跑 `radar extract`，指着输出行 | This is shop-demo. Like any well-run repo, its decisions are recorded. ADR-001 says: inventory reads tolerate five minutes of staleness. Not a style preference — a business decision: during peak sales, fresh reads would melt the primary database. Last year that cost four hundred thousand euros in abandoned carts.<br><br>Here's what makes this ADR special: it carries a machine-readable constraint block — a rule, a scope, and a link to the business driver. Delivery Radar extracts it into an addressable, checkable constraint. The ADR stays the single source of truth; the constraint is what every check runs against. |
-| 3 | 1:10–2:20 | PR #1 页面（绿 CI 特写，author/描述可见）→ 终端跑 `radar check`（真输出，violated 行特写）→ 切回 PR，🛰️ 评论出现，鼠标依次划过 Rule / Why this rule exists / Evidence / Direction | Now watch a perfectly normal Tuesday. A developer fixes a real customer complaint: stale stock counts on the product page. The fix reads the primary database directly and locks the row. It's small, it's well-intentioned, tests pass, CI is green. Reviewers are busy. This merges.<br><br>Delivery Radar runs on the pull request. First, scope: it retrieves only the constraints whose paths match the changed files — that's the noise control. Then it checks the diff against each constraint, grounded with the rule *and* the business reason behind it. Verdict: **violated**, confidence zero point nine nine.<br><br>And look at the comment it posts. It cites the ADR clause. It quotes the business reason — five minutes of staleness is *accepted*, to protect the primary during peak sales. It points at the exact lines. And it gives the direction of the fix. One more thing: it's advisory. It doesn't block the merge. The human decides. |
-| 4 | 2:20–2:50 | 分屏：左 = 无锚定 baseline 输出（高亮 "a far cheaper approach would be a plain primary read" 一句），右 = radar 评论（高亮 Why this rule exists） | So is this just AI code review? We gave the exact same model the same diff, without the grounding. It's a good reviewer — it flags the locking as bad practice. But watch closely: it treats staleness as a bug to *fix*, and even suggests a "cheaper" alternative — read the primary without the lock. That is *also* a violation of the team's recorded decision. Ungrounded review is opinion: it can be argued with, and it proposes its own violations. Grounded in the ADR, it becomes a verdict — addressable, measurable, attached to the decision and its reason. |
-| 5 | 2:50–3:30 | 简洁示意图（spec §4 闭环 ASCII 或简版图形）：ADR → Constraint → conformance/drift；capture/supersede → 回到 ADR；高亮 "machine drafts, human confirms" | How does this stay alive instead of becoming another stale wiki? The whole system is a closed loop around one shared object — the constraint. ADRs produce constraints. **Conformance** enforces them on every pull request. **Drift** audits the standing codebase — and can conclude that the *decision* itself is stale. **Capture** detects decisions a PR makes implicitly and turns them into new ADRs. Every new or superseded ADR re-extracts constraints, and the loop continues. And one principle is non-negotiable everywhere: the machine drafts, the human confirms. |
-| 6 | 3:30–4:25 | dashboard：KPI 行 → conformance feed（LIVE 卡特写）→ drift 趋势 sparklines → at-risk 卡（悬停 Remediation / Supersede 两个草稿）→ capture 队列（DN 卡 + 三个 triage 按钮） | This is the architect's view. The conformance feed shows live verdicts — there's our pull request. Drift watches the default branch: ADR-002 is decaying — five violations across three services, and rising. The radar drafts both ways out: a remediation plan to refactor the code back into conformance — or a superseding ADR, if the decision no longer matches reality. A human picks one; neither executes on its own.<br><br>And down here, Capture: pull request thirty-eight quietly introduced a direct service-to-service call — a decision nobody recorded. It's now a Decision Note waiting for triage: graduate it into an ADR, route it to a story, or dismiss it. Undocumented decisions stop leaking away. |
-| 7 | 4:25–5:00 | 路线图一屏（Phase 1/2/3 三列）→ 收尾静帧：🛰️ logo + "keep the why alive" | What you saw — advisory conformance and capture on real pull requests — runs today. Next: the drift engine and this dashboard go live, then a replay harness that measures precision on your repo's own history — because a check only earns the right to *block* a merge after it proves itself. Semantic checks never block; that's policy.<br><br>Intent stays in version control. The machine drafts; the human confirms. Delivery Radar — keep the *why* alive. |
+## 开录前 5 分钟检查
 
-字数 ≈ 700 / 常速 ≈ 4:50 ✅
+- Zoom：New Meeting（只有你一人）→ **Record on this Computer** → **Share Screen 选"整个屏幕"**（不是单窗口，要切终端）
+- 浏览器开 5 个标签（按顺序）：① ADR-001（GitHub 文件页）② PR #1 ③ `contrast.html` ④ `dashboard/index.html` ⑤ `slides.html`
+- 隐藏书签栏（Cmd+Shift+B）、系统勿扰模式、浏览器 125% 缩放
+- 终端：`cd ~/Projects/intent-impl-align`，字号调大（Cmd+ 两三次），预输入好命令历史（↑ 即可调出）：
+  - `gh pr diff 1 -R fang-lin/shop-demo > pr1.diff`
+  - `.venv/bin/radar check --adr-dir ~/Projects/shop-demo/docs/adr --diff pr1.diff`
+- 保底：若现场调用失败，改用 `--diff /tmp/pr1.diff --replay artifacts/pr1-verdicts.json`（输出一样）
 
-## 录制顺序建议（与播出顺序无关）
+## 流程（共 ~5:00）
 
-1. 先录终端：`radar extract` + `radar check --replay`（消费已验证裁定，零风险）
-2. 再录 PR 页面（评论已贴好，静态）
-3. dashboard 一镜到底（动效循环，随时可录）
-4. 闭环示意图 + 路线图（一张静态页/幻灯片，最后做）
-5. ADR/montage 补拍
+| # | ~时间 | 画面/操作 | 讲什么（口语提示） |
+|---|------|----------|------------------|
+| 1 | 0:00 | 摄像头开场（可不共享屏幕），10 秒后开共享 | Hi, I'm Lin. This is **Delivery Radar** — it keeps code changes aligned with the architectural decisions of your repo, *and the business reasons behind them*. AI writes code faster than anyone can review it against **why** the system is built this way — PRs pass every test and still quietly break decisions you already made. Let me show you on a real repo. |
+| 2 | 0:25 | 标签① ADR-001：先指 Context 里 €400k/8x 那段，再滚到 `constraints` 块 | This demo shop records decisions as ADRs. ADR-001: **inventory reads tolerate five minutes of staleness** — a business decision: during peak sales, fresh reads would melt the primary DB; last peak that cost them €400k. The special part: a **machine-readable constraint block** — rule, scope, and a link to the business driver. This is what every check runs against. |
+| 3 | 1:10 | 标签② PR #1：Conversation 顶部（标题+描述）→ Checks 绿 → Files changed 短看 diff | Now a normal Tuesday: a developer fixes a real complaint — stale stock counts. The fix: read the primary directly, lock the row. Small, well-intentioned, **tests pass, CI is green**. Busy reviewers? This merges. |
+| 4 | 1:40 | 切终端：跑 `gh pr diff...` 然后 `radar check...`；等待时继续讲；结果出来指着两行裁定读 | Let's run the radar on it. It pulls the PR diff, retrieves **only the constraints whose scope matches the changed files** — noise control — then checks the diff against each one, grounded with the rule *and* the driver. …There: **ADR-001 violated, confidence 0.99** — and listen to the reason: it reintroduces the exact lock contention that caused the 8x checkout degradation. And note the second line: ADR-002 — **aligned**. It doesn't cry wolf. |
+| 5 | 2:30 | 标签② 回到 PR Conversation，滚到 🛰️ 评论，鼠标依次划过 Rule / Why this rule exists / Evidence / Direction | On the PR it lands as this review comment: the rule, **why the rule exists — quoting the business rationale**, the exact lines, and the direction of the fix. And it's **advisory** — it doesn't block the merge. Machine drafts, human decides. |
+| 6 | 3:05 | 标签③ contrast.html：先左后右，指左边高亮句 | Is this just AI code review? Same model, same diff, **no grounding** — left side. Good reviewer, catches the lock. But it treats staleness as a bug to *fix*, and even suggests reading the primary without a lock — **which is itself a violation of ADR-001**. Ungrounded review is opinion. Grounded, it's a verdict — addressable, measurable, attached to the decision. |
+| 7 | 3:40 | 标签④ dashboard：KPI → LIVE 卡 → drift sparklines → at-risk 卡两个草稿 → capture 队列 | The architect's view. Conformance feed — there's our PR. **Drift** watches the main branch: ADR-002 is decaying, five violations and rising; the radar drafts both ways out — remediate the code, or supersede the decision. A human picks. And **Capture**: PR 38 made a decision nobody recorded — now a Decision Note waiting for triage. Undocumented decisions stop leaking away. |
+| 8 | 4:25 | 标签⑤ slides.html：闭环图 10 秒 → 滚到路线图 | It's one loop: ADRs become constraints; conformance enforces, drift audits, capture feeds new decisions back. What you saw runs **today**. Next: drift engine live, then a replay harness measuring precision on your own history — a check only earns the right to **block** a merge after it proves itself. **Delivery Radar — keep the why alive.** Thanks! |
 
-## 素材清单（全部就绪 ✅）
+## 提词卡（贴屏幕边上，8 个钩子句）
 
-- [x] PR #1 真实 radar 评论：https://github.com/fang-lin/shop-demo/pull/1（用最新一条；旧条已折叠为 superseded）
-- [x] 场景 4 分屏对照页：`dashboard/contrast.html`（左 baseline / 右 radar，自带高亮）
-- [x] 回放：`artifacts/pr1-verdicts.json` — 命令：`.venv/bin/radar check --adr-dir ~/Projects/shop-demo/docs/adr --diff /tmp/pr1.diff --replay artifacts/pr1-verdicts.json`
-- [x] dashboard `data.js` 与真实裁定同步（0.99 / 0.92，Sonnet 文案）
-- [x] 闭环示意图 + 路线图：`dashboard/slides.html`（场景 5 & 7）
-- [x] 模型合规：全链路 `claude-sonnet-4-6` @ hackathon key
+1. "PRs pass every test and still break decisions you already made"
+2. "€400k — that's why this rule exists"
+3. "Tests pass, CI green — this merges"
+4. "Violated 0.99 — and aligned on the other. It doesn't cry wolf"
+5. "Why the rule exists, quoted on the PR. Advisory — human decides"
+6. "Ungrounded review suggested a violation itself"
+7. "Remediate the code or supersede the decision — human picks"
+8. "A check earns the right to block. Keep the why alive"
+
+## 录制小抄
+
+- 翻车就停下重录那一段？**不行，Zoom 是一镜到底**——小磕绊直接讲下去（真实感反而加分），大翻车就整段重录（总共才 5 分钟）
+- 终端等待 API 的 ~20 秒是讲解时间，不是尴尬时间（第 4 段台词就是为此设计的）
+- 语速放慢 10%；切标签前先说完当前句

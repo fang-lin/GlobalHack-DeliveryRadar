@@ -9,7 +9,7 @@
 - **Layering principle**: the differentiating capability (driver-grounded semantic checking) must be real; everything else may be staged.
 - This slice does not replace the full Phase 1 design; weekend work continues from here.
 
-## 2. Video Narrative (seven scenes, see `docs/video/2026-06-12-demo-video-script.md`)
+## 2. Video Narrative (single-take Zoom-meeting walkthrough; run-sheet in `docs/video/2026-06-12-demo-video-script.md`)
 
 1. Pain: code is produced faster than review-against-why (~30s)
 2. Staging: `shop-demo` + `ADR-001` (business rationale) + machine-readable constraints block + live `radar extract` (~40s)

@@ -9,7 +9,7 @@
 - **分层原则**：差异化能力（driver 锚定的语义检查）必须真实；其余皆可布景。
 - 本切片不替代 Phase 1 完整设计；周末在此基础上继续。
 
-## 2. 视频叙事（七幕，详见 `docs/video/2026-06-12-demo-video-script.md`）
+## 2. 视频叙事（Zoom meeting 一镜到底 walkthrough，run-sheet 见 `docs/video/2026-06-12-demo-video-script.md`）
 
 1. 痛点：代码生产快于"对照为什么"的评审（~30s）
 2. 布景：`shop-demo` + `ADR-001`（业务理由）+ 机读 constraints 块 + `radar extract` 实跑（~40s）
