@@ -147,6 +147,6 @@ contract.
 ---
 
 Built at the [Thoughtworks](https://www.thoughtworks.com) **Global Hackathon**
-(June 2026) — organizer and sponsor.
+(June 2026) — organizer and sponsor. *Innovation that AI/works™*
 
-<img src="https://www.thoughtworks.com/etc.clientlibs/thoughtworks/clientlibs/clientlib-site/resources/images/thoughtworks-logo.svg" alt="Thoughtworks" height="22" />
+<img src="https://www.thoughtworks.com/etc.clientlibs/thoughtworks/clientlibs/clientlib-site/resources/images/thoughtworks-logo.svg" alt="Thoughtworks — Innovation that AI/works™" height="22" />
