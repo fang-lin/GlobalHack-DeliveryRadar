@@ -128,7 +128,7 @@ radar check --adr-dir docs/adr --diff pr1.diff --replay ~/Projects/intent-impl-a
 
 **Actions**: point at the yellow highlight on the left → then the right panel.
 
-> 🇬🇧 And this is the difference from vibe review: same model, same diff, no method — the left side. A decent reviewer — but it treats staleness as a bug to fix, and even proposes its own fix — one that violates the ADR. Review without a method is opinion; with a method, it's a verdict.
+> 🇬🇧 So how is this different from vibe review? Same model, same diff — but no method. That's the left side. It's not a bad reviewer. But it treats the staleness as a bug to fix. It even suggests its own fix — and that fix breaks the ADR. So: without a method, a review is just an opinion. With a method, it's a **verdict**.
 >
 > 🇨🇳 这跟 vibe review 差在哪：同模型、同 diff、没方法——左边。算个好评审，但它把陈旧当 bug 修，甚至自己提了个违反 ADR 的方案。没方法的 review 是观点；有方法的，才是裁定。
 
