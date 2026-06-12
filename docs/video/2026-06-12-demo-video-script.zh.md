@@ -8,22 +8,24 @@
 
 ## A. 开录前准备（10 分钟，逐项打勾）
 
-### A1. 终端
+### A1. 终端（**在 demo 仓库里跑**，画面更自然）
 
-- [ ] 打开 Terminal，执行：
+- [ ] 打开 Terminal，执行（进 demo 仓库 + 把 API key 导入当前 shell；`radar` 已软链到 PATH，可直接调用）：
   ```bash
-  cd ~/Projects/intent-impl-align
+  cd ~/Projects/shop-demo
+  export ANTHROPIC_API_KEY=$(sed -n 's/^ANTHROPIC_API_KEY=//p' ~/Projects/intent-impl-align/.env)
   clear
   ```
+  > 若 `radar` 提示 command not found：用绝对路径 `~/Projects/intent-impl-align/.venv/bin/radar` 代替下文所有 `radar`。
 - [ ] 字号调大：按 `Cmd +` 三次
 - [ ] 下面 4 条命令各预跑一次（练手 + 进命令历史，录制时按 ↑ 调出）：
   ```bash
-  .venv/bin/radar extract --adr-dir ~/Projects/shop-demo/docs/adr
-  gh pr diff 1 -R fang-lin/shop-demo > pr1.diff
+  radar extract --adr-dir docs/adr
+  gh pr diff 1 > pr1.diff
   cat pr1.diff
-  .venv/bin/radar check --adr-dir ~/Projects/shop-demo/docs/adr --diff pr1.diff
+  radar check --adr-dir docs/adr --diff pr1.diff
   ```
-- [ ] 预跑无报错后 `clear` 清屏待命
+- [ ] 预跑无报错后 `clear` 清屏待命（**别关这个终端**——export 的 key 只在本 shell 有效）
 
 ### A2. 浏览器（按此顺序开 5 个标签）
 
@@ -69,13 +71,19 @@
 
 ### ④ 1:30–2:10 · 终端（3 条命令，↑ 调出）
 
-**操作**：依次跑 extract → `gh pr diff` → check；check 等待的 20–30 秒正好讲技术细节；结果出来选中 `violated` 行和 `aligned` 行各读一遍。
+**操作**：依次跑下面三条（↑ 调出）；check 等待的约 20 秒正好讲技术细节；结果出来选中 `violated` 行和 `aligned` 行各读一遍。
+
+```bash
+radar extract --adr-dir docs/adr
+gh pr diff 1 > pr1.diff
+radar check --adr-dir docs/adr --diff pr1.diff
+```
 
 > 跑一下 radar。技术上一句话讲完：从 ADR 提取出机器可检查的约束，只检索作用域命中变更文件的那些，然后把规则、业务动因和正反例一起灌给模型，强制输出结构化裁定——不许猜，证据不足必须答 unknown。……结果出来了：ADR-001，**violated**，置信度 0.99——理由直指要害：重新引入了当年造成八倍结账延迟的锁竞争。第二行 ADR-002：**aligned**。它不乱咬。
 
 **保底**（check 失败/超 30 秒，输出一致、瞬间出）：
 ```bash
-.venv/bin/radar check --adr-dir ~/Projects/shop-demo/docs/adr --diff pr1.diff --replay artifacts/pr1-verdicts.json
+radar check --adr-dir docs/adr --diff pr1.diff --replay ~/Projects/intent-impl-align/artifacts/pr1-verdicts.json
 ```
 
 ### ⑤ 2:10–2:30 · 标签②（PR 上的评论）

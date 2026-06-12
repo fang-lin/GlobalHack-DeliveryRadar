@@ -8,22 +8,24 @@
 
 ## A. Pre-recording Setup (10 min, check off each item)
 
-### A1. Terminal
+### A1. Terminal (**run from inside the demo repo** — more natural on screen)
 
-- [ ] Open Terminal and run:
+- [ ] Open Terminal and run (enter the demo repo + load the API key into this shell; `radar` is symlinked onto PATH so it's callable directly):
   ```bash
-  cd ~/Projects/intent-impl-align
+  cd ~/Projects/shop-demo
+  export ANTHROPIC_API_KEY=$(sed -n 's/^ANTHROPIC_API_KEY=//p' ~/Projects/intent-impl-align/.env)
   clear
   ```
+  > If `radar` says command not found: replace every `radar` below with the absolute path `~/Projects/intent-impl-align/.venv/bin/radar`.
 - [ ] Increase font size: `Cmd +` three times
 - [ ] Pre-run each command once (rehearsal + shell history; recall with ↑ while recording):
   ```bash
-  .venv/bin/radar extract --adr-dir ~/Projects/shop-demo/docs/adr
-  gh pr diff 1 -R fang-lin/shop-demo > pr1.diff
+  radar extract --adr-dir docs/adr
+  gh pr diff 1 > pr1.diff
   cat pr1.diff
-  .venv/bin/radar check --adr-dir ~/Projects/shop-demo/docs/adr --diff pr1.diff
+  radar check --adr-dir docs/adr --diff pr1.diff
   ```
-- [ ] After a clean dry run, `clear`
+- [ ] After a clean dry run, `clear` (**don't close this terminal** — the exported key lives only in this shell)
 
 ### A2. Browser (5 tabs in this order)
 
@@ -69,13 +71,19 @@
 
 ### ④ 1:30–2:10 · Terminal (3 commands, recall with ↑)
 
-**Actions**: run extract → `gh pr diff` → check; the 20–30 s wait after check is exactly for the technique sentence; when results appear, highlight the `violated` line and the `aligned` line and read each.
+**Actions**: run the three commands below (recall with ↑); the ~20 s wait after check is exactly for the technique sentence; when results appear, highlight the `violated` line and the `aligned` line and read each.
+
+```bash
+radar extract --adr-dir docs/adr
+gh pr diff 1 > pr1.diff
+radar check --adr-dir docs/adr --diff pr1.diff
+```
 
 > Let's run the radar on it. The technique in one sentence: extract machine-checkable constraints from the ADRs, retrieve only those whose scope matches the changed files, then ground the model with the rule, the business driver and examples, forcing a structured verdict — no guessing; if the evidence is thin, it must answer *unknown*. …There: ADR-001 — **violated**, confidence 0.99 — and the reason cuts straight to it: this **re-introduces** the exact lock contention that caused the eightfold checkout slowdown. Second line, ADR-002: **aligned**. It doesn't cry wolf.
 
 **Fallback** (check fails / >30 s; identical output, instant):
 ```bash
-.venv/bin/radar check --adr-dir ~/Projects/shop-demo/docs/adr --diff pr1.diff --replay artifacts/pr1-verdicts.json
+radar check --adr-dir docs/adr --diff pr1.diff --replay ~/Projects/intent-impl-align/artifacts/pr1-verdicts.json
 ```
 
 ### ⑤ 2:10–2:30 · Tab ② (the review on the PR)
