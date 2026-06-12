@@ -1,6 +1,6 @@
-# IIAC Loop 图设计说明（视频 slides 第一屏）
+# IIAC Loop 图设计说明
 
-> **权威: 中文（本文件） · 翻译: 英文（`loop-diagram-design.en.md`） · 最后同步: 2026-06-12 · 两版冲突以中文为准**
+> **权威: 中文（本文件） · 翻译: 英文（`2026-06-12-iiac-loop-diagram-design.en.md`） · 最后同步: 2026-06-12 · 两版冲突以中文为准**
 > 状态：已实现于 `dashboard/index.html` 第一屏（showcase 落地页）；本文供快速审核，改这里=改图。
 
 ## 一句话

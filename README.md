@@ -135,7 +135,7 @@ dashboard/        static demo pages (dashboard, slides, contrast)
 artifacts/        persisted verdicts + baseline output (replayable)
 docs/
   requirements/   full build spec (zh authoritative · en mirror)
-  specs/          demo-day slice design (zh · en)
+  specs/          design specs — demo-day slice, IIAC Loop diagram (zh · en)
   governance/     documentation policy (bilingual, zh authoritative)
   video/          showcase operating scripts (zh · en)
   adr/            reserved for this repo's own ADRs (en)

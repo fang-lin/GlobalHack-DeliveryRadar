@@ -1,6 +1,6 @@
-# IIAC Loop Diagram Design Notes (showcase slides, screen 1)
+# IIAC Loop Diagram Design Notes
 
-> **Authoritative version: Chinese (`loop-diagram-design.zh.md`) · This file: synchronized English translation · Last synced: 2026-06-12 · On conflict, the Chinese version prevails.**
+> **Authoritative version: Chinese (`2026-06-12-iiac-loop-diagram-design.zh.md`) · This file: synchronized English translation · Last synced: 2026-06-12 · On conflict, the Chinese version prevails.**
 > Status: implemented as screen 1 of `dashboard/index.html` (the showcase landing page); this document exists for quick review — change here = change the diagram.
 
 ## One sentence
