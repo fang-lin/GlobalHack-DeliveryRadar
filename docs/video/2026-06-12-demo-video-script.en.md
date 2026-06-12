@@ -76,6 +76,7 @@
 ### ① 0:00–0:40 · Pose the problem (camera only; share screen afterwards)
 
 **Actions**: deliver the whole passage to the camera, then Share Screen → entire screen → Share.
+**操作**：对着摄像头把这段说完，然后 Share Screen → 整个屏幕 → Share。
 
 > 🇬🇧 Hi, I'm Lin — this is our project, **Delivery Radar**. Let me open with a problem. When humans wrote the code, humans could review it — a colleague would read your PR and ask: does this fit how we build this system? Does it fit *why* we built it that way? In the AI era, that breaks: code now arrives faster than any team can review it. So — let AI review it? Point an agent at the PR and let it vibe-review? That can't be the answer. If agents are going to review code, they need a **method**. We built one.
 >
@@ -84,6 +85,7 @@
 ### ② 0:40–1:10 · Tab ① (ADR-001)
 
 **Actions**: scroll to the Context section, sweep the "€400k" sentence → scroll to the `constraints` block, rest on the `driver: EPIC-512` line.
+**操作**：滚到 Context 段，鼠标划过 "€400k" 那句 → 再滚到底部 `constraints` 块，停在 `driver: EPIC-512` 那行。
 
 > 🇬🇧 This is the demo repo; its architectural decisions live in ADRs. ADR-001: inventory reads tolerate five minutes of staleness — a business decision: fresh reads would melt the primary database during peak sales; last peak cost four hundred thousand euros. The key part is this **machine-readable constraint block**: a rule, a scope, and the business driver.
 >
@@ -92,6 +94,7 @@
 ### ③ 1:10–1:30 · Tab ② (PR #1)
 
 **Actions**: title + description for 3 seconds → point at the green ✅ → glance at `FOR UPDATE` in Files changed → back to Conversation.
+**操作**：标题+描述停 3 秒 → 指绿色 ✅ → 点 Files changed 扫一眼 `FOR UPDATE` → 点回 Conversation。
 
 > 🇬🇧 Now a perfectly normal PR: fixing a customer complaint about stale stock counts — by reading the primary directly, with a row lock. Tests pass, CI is green. Busy reviewers? This merges.
 >
@@ -100,6 +103,7 @@
 ### ④ 1:30–2:10 · Terminal (3 commands, recall with ↑)
 
 **Actions**: run the three commands below (recall with ↑); the ~20 s wait after check is exactly for the technique sentence; when results appear, highlight the `violated` line and the `aligned` line and read each.
+**操作**：依次跑下面三条命令（按 ↑ 调出历史）；check 之后约 20 秒的等待正好用来说"三步方法"那段；结果出来后选中 `violated` 行和 `aligned` 行各读一遍。
 
 ```bash
 radar extract --adr-dir docs/adr
@@ -119,6 +123,7 @@ radar check --adr-dir docs/adr --diff pr1.diff --replay ~/Projects/intent-impl-a
 ### ⑤ 2:10–2:30 · Tab ② (the review on the PR)
 
 **Actions**: scroll to the 🛰️ review; sweep Rule / Why this rule exists / Evidence / Direction.
+**操作**：滚到 🛰️ 那条评审，鼠标依次划过 Rule / Why this rule exists / Evidence / Direction 四块。
 
 > 🇬🇧 On the PR it lands as this review: the rule, why the rule exists — it quotes the business reason — the exact lines, and the direction of the fix. Advisory; it doesn't block the merge. This is **Conformance**: implementation aligning toward intent.
 >
@@ -127,6 +132,7 @@ radar check --adr-dir docs/adr --diff pr1.diff --replay ~/Projects/intent-impl-a
 ### ⑥ 2:30–2:45 · Tab ③ (contrast) — **cut if short on time**
 
 **Actions**: point at the yellow highlight on the left → then the right panel.
+**操作**：指左栏黄色高亮句 → 再指右栏。
 
 > 🇬🇧 So how is this different from vibe review? Same model, same diff — but no method. That's the left side. It's not a bad reviewer. But it treats the staleness as a bug to fix. It even suggests its own fix — and that fix breaks the ADR. So: without a method, a review is just an opinion. With a method, it's a **verdict**.
 >
@@ -135,6 +141,7 @@ radar check --adr-dir docs/adr --diff pr1.diff --replay ~/Projects/intent-impl-a
 ### ⑦ 2:45–3:40 · Tab ⑤ screen 1 (IIAC Loop) — the method's formal entrance
 
 **Actions**: point at the middle pipeline for Capture, the right pipeline for Drift, then the human-confirms gate on the return edge.
+**操作**：说 Capture 时指中间那条管线，说 Drift 时指右边那条，最后指回灌线上的 human confirms 门。
 
 > 🇬🇧 But reviewing PRs against ADRs is **not enough** — that only aligns implementation toward intent, one direction. Sometimes intent grows out of the code: a PR quietly makes a decision nobody recorded. If you can't detect and record it, there is no real alignment. So, the second method: **Decision Capture** — detect new intent created as the code is merged, and write it down as recorded intent. Still not done: intent that only grows and never changes is wrong too. Intent should be stable — and still change over time. The third method: **Drift Detection** — on a regular schedule, scan the whole codebase against all intent, and surface either code that needs fixing, or intent that needs changing. Together, this is our method: **IIAC — intent–implementation alignment and convergence**. Three operations over one shared constraint store; every write-back to intent passes human confirmation. Alignment makes each change right. Convergence keeps the whole thing moving closer to intent — not drifting away.
 >
@@ -143,6 +150,7 @@ radar check --adr-dir docs/adr --diff pr1.diff --replay ~/Projects/intent-impl-a
 ### ⑧ 3:40–3:55 · Tab ④ (dashboard glance) — **cut if short on time**
 
 **Actions**: sweep quickly: LIVE card in the conformance feed → drift trends and the AT RISK card → capture queue.
+**操作**：鼠标快速划过：conformance 流里的 LIVE 卡 → drift 趋势和 AT RISK 卡 → capture 队列。
 
 > 🇬🇧 This is the dashboard — the architect's view. Here's the live **conformance** feed. There's our PR. Here are the **drift** trends. For each one, the radar drafts a choice: fix the code, or change the intent. And here's the **capture** queue, waiting for review.
 >
@@ -151,6 +159,7 @@ radar check --adr-dir docs/adr --diff pr1.diff --replay ~/Projects/intent-impl-a
 ### ⑨ 3:55–4:15 · Tab ⑤ screen 2 (What you saw today is one slice)
 
 **Actions**: point at the legend and the "4 of 13" stat line, then sweep the dimmed cards.
+**操作**：指一下图例和 "4 of 13" 那行统计，再扫过暗色的卡片。
 
 > 🇬🇧 What you saw today is just a small part of this. We've built a little; the plan behind it is much bigger. But here's the point — the vision is **not a code-review tool**. With IIAC, we want AI-driven development to **converge** under AI's watch — the same way it used to, under ours.
 >
@@ -159,6 +168,7 @@ radar check --adr-dir docs/adr --diff pr1.diff --replay ~/Projects/intent-impl-a
 ### ⑩ 4:15–4:40 · Tab ⑤ screen 3 (From writing, to steering, to autonomy)
 
 **Actions**: point left to right across the three cards, then the audit strip.
+**操作**：从左到右逐张指过三张卡，最后指底部的审计带。
 
 > 🇬🇧 In the past, humans wrote the code and reviewed each other's code. Today, AI writes the code, and humans review and steer in real time — that doesn't scale: one person, one session. And it shouldn't be the future. Code written by AI should be reviewed by AI; humans should manage what only humans can — **intent**. Govern the intent, ensure convergence — with the whole process tracked and auditable.
 >
