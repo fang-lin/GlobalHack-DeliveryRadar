@@ -4,19 +4,20 @@
 
 ## 1. 目标与约束
 
-- **交付物**：一支约 3 分钟的 demo 视频，**2026-06-12 24:00 CEST 前提交**（hackathon）。
+- **交付物**：一支约 **5 分钟**的 demo 视频，**2026-06-12 24:00 CEST 前提交**（hackathon）。
 - **北极星**：需求规格 `AC-3` —— 对一个 CI 全绿的 PR，展示它悄悄违反的 ADR 条款、其业务理由（driver），以及系统贴出的评审评论。
 - **分层原则**：差异化能力（driver 锚定的语义检查）必须真实；其余皆可布景。
 - 本切片不替代 Phase 1 完整设计；周末在此基础上继续。
 
-## 2. 视频叙事（六幕）
+## 2. 视频叙事（七幕，详见 `docs/video/2026-06-12-demo-video-script.md`）
 
-1. 痛点：代码生产快于"对照为什么"的评审（~20s）
-2. 布景：`shop-demo` 仓库 + `ADR-001`（库存读容忍最终一致性，driver 指向业务理由）（~25s）
-3. **主戏**：CI 绿的 PR "Fix: stale stock count on product page" → radar 跑 → 真实评审评论引用 ADR 条款 + 业务理由 + 代码行（~55s）
-4. 对照组：同模型、无锚定的 AI review 抓不到（~20s）
-5. Dashboard 全景：约束清单、conformance feed（含真裁定）、drift 趋势、at-risk ADR 二选一卡片、Decision Note 队列（~45s）
-6. 收尾：闭环图 + "machine drafts, human confirms"（~15s）
+1. 痛点：代码生产快于"对照为什么"的评审（~30s）
+2. 布景：`shop-demo` + `ADR-001`（业务理由）+ 机读 constraints 块 + `radar extract` 实跑（~40s）
+3. **主戏**：CI 绿的 PR → scope 检索 → radar check → 真实评审评论引用 ADR 条款 + 业务理由 + 代码行 + 修复方向（~70s）
+4. 对照组：同模型、无锚定的 AI review 抓不到——"letter honored, reason defeated"（~30s）
+5. 闭环原理：ADR → Constraint → conformance/drift；capture/supersede 回流；"machine drafts, human confirms"（~40s）
+6. Dashboard 全景：conformance feed（含真裁定）、drift 趋势、at-risk ADR 二选一卡片、Decision Note triage 队列（~55s）
+7. 路线图（Phase 1 已跑通 / Phase 2 drift+dashboard / Phase 3 凭实绩开 gate）+ 收尾（~35s）
 
 ## 3. 构建范围
 

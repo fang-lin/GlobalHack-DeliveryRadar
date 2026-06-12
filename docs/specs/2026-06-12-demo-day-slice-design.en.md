@@ -4,19 +4,20 @@
 
 ## 1. Goal and Constraints
 
-- **Deliverable**: a ~3-minute demo video, **submitted by 2026-06-12 24:00 CEST** (hackathon).
+- **Deliverable**: a ~**5-minute** demo video, **submitted by 2026-06-12 24:00 CEST** (hackathon).
 - **North star**: requirements spec `AC-3` — for a CI-green PR, show the ADR clause it quietly violated, its business driver, and the review comment the system posts.
 - **Layering principle**: the differentiating capability (driver-grounded semantic checking) must be real; everything else may be staged.
 - This slice does not replace the full Phase 1 design; weekend work continues from here.
 
-## 2. Video Narrative (six scenes)
+## 2. Video Narrative (seven scenes, see `docs/video/2026-06-12-demo-video-script.md`)
 
-1. Pain: code is produced faster than review-against-why (~20s)
-2. Staging: `shop-demo` repo + `ADR-001` (inventory reads tolerate eventual consistency, driver links the business rationale) (~25s)
-3. **Main scene**: CI-green PR "Fix: stale stock count on product page" → radar runs → real review comment citing ADR clause + business rationale + code lines (~55s)
-4. Contrast: same model, ungrounded AI review misses it (~20s)
-5. Dashboard overview: constraint inventory, conformance feed (with the real verdict), drift trends, at-risk ADR binary-choice card, Decision Note queue (~45s)
-6. Close: closed-loop diagram + "machine drafts, human confirms" (~15s)
+1. Pain: code is produced faster than review-against-why (~30s)
+2. Staging: `shop-demo` + `ADR-001` (business rationale) + machine-readable constraints block + live `radar extract` (~40s)
+3. **Main scene**: CI-green PR → scope retrieval → radar check → real review comment citing ADR clause + business rationale + code lines + fix direction (~70s)
+4. Contrast: same model, ungrounded AI review misses it — "letter honored, reason defeated" (~30s)
+5. Closed loop: ADR → Constraint → conformance/drift; capture/supersede feed back; "machine drafts, human confirms" (~40s)
+6. Dashboard overview: conformance feed (with the real verdict), drift trends, at-risk ADR binary-choice card, Decision Note triage queue (~55s)
+7. Roadmap (Phase 1 running / Phase 2 drift+dashboard / Phase 3 earned gating) + close (~35s)
 
 ## 3. Build Scope
 
