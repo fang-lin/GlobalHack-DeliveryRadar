@@ -32,7 +32,7 @@
 ### 3.2 Tech Choices (locked)
 
 - Python 3 (miniconda) + venv + pip; deps only `anthropic`, `PyYAML` (+ `pytest` for tests); CLI via `argparse`.
-- Semantic check: `claude-opus-4-8`, adaptive thinking, `client.messages.parse()` + Pydantic (`DM-VERDICT` shape).
+- Semantic check: `claude-sonnet-4-6` (hackathon workspace policy blocks Opus-tier models), adaptive thinking, `client.messages.parse()` + Pydantic (`DM-VERDICT` shape).
 - API key: env var first, fallback to `.env` at repo root (gitignored).
 - Demo repo: `~/Projects/shop-demo` (sibling dir, separate git), GitHub personal account `fang-lin`, private.
 - Dashboard: single-file `dashboard/index.html` + Tailwind CDN + inline SVG; data injected via `data.js` (`window.RADAR_DATA`) — conformance fed with real verdicts, drift/capture seeded.

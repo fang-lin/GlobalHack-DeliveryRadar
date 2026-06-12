@@ -2,35 +2,71 @@
 
 ## Review
 
-This change "works" in the narrow sense that it returns a fresh value, but it's the wrong fix and introduces serious problems. I'd block it.
+This change solves the symptom by introducing several serious problems. I would not approve it.
 
-### Critical issues
+---
 
-**1. `FOR UPDATE` on a read/display path is a bad idea**
-This is the product page — a high-traffic, read-heavy path. `SELECT ... FOR UPDATE` takes a row lock. Every concurrent view of the same SKU will now serialize on that lock, and any process actually mutating stock (checkout, restock) will contend with display reads. Expect lock waits, timeouts, and deadlocks under load. A display value should never lock the row.
+### Critical: `FOR UPDATE` on a display read
 
-**2. The lock is also probably useless here**
-There's no surrounding transaction shown. `FOR UPDATE` only holds a lock for the duration of the transaction; if this runs in autocommit it provides no real consistency guarantee, and if it doesn't autocommit you may be leaking held locks because nothing commits/rolls back. Either way the lock buys you nothing for a read.
-
-**3. Cache and replica are now completely dead code**
-Every call hits the primary directly. You've removed caching entirely, which will dramatically increase primary DB load. The injected `cache` and `replica_db` are now unused. This is a scalability regression, not just a style nit.
-
-**4. `NoneType` crash for unknown/zero-row SKUs**
 ```python
-row = ...fetchone()
-return int(row[0])
+"SELECT quantity FROM stock WHERE sku = %s FOR UPDATE"
 ```
-If the SKU isn't found, `fetchone()` returns `None` and `int(row[0])` throws `TypeError`. The old replica path presumably handled this. Need a `None` guard.
 
-### Root cause concern
+`FOR UPDATE` acquires an **exclusive row-level lock**. It is designed for write transactions where you are about to modify the row (e.g., decrementing stock during checkout). Using it on a product-page display means:
 
-Stale stock is almost certainly a **cache invalidation** problem: when stock changes, the `stock:{sku}` key isn't being invalidated/updated, so it serves until TTL expiry. The correct fix is to invalidate (or write-through update) the cache entry when stock is decremented/restocked — not to throw away caching and lock rows on the read path.
+- Every concurrent product page hit for the same SKU will **queue behind each other**, serializing all reads.
+- Any actual write (purchase, restock) will be **blocked** until every in-flight page view releases its lock.
+- Under normal traffic this will cause lock contention, timeouts, and potentially cascading failures on the primary.
+- The lock scope depends entirely on when/whether the caller commits or rolls back the surrounding transaction, which is not managed here at all.
 
-If a small consistency window is genuinely unacceptable for this display, a far cheaper approach would be a plain primary read (no `FOR UPDATE`) with a short TTL cache, but I'd push back even on that until invalidation is ruled out.
+Remove `FOR UPDATE`. A plain `SELECT` is correct for a read.
+
+---
+
+### Major: Entire cache + replica path removed, all reads now hit primary
+
+The cache and replica existed to absorb read traffic. Product pages are almost always read-heavy. Bypassing both on every page view will put severe load on the primary under any meaningful traffic. This is a scalability regression that could take the primary down.
+
+---
+
+### Major: Root cause is almost certainly cache invalidation, not the cache itself
+
+The stale-count problem is almost certainly one of:
+
+1. Cache TTL is too long.
+2. Stock-mutation code (purchase, restock) doesn't invalidate `stock:{sku}`.
+
+Deleting the cache is the wrong fix. The right fix is to invalidate (or update) the cache entry whenever stock changes, and/or shorten the TTL.
+
+---
+
+### Minor: No null guard for unknown SKU
+
+```python
+return int(row[0])   # TypeError if row is None (SKU not in table)
+```
+
+The original code had the same gap, but it's worth fixing here.
+
+---
 
 ### Suggested direction
-- Keep the cache; fix invalidation at the write site (decrement/restock).
-- If you must read fresher data, do a normal `SELECT` (no lock) and handle `None`.
-- Drop `FOR UPDATE` entirely from this code path.
 
-Happy to look again once invalidation is addressed.
+```python
+def get_stock(self, sku: str) -> int:
+    cached = self.cache.get(f"stock:{sku}")
+    if cached is not None:
+        return int(cached)
+    # Read from replica for display; cache result with a short TTL.
+    value = self.replica_db.query_stock(sku)
+    self.cache.set(f"stock:{sku}", value, ttl=CACHE_TTL_SECONDS)
+    return value
+```
+
+And in whatever code decrements stock (checkout path):
+
+```python
+self.cache.delete(f"stock:{sku}")   # or set the new value directly
+```
+
+If you genuinely need sub-second freshness on the product page (unusual), read from the primary with a plain `SELECT` — no lock, no cache bypass for writes.

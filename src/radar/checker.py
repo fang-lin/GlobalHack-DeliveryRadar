@@ -23,7 +23,9 @@ from .models import (
     Verdict,
 )
 
-DEFAULT_MODEL = "claude-opus-4-8"
+# Hackathon workspace policy: Opus-tier models are blocked (0 RPM); Sonnet is
+# the strongest permitted model.
+DEFAULT_MODEL = "claude-sonnet-4-6"
 
 _SYSTEM = """You are the conformance checker of Delivery Radar, an \
 intent-implementation governance engine. You evaluate whether a pull-request \

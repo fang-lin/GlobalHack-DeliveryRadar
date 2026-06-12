@@ -32,7 +32,7 @@
 ### 3.2 技术选型（已锁定）
 
 - Python 3（miniconda）+ venv + pip；依赖仅 `anthropic`、`PyYAML`（测试加 `pytest`）；CLI 用 `argparse`。
-- 语义检查：`claude-opus-4-8`，adaptive thinking，`client.messages.parse()` + Pydantic（`DM-VERDICT` 形状）。
+- 语义检查：`claude-sonnet-4-6`（hackathon workspace 政策禁用 Opus 系），adaptive thinking，`client.messages.parse()` + Pydantic（`DM-VERDICT` 形状）。
 - API key：环境变量优先，回退读项目根 `.env`（已 gitignore）。
 - demo 仓库：`~/Projects/shop-demo`（兄弟目录，独立 git），GitHub 个人号 `fang-lin`，private。
 - Dashboard：`dashboard/index.html` 单文件 + Tailwind CDN + 内联 SVG；数据由 `data.js`（`window.RADAR_DATA`）注入，conformance 喂真实裁定，drift/capture 用种子数据。

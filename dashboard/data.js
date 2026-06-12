@@ -29,7 +29,7 @@ window.RADAR_DATA = {
           severity: "high",
           evidence: "services/inventory/reader.py L16–L23",
           explanation:
-            "The read path get_stock now reads the primary store synchronously and uses SELECT ... FOR UPDATE row locking, directly violating both the letter and the reason of the constraint (avoiding lock contention and primary load during peak reads).",
+            "Removes the compliant cache+replica read path and replaces it with SELECT ... FOR UPDATE against the primary — reintroducing the lock contention that caused the 8x checkout latency degradation during the 2025 peak event (EPIC-512).",
         },
         {
           constraint_id: "ADR-002-C1",
@@ -37,11 +37,11 @@ window.RADAR_DATA = {
           adr: "ADR-002",
           driver: "EPIC-340",
           result: "aligned",
-          confidence: 0.9,
+          confidence: 0.92,
           severity: "medium",
           evidence: "services/inventory/reader.py",
           explanation:
-            "The diff only changes how the inventory service reads its own database; it introduces no synchronous HTTP call to another service.",
+            "The diff only modifies how the inventory service reads its own database; no synchronous HTTP call to another service is introduced.",
         },
       ],
     },
