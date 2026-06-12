@@ -55,7 +55,7 @@
 
 **Actions**: deliver the whole passage to the camera, then Share Screen → entire screen → Share.
 
-> When humans wrote the code, humans could review it — a colleague would read your PR and ask: does this match how we build things, and *why* we build them that way? In the AI era, that breaks: code now arrives faster than any team can review it. So — let AI review it? Point an agent at the PR and let it vibe-review? That can't be the answer. If agents are going to review code, they need a **method**. We built one.
+> Hi, I'm Lin — this is our project, **Delivery Radar**. Let me open with a problem. When humans wrote the code, humans could review it — a colleague would read your PR and ask: does this fit how we build this system? Does it fit *why* we built it that way? In the AI era, that breaks: code now arrives faster than any team can review it. So — let AI review it? Point an agent at the PR and let it vibe-review? That can't be the answer. If agents are going to review code, they need a **method**. We built one.
 
 ### ② 0:40–1:10 · Tab ① (ADR-001)
 
