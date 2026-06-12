@@ -14,7 +14,7 @@
 1. Pain: code is produced faster than review-against-why (~30s)
 2. Staging: `shop-demo` + `ADR-001` (business rationale) + machine-readable constraints block + live `radar extract` (~40s)
 3. **Main scene**: CI-green PR → scope retrieval → radar check → real review comment citing ADR clause + business rationale + code lines + fix direction (~70s)
-4. Contrast: same model, ungrounded AI review misses it — "letter honored, reason defeated" (~30s)
+4. Contrast: ungrounded review is engineering opinion — treats staleness as a bug to fix and even proposes an ADR-violating alternative; grounding turns it into a governable verdict (~30s)
 5. Closed loop: ADR → Constraint → conformance/drift; capture/supersede feed back; "machine drafts, human confirms" (~40s)
 6. Dashboard overview: conformance feed (with the real verdict), drift trends, at-risk ADR binary-choice card, Decision Note triage queue (~55s)
 7. Roadmap (Phase 1 running / Phase 2 drift+dashboard / Phase 3 earned gating) + close (~35s)

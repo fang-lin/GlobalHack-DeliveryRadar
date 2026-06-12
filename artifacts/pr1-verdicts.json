@@ -1,0 +1,38 @@
+[
+  {
+    "constraint_id": "ADR-001-C1",
+    "result": "violated",
+    "confidence": 0.99,
+    "evidence": {
+      "adr_clause": "ADR-001-C1",
+      "code": {
+        "file": "services/inventory/reader.py",
+        "lines": [
+          16,
+          23
+        ]
+      }
+    },
+    "explanation": "The read path get_stock now reads the primary store synchronously and uses SELECT ... FOR UPDATE row locking, directly violating both the letter and the reason of the constraint (avoiding lock contention and primary load during peak reads).",
+    "fix_locality": "structural",
+    "fix_direction": "Revert to cache/replica reads (cache.get then replica_db.query_stock with cache fill) and accept up to 5 minutes of staleness per EPIC-512; freshness/locking belongs only to the checkout reservation path."
+  },
+  {
+    "constraint_id": "ADR-002-C1",
+    "result": "aligned",
+    "confidence": 0.9,
+    "evidence": {
+      "adr_clause": "ADR-002-C1",
+      "code": {
+        "file": "services/inventory/reader.py",
+        "lines": [
+          16,
+          23
+        ]
+      }
+    },
+    "explanation": "The diff only changes how the inventory service reads its own database (from cache/replica to primary with a row lock); it introduces no synchronous HTTP call to another service, so it does not violate the no-direct-sync-calls constraint.",
+    "fix_locality": "none",
+    "fix_direction": null
+  }
+]
