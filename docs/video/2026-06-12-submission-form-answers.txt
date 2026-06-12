@@ -1,0 +1,43 @@
+=====================================================================
+Q1: What does your project do?
+=====================================================================
+
+Software has two sides: the intent — what a team meant to build, and why — and the code that actually gets written. When they drift apart, software rots, even while every test passes. Now that AI writes most of the code, faster than anyone can review, that drift is faster than ever.
+
+IIAC — Intent–Implementation Alignment & Convergence — is our method for fixing this: AI reads the team's recorded decisions and the reasons behind them, and checks every change — human-written or AI-written — against that intent. Each change stays aligned; the whole project keeps converging on its goal. It already works today: it reviews real pull requests and explains, in plain words, exactly which decision a change breaks and why.
+
+The bigger aim: agents that check themselves against intent, working unsupervised for longer and longer — with every step observable, traceable, and auditable. Humans stop reviewing every line, and start governing the intent.
+
+=====================================================================
+Q2: What is the immediate benefit from it / what problem does it solve?
+=====================================================================
+
+Today, three things review code: tests, linters, and busy humans. Tests check "does it work". Linters check "is it tidy". Nobody checks "does this still match the decisions we made, and the reasons behind them" — and at AI speed, no human has time to.
+
+Delivery Radar closes that gap. In our demo scenario, a well-meaning bugfix passes CI completely green while quietly breaking a recorded architecture decision — exactly the kind of change that causes real production incidents. The radar flags it instantly, quotes the recorded reason, points at the exact lines, and suggests a fix — as an advisory comment, never a blocker.
+
+Immediate benefits: costly mistakes stop coming back, because recorded decisions become active guardrails instead of dead documents. Senior engineers get their review time back. Every comment carries the "why", so humans and AI agents both learn the team's reasoning. And adoption is zero-risk: it is advisory only — humans always keep the final say.
+
+=====================================================================
+Q3: Storytelling
+=====================================================================
+
+GENESIS
+
+Two real moments on our own project. First: agents already write our code and even review it — but when we pointed one at our PRs, it felt wrong: "vibe review", an automated opinion with no method behind it. Second: a wish — I want my agent working through the night, while I spend the day aligning it with my intent. Both need the same thing: intent written down in a form a machine can check. That became IIAC — Intent–Implementation Alignment and Convergence.
+
+TECHNICAL APPROACH
+
+Extract checkable constraints from decision records (rule, scope, business reason). For each PR, retrieve only the constraints covering the changed files, then have an LLM judge the diff grounded in the rule and its reason — structured verdicts only: aligned, violated, or unknown. Advisory comments with evidence; nothing blocks until a check earns it; everything persisted and auditable.
+
+BUSINESS VALUE
+
+Expensive mistakes stop quietly returning. Decision documents become active guardrails. Senior engineers get review time back. And AI-built software gains an audit trail: who decided, what changed, why.
+
+SOCIETAL IMPACT
+
+Every comment carries the "why" — so juniors, non-native speakers and agents all learn the team's reasoning. Honest limit: teams that don't write decisions down benefit less at first.
+
+THE HUMAN STORY
+
+We built it the way it preaches: an agent wrote most of the code, the human governed intent and confirmed every decision — all recorded in git. The project is its own first case study.
