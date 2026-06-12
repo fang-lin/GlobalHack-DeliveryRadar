@@ -30,3 +30,6 @@ coverage/
 
 # Logs
 *.log
+
+# transient PR diff scratch files at repo root
+/pr1.diff
