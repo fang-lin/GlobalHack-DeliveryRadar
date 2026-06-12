@@ -98,7 +98,7 @@ Actions: at extract say "constraints, extracted from the ADRs"; the 20–30 s wa
 
 #### ⑧ 3:15–3:35 · Tab ⑤ screen 1 (three-pipeline loop): point at the three green ops and the return edge; on the convergence line, point at the bottom chart (red rising vs teal decaying)
 
-> The heart is a closed loop — intent, implementation, alignment, convergence. ADRs become constraints; conformance enforces, drift audits, capture feeds decisions back. **Alignment makes each change right; convergence makes the whole trajectory settle** — no oscillation, so the process ends in a deterministic, auditable state instead of circling.
+> The heart is what we call the **IIAC loop** — intent, implementation, alignment, convergence. ADRs become constraints; conformance enforces, drift audits, capture feeds decisions back. **Alignment makes each change right; convergence makes the whole trajectory settle** — no oscillation, so the process ends in a deterministic, auditable state instead of circling.
 
 #### ⑨ 3:35–4:00 · Tab ⑤ screen 2 (system map): point at the legend, then sweep the dimmed cards
 

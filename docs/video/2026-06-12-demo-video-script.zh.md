@@ -112,7 +112,7 @@ gh pr diff 1 -R fang-lin/shop-demo > pr1.diff
 
 #### ⑧ 3:15–3:35 · 标签⑤ 第一屏（三管线闭环图）：先指三个绿色操作和回灌线，说收敛句时指底部曲线（红升 vs 青降）
 
-> 🇬🇧 The heart is a closed loop — intent, implementation, alignment, convergence. ADRs become constraints; conformance enforces, drift audits, capture feeds decisions back. **Alignment makes each change right; convergence makes the whole trajectory settle** — no oscillation, so the process ends in a deterministic, auditable state instead of circling.
+> 🇬🇧 The heart is what we call the **IIAC loop** — intent, implementation, alignment, convergence. ADRs become constraints; conformance enforces, drift audits, capture feeds decisions back. **Alignment makes each change right; convergence makes the whole trajectory settle** — no oscillation, so the process ends in a deterministic, auditable state instead of circling.
 >
 > 🇨🇳 核心是闭环——意图、实现、对齐、收敛。ADR 变约束；conformance 执行、drift 审计、capture 喂回决策。**对齐让每一步正确；收敛让整条轨迹安定下来**——不摆动，过程以确定的、可审计的状态收尾，而不是打转。
 

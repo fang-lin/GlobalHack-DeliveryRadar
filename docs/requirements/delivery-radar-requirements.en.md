@@ -119,9 +119,10 @@ There is exactly one constraint schema (`DM-CONSTRAINT`) and one verdict shape
   *decision* is stale (→ supersede → new ADR → new constraints).
 - Every new/changed ADR triggers constraint re-extraction and a `drift` rescan.
 
-Expanded view of the loop (the three pipelines, their artifacts, and the
-human-confirmation gate on intent write-back — only the final convergence
-requires human confirmation):
+We name this closed loop the **IIAC Loop**
+(Intent–Implementation–Alignment–Convergence). Its expanded view (the three
+pipelines, their artifacts, and the human-confirmation gate on intent
+write-back — only the final convergence requires human confirmation):
 
 ```mermaid
 flowchart TB

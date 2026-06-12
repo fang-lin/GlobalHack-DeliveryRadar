@@ -10,7 +10,7 @@ one green build at a time.
 > team already made. Delivery Radar checks every change against the recorded
 > decisions — and the business reasons behind them.
 
-## The loop
+## The IIAC Loop
 
 ```mermaid
 flowchart TB
