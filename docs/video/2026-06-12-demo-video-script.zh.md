@@ -114,7 +114,7 @@ radar check --adr-dir docs/adr --diff pr1.diff --replay ~/Projects/intent-impl-a
 
 **操作**：先指图例和"4 of 13"统计行，再扫过暗色卡片。
 
-> 今天你看到的只是一个切片——13 组能力跑通了 4 组，每个框都有需求 ID。但我们的愿景**不是做一款 code review 工具**。我们想用 IIAC 让 AI 驱动的软件开发，在 AI 的监管下**收敛**——就像过去它在人类的监管下收敛一样。
+> 今天你看到的只是其中很小一部分——我们只做了一点点，背后是大得多的计划。但重点是——我们的愿景**不是做一款 code review 工具**。我们想用 IIAC，让 AI 驱动的开发在 AI 的监管下**收敛**——就像它过去在我们人类的监管下收敛一样。
 
 ### ⑩ 4:15–4:40 · 标签⑤ 第三屏（From writing, to steering, to autonomy）
 

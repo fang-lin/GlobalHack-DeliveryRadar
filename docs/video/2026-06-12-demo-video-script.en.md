@@ -152,9 +152,9 @@ radar check --adr-dir docs/adr --diff pr1.diff --replay ~/Projects/intent-impl-a
 
 **Actions**: point at the legend and the "4 of 13" stat line, then sweep the dimmed cards.
 
-> 🇬🇧 What you saw today is one slice — four of thirteen capability groups run, and every box carries requirement IDs. But the vision is **not a code-review tool**. With IIAC we want AI-driven software development to **converge** under AI supervision — the way it used to converge under human supervision.
+> 🇬🇧 What you saw today is just a small part of this. We've built a little; the plan behind it is much bigger. But here's the point — the vision is **not a code-review tool**. With IIAC, we want AI-driven development to **converge** under AI's watch — the same way it used to, under ours.
 >
-> 🇨🇳 今天你看到的只是一个切片——13 组能力跑通了 4 组，每个框都有需求 ID。但我们的愿景不是做一款 code review 工具。我们想用 IIAC 让 AI 驱动的软件开发，在 AI 的监管下收敛——就像过去它在人类监管下收敛一样。
+> 🇨🇳 今天你看到的只是其中很小一部分——我们只做了一点点，背后是大得多的计划。但重点是——我们的愿景不是做一款 code review 工具。我们想用 IIAC，让 AI 驱动的开发在 AI 的监管下收敛——就像它过去在我们人类的监管下收敛一样。
 
 ### ⑩ 4:15–4:40 · Tab ⑤ screen 3 (From writing, to steering, to autonomy)
 
