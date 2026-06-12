@@ -2,6 +2,8 @@
 
 > **Authoritative version: Chinese (`2026-06-12-demo-video-script.zh.md`) · This file: synchronized English translation · Last synced: 2026-06-12 · On conflict, the Chinese version prevails.**
 
+> **Structure: first half (0:00–2:45) tight demo; second half (2:45–5:00) the project's bigger vision.**
+
 ---
 
 ## A. Pre-recording Setup (10 min, check off each item)
@@ -13,17 +15,17 @@
   cd ~/Projects/intent-impl-align
   clear
   ```
-- [ ] Increase font size: press `Cmd +` three times
-- [ ] Pre-run each of these 4 commands once (rehearsal + shell history; recall with ↑ while recording):
+- [ ] Increase font size: `Cmd +` three times
+- [ ] Pre-run each command once (rehearsal + shell history; recall with ↑ while recording):
   ```bash
   .venv/bin/radar extract --adr-dir ~/Projects/shop-demo/docs/adr
   gh pr diff 1 -R fang-lin/shop-demo > pr1.diff
   cat pr1.diff
   .venv/bin/radar check --adr-dir ~/Projects/shop-demo/docs/adr --diff pr1.diff
   ```
-- [ ] After a clean dry run, `clear` the screen
+- [ ] After a clean dry run, `clear`
 
-### A2. Browser (open 5 tabs in this order)
+### A2. Browser (5 tabs in this order)
 
 | Tab | URL |
 |---|---|
@@ -31,108 +33,84 @@
 | ② PR | `https://github.com/fang-lin/shop-demo/pull/1` |
 | ③ Contrast | `file:///Users/linfang/Projects/intent-impl-align/dashboard/contrast.html` |
 | ④ Dashboard | `file:///Users/linfang/Projects/intent-impl-align/dashboard/index.html` |
-| ⑤ Slides | `file:///Users/linfang/Projects/intent-impl-align/dashboard/slides.html` |
+| ⑤ Slides | `file:///Users/linfang/Projects/intent-impl-align/dashboard/slides.html` (four screens: loop / system map / two paths + audit / roadmap; scroll to switch) |
 
-- [ ] Hide bookmarks bar: `Cmd+Shift+B`; zoom each tab to 125%: `Cmd +`
-- [ ] Park tab ② (PR) on the **Conversation** page, scrolled to top
+- [ ] Hide bookmarks bar `Cmd+Shift+B`; zoom each tab to 125%
+- [ ] Park tab ② (PR) on **Conversation**, top
 
 ### A3. System & Zoom
 
-- [ ] Enable macOS Do Not Disturb (Control Center → Focus)
-- [ ] Zoom: **New Meeting** (just you) → camera on, mic on
-- [ ] 10-second recording test: Record on this Computer → say a sentence → stop → verify audio
-- [ ] To start for real: click **Record on this Computer** (not Record to Cloud)
+- [ ] macOS Do Not Disturb on
+- [ ] Zoom: **New Meeting** → camera on, mic on
+- [ ] 10-second recording test (Record on this Computer → speak → stop → verify audio)
+- [ ] Start for real: **Record on this Computer**
 
 ---
 
-## B. Walkthrough (8 segments, all actions and lines)
+## B. Walkthrough
 
-> Say the current line to the end before switching screens.
+> Finish the current line before switching screens.
 
-### ① 0:00–0:25 · Opening (camera only, no screen share yet)
+### First half · Tight demo (0:00–2:45)
 
-**Actions**: deliver the line to the camera, then click **Share Screen → entire screen (Desktop 1) → Share**.
+#### ① 0:00–0:20 · Opening (camera; share screen after the line)
 
-> Hi, I'm Lin. This is **Delivery Radar** — it keeps code changes aligned with the architectural decisions of your repo, and the business reasons behind them. AI writes code faster than anyone can review it against **why** the system is built this way — PRs pass every test and still quietly break decisions you already made. Let me show you on a real repo.
+> Hi, I'm Lin. This is **Delivery Radar** — it keeps code changes aligned with your architectural decisions, and the business reasons behind them. A quick live demo first — then the bigger picture.
 
-### ② 0:25–1:10 · Tab ① (ADR-001 page)
+#### ② 0:20–0:50 · Tab ① (ADR): sweep the €400k sentence → rest on the constraints block
 
-**Actions**:
-1. Switch to tab ①
-2. Scroll to the **Context** section, sweep the cursor over the "€400k in abandoned carts" sentence (first half of the line)
-3. Scroll to the ` ```constraints ` block at the bottom, rest the cursor on the `driver: EPIC-512` line (second half)
+> This demo shop records decisions as ADRs. ADR-001: inventory reads tolerate five minutes of staleness — a business decision: fresh reads would melt the primary DB during peak sales; last peak cost €400k. The key part: this **machine-readable constraint block** — rule, scope, and the business driver. Checks run against this.
 
-> This demo shop records decisions as ADRs. ADR-001: **inventory reads tolerate five minutes of staleness** — a business decision: during peak sales, fresh reads would melt the primary DB; last peak that cost them €400k. The special part: this **machine-readable constraint block** — rule, scope, and a link to the business driver. This is what every check runs against.
+#### ③ 0:50–1:15 · Tab ② (PR): title/description → green ✅ → glance at Files changed → back to Conversation
 
-### ③ 1:10–1:40 · Tab ② (PR #1)
+> A developer fixes a real complaint — stale stock counts — by reading the primary directly and locking the row. Well-intentioned, **tests pass, CI is green**. This merges.
 
-**Actions**:
-1. Switch to tab ② (Conversation, top): let the title "Fix stale stock count on product page" and description sit for 3 seconds
-2. Point at the green ✅ "All checks have passed"
-3. Click **Files changed**, sweep over the red/green diff (the `FOR UPDATE` lines)
-4. After the line, click back to **Conversation** (prep for segment ⑤) — do not scroll yet
+#### ④ 1:15–2:00 · Terminal: run 3 commands (recall with ↑)
 
-> Now a normal Tuesday: a developer fixes a real complaint — stale stock counts. The fix: read the primary directly, lock the row. Small, well-intentioned, **tests pass, CI is green**. Busy reviewers? This merges.
+```bash
+.venv/bin/radar extract --adr-dir ~/Projects/shop-demo/docs/adr
+gh pr diff 1 -R fang-lin/shop-demo > pr1.diff
+.venv/bin/radar check --adr-dir ~/Projects/shop-demo/docs/adr --diff pr1.diff
+```
 
-### ④ 1:40–2:35 · Terminal (4 commands)
+Actions: at extract say "constraints, extracted from the ADRs"; the 20–30 s wait after the check is for the first half of the line; when results appear, highlight the `violated` line and the `aligned` line and read each.
 
-**Actions** (`Cmd+Tab` to Terminal; recall commands with ↑):
+> Radar pulls the diff, retrieves **only the constraints whose scope matches the changed files**, and checks each one — grounded with the rule *and* the driver. …There: **ADR-001 — violated, 0.99** — it reintroduces the exact lock contention from the €400k incident. And ADR-002 — **aligned**. No false alarm.
 
-1. Extraction (one-line constraint list appears; point and say "two constraints, extracted from the ADRs"):
-   ```bash
-   .venv/bin/radar extract --adr-dir ~/Projects/shop-demo/docs/adr
-   ```
-2. Pull the PR diff (say "now pull the PR's diff from GitHub" — no output is normal):
-   ```bash
-   gh pr diff 1 -R fang-lin/shop-demo > pr1.diff
-   ```
-3. Run the check (after Enter there is a **20–30 s wait — exactly the time for the line below**):
-   ```bash
-   .venv/bin/radar check --adr-dir ~/Projects/shop-demo/docs/adr --diff pr1.diff
-   ```
-4. When results appear: select/highlight the `violated (confidence 0.99)` line, then the `aligned` line, reading each aloud
-
-> (while waiting) It retrieves **only the constraints whose scope matches the changed files** — that's the noise control — then checks the diff against each one, grounded with the rule *and* the business driver. … (results appear) There: **ADR-001 — violated, confidence 0.99.** And the reason: it reintroduces the exact lock contention that caused the 8x checkout degradation. Second line: ADR-002 — **aligned**. It doesn't cry wolf.
-
-**Fallback**: if command 3 errors or exceeds ~30 s, run this instead (identical output, instant):
+**Fallback** (check fails / >30 s):
 ```bash
 .venv/bin/radar check --adr-dir ~/Projects/shop-demo/docs/adr --diff /tmp/pr1.diff --replay artifacts/pr1-verdicts.json
 ```
 
-### ⑤ 2:35–3:05 · Tab ② (back to the PR comment)
+#### ⑤ 2:00–2:25 · Tab ②: scroll to the 🛰️ comment; sweep Rule / Why / Evidence / Direction
 
-**Actions**:
-1. `Cmd+Tab` back to the browser (should still be on PR Conversation)
-2. Scroll down to the 🛰️ **Delivery Radar — Architecture Conformance** review (the latest big one)
-3. Sweep the cursor over the four parts while speaking: **Rule** → **Why this rule exists** → **Evidence** → **Direction**
+> On the PR it lands as this comment: the rule — **why the rule exists, quoting the business rationale** — the exact lines, and the fix direction. **Advisory**: machine drafts, human decides.
 
-> On the PR it lands as this review comment: the rule — **why the rule exists, quoting the business rationale** — the exact lines — and the direction of the fix. And it's **advisory**: it doesn't block the merge. Machine drafts, human decides.
+#### ⑥ 2:25–2:45 · Tab ③ (contrast): point at the yellow highlight on the left → then the right panel
 
-### ⑥ 3:05–3:40 · Tab ③ (contrast.html)
+> Same model, no grounding — the left side. It catches the lock as an *opinion* — and then suggests an unlocked primary read, **itself a violation**. Opinion versus a governable verdict.
 
-**Actions**:
-1. Switch to tab ③
-2. Point at the left UNGROUNDED panel, scroll to the **yellow-highlighted sentence** ("read from the primary with a plain SELECT"), hold the cursor there
-3. Then point at the "Why this rule exists" quote block in the right GROUNDED panel
+### Second half · The bigger vision (2:45–5:00)
 
-> Is this just AI code review? Same model, same diff, **no grounding** — that's the left side. It's a good reviewer — catches the lock. But it treats staleness as a bug to *fix*, and even suggests reading the primary without a lock — **which is itself a violation of ADR-001**. Ungrounded review is opinion. Grounded — the right side — it's a verdict: addressable, measurable, attached to the decision.
+#### ⑦ 2:45–3:15 · Tab ④ (dashboard): KPI → LIVE card → drift trends → AT RISK card → Capture queue
 
-### ⑦ 3:40–4:25 · Tab ④ (dashboard)
+> And here the demo opens into the vision. What you saw is **one of three operations over one shared object** — the constraint. The architect's view: conformance, live. **Drift** audits the standing codebase — ADR-002 is decaying — and the radar drafts both ways out: remediate the code, or supersede the decision. **Capture** queues unrecorded decisions for triage. Humans confirm; nothing executes on its own.
 
-**Actions**:
-1. Switch to tab ④
-2. Sweep in order: KPI row → first PR card with the **LIVE** badge → the two sparkline trends → the red **AT RISK** card (hover 1 s each on Remediation and Supersede) → the Capture DN card with its three buttons
+#### ⑧ 3:15–3:35 · Tab ⑤ screen 1 (closed loop)
 
-> The architect's view. The conformance feed — there's our pull request, live. **Drift** watches the main branch: ADR-002 is decaying — five violations and rising. The radar drafts both ways out: remediate the code, or supersede the decision. A human picks; neither runs on its own. And **Capture**: PR 38 made a decision nobody recorded — now a Decision Note waiting for triage. Undocumented decisions stop leaking away.
+> The heart is a closed loop: ADRs become constraints; conformance enforces, drift audits, capture feeds decisions back — everything returns as new or superseded ADRs. Intent stops rotting, because the loop never stops.
 
-### ⑧ 4:25–5:00 · Tab ⑤ (slides.html) + close
+#### ⑨ 3:35–4:00 · Tab ⑤ screen 2 (system map): point at the legend, then sweep the dimmed cards
 
-**Actions**:
-1. Switch to tab ⑤ (closed-loop diagram), hold 10 s for the first half
-2. Scroll down to the Roadmap screen for the second half
-3. After "Thanks!" → Zoom **Stop Recording** → End Meeting
+> We've specified the **whole system** — every box carries requirement IDs. Today you saw the lit spine. Around it, sequenced: the behavioral intent layer, deterministic checks, capture triage, the drift engine — and a trust ladder: a replay harness measuring precision on your repo's *own history*, because a check only earns the right to **block** after it proves itself.
 
-> It's one loop: ADRs become constraints; conformance enforces, drift audits, capture feeds new decisions back. What you saw runs **today**. Next: the drift engine live, then a replay harness measuring precision on your own history — a check only earns the right to **block** a merge after it proves itself. **Delivery Radar — keep the why alive.** Thanks!
+#### ⑩ 4:00–4:40 · Tab ⑤ screen 3 (Two paths, one loop): left card → right card (highlighted) → bottom audit strip
+
+> Two paths make this matter. **Today, humans write the code** — and the loop keeps intent and implementation converging naturally. But the bigger one: this is an exploration of **how to let coding agents work autonomously for long stretches**. Agents drift. Machine-checkable intent gives them a self-check loop: verify against the decisions *before* opening a PR, capture new decisions as they're made, escalate to a human only at decision points. And the entire process is **tracked and auditable**: every verdict carries its evidence and constraint ID, every confirmation is recorded, intent history lives in git. You can always answer — who decided, what changed, and why.
+
+#### ⑪ 4:40–5:00 · Tab ⑤ screen 4 (roadmap) → close
+
+> The road is sequenced: what you saw runs today; capture and drift next; gating only once precision is proven. **Delivery Radar — keep the why alive.** Thanks!
 
 ---
 
@@ -140,14 +118,14 @@
 
 1. Zoom transcodes after the meeting ends; the `.mp4` lands under `~/Documents/Zoom/<date-time>.../`
 2. Playback check: duration ≤ 5:00, audio clear, on-screen text readable
-3. If over time: up to ~20 s over is usually tolerated; if far over, shorten the dwell time in segments ② and ⑦ and re-record
+3. Over time: up to ~20 s is usually fine; if far over, shorten dwell time in segments ② and ⑦ and re-record
 4. Submit the `.mp4` through the organizer's channel
 
 ## D. Emergency Quick Reference
 
 | Situation | Action |
 |---|---|
-| radar check errors / exceeds 30 s | run the replay fallback (segment ④) |
-| Misspoken word, small stumble | keep going; don't apologize or restart |
-| Major derailment (order lost / repeated failures) | stop recording, redo the whole take (it's only 5 minutes) |
-| GitHub pages slow | refresh every tab right before recording |
+| radar check errors / >30 s | run the replay fallback (segment ④) |
+| Small stumble | keep going; don't apologize or restart |
+| Major derailment | stop recording, redo the take (it's only 5 minutes) |
+| GitHub pages slow | refresh all tabs right before recording |
