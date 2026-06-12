@@ -119,6 +119,45 @@ There is exactly one constraint schema (`DM-CONSTRAINT`) and one verdict shape
   *decision* is stale (→ supersede → new ADR → new constraints).
 - Every new/changed ADR triggers constraint re-extraction and a `drift` rescan.
 
+Expanded view of the loop (the three pipelines, their artifacts, and the
+human-confirmation gate on intent write-back — only the final convergence
+requires human confirmation):
+
+```mermaid
+flowchart TB
+    I["Intent — source of truth<br/>carried by ADRs · specs · stories · requirement docs"]
+    C["Constraints<br/>addressable · stable IDs"]
+    CONF["Conformance<br/>on PR open + push"]
+    CAP["Decision Capture<br/>on PR open"]
+    DRIFT["Drift Detection<br/>cron · on intent change"]
+    R["Report<br/>typed advisory PR review"]
+    DN["Decision Note<br/>draft · human triage"]
+    DR["Drift report<br/>+ decay trend per ADR"]
+    G["Graduate → intent<br/>architectural → ADR · behavioral → story/AC"]
+    REM["Remediation issue"]
+    SUP["Supersede → intent"]
+    H{{"human confirms ✓"}}
+
+    I -- extract --> C
+    C --> CONF
+    C --> CAP
+    C --> DRIFT
+    CONF --> R
+    CAP --> DN
+    DRIFT --> DR
+    DN --> G
+    DR --> REM
+    DR --> SUP
+    G --> H
+    SUP --> H
+    H -- "updated intent → constraints re-extracted ↻" --> I
+
+    classDef intent stroke:#7c3aed,stroke-width:2.5px;
+    class I,C,G,SUP,H intent;
+    classDef op stroke:#059669,stroke-width:2.5px;
+    class CONF,CAP,DRIFT op;
+```
+
 **`FR-LOOP-1`** When an ADR is created or its status changes, the system MUST
 re-run the constraint extraction core for that ADR and enqueue a `drift` rescan
 scoped to the affected constraints.
