@@ -23,11 +23,11 @@
 4. 闭环示意图 + 路线图（一张静态页/幻灯片，最后做）
 5. ADR/montage 补拍
 
-## 素材清单
+## 素材清单（全部就绪 ✅）
 
-- [ ] PR #1 上的真实 radar 评论（待 API key → check → comment --post）
-- [ ] baseline 对照输出截图（待 API key）
-- [ ] `verdicts.json`（--save 落盘，供 --replay 录制）
-- [ ] dashboard `data.js` 顶部卡片与真实裁定数值同步
-- [ ] 闭环示意图一张（场景 5）
-- [ ] 路线图一屏（场景 7，Phase 1 ✅ / Phase 2 / Phase 3）
+- [x] PR #1 真实 radar 评论：https://github.com/fang-lin/shop-demo/pull/1（用最新一条；旧条已折叠为 superseded）
+- [x] 场景 4 分屏对照页：`dashboard/contrast.html`（左 baseline / 右 radar，自带高亮）
+- [x] 回放：`artifacts/pr1-verdicts.json` — 命令：`.venv/bin/radar check --adr-dir ~/Projects/shop-demo/docs/adr --diff /tmp/pr1.diff --replay artifacts/pr1-verdicts.json`
+- [x] dashboard `data.js` 与真实裁定同步（0.99 / 0.92，Sonnet 文案）
+- [x] 闭环示意图 + 路线图：`dashboard/slides.html`（场景 5 & 7）
+- [x] 模型合规：全链路 `claude-sonnet-4-6` @ hackathon key
