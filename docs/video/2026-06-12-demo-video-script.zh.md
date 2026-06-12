@@ -110,7 +110,7 @@ gh pr diff 1 -R fang-lin/shop-demo > pr1.diff
 >
 > 🇨🇳 从这里进入愿景。刚才只是同一对象（约束）之上三个操作之一。架构师视角：conformance 实时；Drift 审计存量——ADR-002 在衰减，雷达起草两条出路：修代码或废决策；Capture 把未记录决策排队分诊。人来确认，一切不自动执行。
 
-#### ⑧ 3:15–3:35 · 标签⑤ 第一屏（闭环图）
+#### ⑧ 3:15–3:35 · 标签⑤ 第一屏（三管线闭环图）：先指三个绿色操作和回灌线，说收敛句时指底部曲线（红升 vs 青降）
 
 > 🇬🇧 The heart is a closed loop — intent, implementation, alignment, convergence. ADRs become constraints; conformance enforces, drift audits, capture feeds decisions back. **Alignment makes each change right; convergence makes the whole trajectory settle** — no oscillation, so the process ends in a deterministic, auditable state instead of circling.
 >

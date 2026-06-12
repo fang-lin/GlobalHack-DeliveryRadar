@@ -32,55 +32,112 @@
   <h1 class="text-3xl font-bold mb-1">The Closed Loop</h1>
   <div class="text-sm text-slate-400 mb-3">alignment makes each change right · <span class="text-beam">convergence</span> makes the trajectory settle — no oscillation</div>
 
-  <svg viewBox="0 0 980 560" class="w-full max-w-5xl">
+  <svg viewBox="0 0 980 672" class="w-full max-w-5xl">
     <defs>
-      <marker id="mGreen" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#34d399"/></marker>
-      <marker id="mAmber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b"/></marker>
+      <marker id="mSlate" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8"/></marker>
       <marker id="mViolet" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#a78bfa"/></marker>
     </defs>
 
-    <!-- layer labels -->
-    <text x="20" y="92" fill="#475569" font-size="11" font-family="JetBrains Mono" transform="rotate(-90 20 92)" text-anchor="end"></text>
-    <text x="60" y="30" fill="#64748b" font-size="11" font-family="JetBrains Mono" letter-spacing="3">INTENT LAYER</text>
-    <text x="60" y="545" fill="#64748b" font-size="11" font-family="JetBrains Mono" letter-spacing="3">IMPLEMENTATION LAYER</text>
+    <!-- intent band: the real center; documents are carriers -->
+    <text x="340" y="28" text-anchor="middle" fill="#64748b" font-size="11" font-family="JetBrains Mono" letter-spacing="2">SOURCE OF TRUTH</text>
+    <rect x="100" y="40" width="480" height="62" rx="12" fill="#11182e" stroke="#a78bfa" stroke-width="2.5"/>
+    <text x="340" y="67" text-anchor="middle" fill="#a78bfa" font-size="19" font-weight="700" font-family="Space Grotesk">Intent</text>
+    <text x="340" y="89" text-anchor="middle" fill="#94a3b8" font-size="11">carried by ADRs · specs · stories · requirement docs — linked to business drivers</text>
 
-    <!-- intent band -->
-    <rect x="120" y="42" width="740" height="84" rx="16" fill="#11182e" stroke="#37e8c2" stroke-width="2"/>
-    <text x="490" y="78" text-anchor="middle" fill="#37e8c2" font-size="19" font-weight="700" font-family="Space Grotesk">ADRs · machine-readable constraints</text>
-    <text x="490" y="103" text-anchor="middle" fill="#94a3b8" font-size="12">decisions + business drivers — the single shared contract</text>
+    <rect x="650" y="42" width="230" height="58" rx="12" fill="#11182e" stroke="#a78bfa" stroke-width="2"/>
+    <text x="765" y="67" text-anchor="middle" fill="#a78bfa" font-size="16" font-weight="700" font-family="Space Grotesk">Constraints</text>
+    <text x="765" y="88" text-anchor="middle" fill="#94a3b8" font-size="11">addressable · stable IDs</text>
+    <line x1="580" y1="71" x2="644" y2="71" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
+    <text x="612" y="60" text-anchor="middle" fill="#64748b" font-size="10" font-family="JetBrains Mono">extract</text>
 
-    <!-- implementation boxes -->
-    <rect x="120" y="430" width="310" height="84" rx="16" fill="#11182e" stroke="#475569" stroke-width="2"/>
-    <text x="275" y="466" text-anchor="middle" fill="#e2e8f0" font-size="17" font-weight="700" font-family="Space Grotesk">Every pull request</text>
-    <text x="275" y="490" text-anchor="middle" fill="#94a3b8" font-size="12">each incoming change</text>
+    <!-- fan-out to the three operations -->
+    <path d="M 765 100 V 135 H 190 V 184" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
+    <path d="M 765 100 V 135 H 490 V 184" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
+    <path d="M 765 100 V 135 H 790 V 184" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
 
-    <rect x="550" y="430" width="310" height="84" rx="16" fill="#11182e" stroke="#475569" stroke-width="2"/>
-    <text x="705" y="466" text-anchor="middle" fill="#e2e8f0" font-size="17" font-weight="700" font-family="Space Grotesk">Standing codebase</text>
-    <text x="705" y="490" text-anchor="middle" fill="#94a3b8" font-size="12">main, accumulating over time</text>
+    <!-- row 1: the three detection operations -->
+    <rect x="75" y="190" width="230" height="64" rx="12" fill="#11182e" stroke="#34d399" stroke-width="2"/>
+    <text x="190" y="217" text-anchor="middle" fill="#34d399" font-size="17" font-weight="700" font-family="Space Grotesk">Conformance</text>
+    <text x="190" y="240" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="JetBrains Mono">on PR open + push</text>
 
-    <!-- ① conformance: intent -> PR (down) -->
-    <line x1="205" y1="130" x2="205" y2="424" stroke="#34d399" stroke-width="3" marker-end="url(#mGreen)"/>
-    <text x="218" y="252" fill="#34d399" font-size="15" font-weight="700" font-family="Space Grotesk">① Conformance</text>
-    <text x="218" y="272" fill="#64748b" font-size="11" font-family="JetBrains Mono">enforce · advisory verdicts</text>
+    <rect x="375" y="190" width="230" height="64" rx="12" fill="#11182e" stroke="#34d399" stroke-width="2"/>
+    <text x="490" y="217" text-anchor="middle" fill="#34d399" font-size="17" font-weight="700" font-family="Space Grotesk">Decision Capture</text>
+    <text x="490" y="240" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="JetBrains Mono">on PR open</text>
 
-    <!-- ③ capture: PR -> intent (up) -->
-    <line x1="370" y1="424" x2="370" y2="130" stroke="#a78bfa" stroke-width="3" marker-end="url(#mViolet)"/>
-    <text x="383" y="322" fill="#a78bfa" font-size="15" font-weight="700" font-family="Space Grotesk">③ Capture</text>
-    <text x="383" y="342" fill="#64748b" font-size="11" font-family="JetBrains Mono">implicit decisions → new ADRs</text>
+    <rect x="675" y="190" width="230" height="64" rx="12" fill="#11182e" stroke="#34d399" stroke-width="2"/>
+    <text x="790" y="217" text-anchor="middle" fill="#34d399" font-size="17" font-weight="700" font-family="Space Grotesk">Drift Detection</text>
+    <text x="790" y="240" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="JetBrains Mono">cron · on ADR change</text>
 
-    <!-- ② drift: intent -> codebase (down) -->
-    <line x1="640" y1="130" x2="640" y2="424" stroke="#f59e0b" stroke-width="3" marker-end="url(#mAmber)"/>
-    <text x="653" y="252" fill="#f59e0b" font-size="15" font-weight="700" font-family="Space Grotesk">② Drift</text>
-    <text x="653" y="272" fill="#64748b" font-size="11" font-family="JetBrains Mono">audit · decay trends</text>
+    <!-- arrows ops -> artifacts -->
+    <line x1="190" y1="254" x2="190" y2="296" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
+    <line x1="490" y1="254" x2="490" y2="296" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
+    <line x1="790" y1="254" x2="790" y2="296" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
 
-    <!-- supersede: codebase -> intent (up, dashed) -->
-    <line x1="815" y1="424" x2="815" y2="130" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#mAmber)"/>
-    <text x="826" y="322" fill="#f59e0b" font-size="12" font-weight="600" font-family="Space Grotesk">supersede</text>
-    <text x="826" y="340" fill="#64748b" font-size="10" font-family="JetBrains Mono">stale decision → new ADR</text>
+    <!-- row 2: intermediate artifacts -->
+    <rect x="75" y="300" width="230" height="64" rx="12" fill="#141b33" stroke="#475569" stroke-width="1.5"/>
+    <text x="190" y="327" text-anchor="middle" fill="#e2e8f0" font-size="16" font-weight="700" font-family="Space Grotesk">Report</text>
+    <text x="190" y="350" text-anchor="middle" fill="#94a3b8" font-size="11">→ typed PR review, advisory</text>
 
+    <rect x="375" y="300" width="230" height="64" rx="12" fill="#141b33" stroke="#475569" stroke-width="1.5"/>
+    <text x="490" y="327" text-anchor="middle" fill="#e2e8f0" font-size="16" font-weight="700" font-family="Space Grotesk">Decision Note</text>
+    <text x="490" y="350" text-anchor="middle" fill="#94a3b8" font-size="11">draft, on the PR · human triage</text>
+
+    <rect x="675" y="300" width="230" height="64" rx="12" fill="#141b33" stroke="#475569" stroke-width="1.5"/>
+    <text x="790" y="327" text-anchor="middle" fill="#e2e8f0" font-size="16" font-weight="700" font-family="Space Grotesk">Drift report</text>
+    <text x="790" y="350" text-anchor="middle" fill="#94a3b8" font-size="11">+ decay trend per ADR</text>
+
+    <!-- column 2: graduate -->
+    <line x1="490" y1="364" x2="490" y2="406" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
+    <rect x="375" y="410" width="230" height="58" rx="12" fill="#11182e" stroke="#a78bfa" stroke-width="2"/>
+    <text x="490" y="435" text-anchor="middle" fill="#a78bfa" font-size="15" font-weight="700" font-family="Space Grotesk">Graduate → intent</text>
+    <text x="490" y="456" text-anchor="middle" fill="#94a3b8" font-size="11">architectural → ADR · behavioral → story/AC</text>
+
+    <!-- column 3: remediation + supersede -->
+    <line x1="790" y1="364" x2="790" y2="406" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
+    <rect x="675" y="410" width="230" height="52" rx="12" fill="#141b33" stroke="#475569" stroke-width="1.5"/>
+    <text x="790" y="442" text-anchor="middle" fill="#e2e8f0" font-size="15" font-weight="600" font-family="Space Grotesk">Remediation issue</text>
+
+    <path d="M 675 332 H 640 V 513 H 671" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#mSlate)"/>
+    <rect x="675" y="487" width="230" height="52" rx="12" fill="#11182e" stroke="#a78bfa" stroke-width="2"/>
+    <text x="790" y="519" text-anchor="middle" fill="#a78bfa" font-size="15" font-weight="700" font-family="Space Grotesk">Supersede → intent</text>
+
+    <!-- return loop: updated intent feeds back, gated by human confirmation -->
+    <path d="M 490 468 V 600" fill="none" stroke="#a78bfa" stroke-width="2"/>
+    <path d="M 790 539 V 600 H 60 V 71 H 94" fill="none" stroke="#a78bfa" stroke-width="2" marker-end="url(#mViolet)"/>
+    <rect x="200" y="586" width="180" height="28" rx="8" fill="#0b1020" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="5 4"/>
+    <text x="290" y="605" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600" font-family="Space Grotesk">human confirms ✓</text>
+    <text x="560" y="588" fill="#a78bfa" font-size="12" font-family="JetBrains Mono">updated intent → constraints re-extracted ↻</text>
+
+    <!-- legend -->
+    <rect x="180" y="638" width="14" height="14" rx="4" fill="#11182e" stroke="#a78bfa" stroke-width="2"/>
+    <text x="202" y="650" fill="#94a3b8" font-size="12">intent · its updates</text>
+    <rect x="450" y="638" width="14" height="14" rx="4" fill="#11182e" stroke="#34d399" stroke-width="2"/>
+    <text x="472" y="650" fill="#94a3b8" font-size="12">detection operations</text>
+    <rect x="660" y="638" width="14" height="14" rx="4" fill="#141b33" stroke="#475569" stroke-width="1.5"/>
+    <text x="682" y="650" fill="#94a3b8" font-size="12">intermediate artifacts</text>
   </svg>
 
-  <div class="text-xs text-slate-500 mt-2">down = checks (enforce · audit) · up = intent production (capture · supersede) — the circulation IS the loop</div>
+  <!-- convergence strip: the outcome of the three processes -->
+  <svg viewBox="0 0 980 132" class="w-full max-w-5xl mt-1">
+    <text x="18" y="78" fill="#64748b" font-size="10" font-family="JetBrains Mono" transform="rotate(-90 18 78)" text-anchor="middle">distance from intent</text>
+    <line x1="60" y1="108" x2="920" y2="108" stroke="#1f2b4a" stroke-width="1.5" stroke-dasharray="3 5"/>
+    <text x="924" y="112" fill="#475569" font-size="10" font-family="JetBrains Mono">0</text>
+    <text x="490" y="128" text-anchor="middle" fill="#475569" font-size="10" font-family="JetBrains Mono">time →</text>
+
+    <!-- without: divergence compounds -->
+    <polyline points="70,55 160,48 180,53 300,40 320,45 460,30 480,35 640,22 660,27 850,12"
+      fill="none" stroke="#f87171" stroke-width="2" opacity="0.85"/>
+    <text x="862" y="14" fill="#f87171" font-size="11" font-family="Space Grotesk">without — divergence compounds</text>
+
+    <!-- with the loop: flat (conformance) + steps down (drift) -->
+    <polyline points="70,55 190,56 210,68 350,69 370,81 510,82 530,93 700,94 720,103 850,104"
+      fill="none" stroke="#37e8c2" stroke-width="2.5"/>
+    <text x="862" y="106" fill="#37e8c2" font-size="11" font-family="Space Grotesk">with — converges ≈ 0</text>
+
+    <text x="265" y="59" fill="#34d399" font-size="10" font-family="JetBrains Mono">flat = conformance blocks new divergence</text>
+    <text x="585" y="72" fill="#f59e0b" font-size="10" font-family="JetBrains Mono">steps = drift drains the backlog</text>
+  </svg>
+  <div class="text-[11px] text-slate-500 mt-1">capture keeps the measure honest — no unrecorded decisions, so "≈ 0" means truly aligned · <span class="text-beam">aligned at every step, convergent over time → deterministic output</span></div>
 </section>
 
 <!-- ============ SLIDE 2: THE FULL SYSTEM — TODAY IS ONE SLICE ============ -->

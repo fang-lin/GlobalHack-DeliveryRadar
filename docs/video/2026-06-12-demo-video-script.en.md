@@ -96,7 +96,7 @@ Actions: at extract say "constraints, extracted from the ADRs"; the 20–30 s wa
 
 > And here the demo opens into the vision. What you saw is **one of three operations over one shared object** — the constraint. The architect's view: conformance, live. **Drift** audits the standing codebase — ADR-002 is decaying — and the radar drafts both ways out: remediate the code, or supersede the decision. **Capture** queues unrecorded decisions for triage. Humans confirm; nothing executes on its own.
 
-#### ⑧ 3:15–3:35 · Tab ⑤ screen 1 (closed loop)
+#### ⑧ 3:15–3:35 · Tab ⑤ screen 1 (three-pipeline loop): point at the three green ops and the return edge; on the convergence line, point at the bottom chart (red rising vs teal decaying)
 
 > The heart is a closed loop — intent, implementation, alignment, convergence. ADRs become constraints; conformance enforces, drift audits, capture feeds decisions back. **Alignment makes each change right; convergence makes the whole trajectory settle** — no oscillation, so the process ends in a deterministic, auditable state instead of circling.
 
