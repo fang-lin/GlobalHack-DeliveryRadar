@@ -112,9 +112,9 @@ gh pr diff 1 -R fang-lin/shop-demo > pr1.diff
 
 #### ⑧ 3:15–3:35 · 标签⑤ 第一屏（闭环图）
 
-> 🇬🇧 The heart is a closed loop: ADRs become constraints; conformance enforces, drift audits, capture feeds decisions back — everything returns as new or superseded ADRs. Intent stops rotting, because the loop never stops.
+> 🇬🇧 The heart is a closed loop — intent, implementation, alignment, convergence. ADRs become constraints; conformance enforces, drift audits, capture feeds decisions back. **Alignment makes each change right; convergence makes the whole trajectory settle** — no oscillation, so the process ends in a deterministic, auditable state instead of circling.
 >
-> 🇨🇳 核心是闭环：ADR 变约束；conformance 执行、drift 审计、capture 喂回决策——一切以新 ADR/废止回流。意图不再腐烂，因为环不停转。
+> 🇨🇳 核心是闭环——意图、实现、对齐、收敛。ADR 变约束；conformance 执行、drift 审计、capture 喂回决策。**对齐让每一步正确；收敛让整条轨迹安定下来**——不摆动，过程以确定的、可审计的状态收尾，而不是打转。
 
 #### ⑨ 3:35–4:00 · 标签⑤ 第二屏（全系统地图）：先指图例，再扫暗色卡片
 
