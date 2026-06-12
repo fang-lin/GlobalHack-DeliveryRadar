@@ -341,7 +341,7 @@ path/ownership mapping first; semantic similarity is a secondary signal only.
   locations, and trend over time.
 - `FR-DRIFT-5` Treat a `confirmed`-but-not-`graduated` Decision Note older than
   the configured window as a drift signal (`DM-NOTE-1`).
-- `FR-DRIFT-6` For each at-risk ADR (heavily/violated or fast-decaying), the
+- `FR-DRIFT-6` For each at-risk ADR (heavily violated or fast-decaying), the
   report MUST present the human a binary choice with **machine-drafted** options:
   - **Remediation** — draft an issue to refactor code back into conformance
     (assignable, may target an agent); OR

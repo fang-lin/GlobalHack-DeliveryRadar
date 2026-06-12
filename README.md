@@ -60,12 +60,12 @@ no oscillation, deterministic output.*
 
 **Auditability is part of the method, not garnish.** Convergence is a property
 of a *trajectory*, and a trajectory needs memory: without recorded verdicts,
-confirmations and intent history you can judge "aligned right now" — but never
-know you are *getting closer*. In AI-led development, where agents write most
+confirmations and intent history you can tell you're aligned *right now* — but
+never whether you're *getting closer*. In AI-led development, where agents write most
 of the code, the audit trail is the system's institutional memory: stable
 constraint IDs make history addressable, recorded confirmations keep settled
-questions settled, and the distance-from-intent trend becomes computable at
-all. **No history, no trajectory; no trajectory, no convergence** — *who
+questions settled, and the distance-from-intent trend becomes computable in the
+first place. **No history, no trajectory; no trajectory, no convergence** — *who
 decided, what changed, why*.
 
 ## Progress — the vision is big; today's slice is deliberately thin
@@ -148,6 +148,6 @@ contract.
 ---
 
 Built at the [Thoughtworks](https://www.thoughtworks.com) **Global Hackathon**
-(June 2026) — organizer and sponsor. *Innovation that AI/works™*
+(June 2026), organized and sponsored by Thoughtworks. *Innovation that AI/works™*
 
 <img src="https://www.thoughtworks.com/etc.clientlibs/thoughtworks/clientlibs/clientlib-site/resources/images/thoughtworks-logo.svg" alt="Thoughtworks — Innovation that AI/works™" height="22" />

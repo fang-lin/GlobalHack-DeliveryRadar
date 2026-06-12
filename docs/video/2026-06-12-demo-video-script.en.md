@@ -71,7 +71,7 @@
 
 **Actions**: run extract → `gh pr diff` → check; the 20–30 s wait after check is exactly for the technique sentence; when results appear, highlight the `violated` line and the `aligned` line and read each.
 
-> Let's run the radar on it. The technique in one sentence: extract machine-checkable constraints from the ADRs, retrieve only those whose scope matches the changed files, then ground the model with the rule, the business driver and examples, forcing a structured verdict — no guessing; insufficient evidence must come back as *unknown*. …There: ADR-001 — **violated**, confidence 0.99, and the reason names the exact lock contention that caused the 8x checkout degradation. Second line, ADR-002: **aligned**. It doesn't cry wolf.
+> Let's run the radar on it. The technique in one sentence: extract machine-checkable constraints from the ADRs, retrieve only those whose scope matches the changed files, then ground the model with the rule, the business driver and examples, forcing a structured verdict — no guessing; if the evidence is thin, it must answer *unknown*. …There: ADR-001 — **violated**, confidence 0.99 — and the reason cuts straight to it: this **re-introduces** the exact lock contention that caused the eightfold checkout slowdown. Second line, ADR-002: **aligned**. It doesn't cry wolf.
 
 **Fallback** (check fails / >30 s; identical output, instant):
 ```bash
@@ -88,19 +88,19 @@
 
 **Actions**: point at the yellow highlight on the left → then the right panel.
 
-> And this is the difference from vibe review: same model, same diff, no method — the left side. A decent reviewer — but it treats staleness as a bug to fix, and even proposes an ADR-violating alternative itself. Review without a method is opinion; with a method, it's a verdict.
+> And this is the difference from vibe review: same model, same diff, no method — the left side. A decent reviewer — but it treats staleness as a bug to fix, and even proposes its own fix — one that violates the ADR. Review without a method is opinion; with a method, it's a verdict.
 
 ### ⑦ 2:45–3:40 · Tab ⑤ screen 1 (IIAC Loop) — the method's formal entrance
 
 **Actions**: point at the middle pipeline for Capture, the right pipeline for Drift, then the human-confirms gate on the return edge.
 
-> But reviewing PRs against ADRs is **not enough** — that only aligns implementation toward intent, one direction. Sometimes intent grows out of the code: a PR quietly makes a decision nobody recorded. If you can't detect and record it, there is no real alignment. So, the second method: **Decision Capture** — detect new intent created during integration and turn it into recorded intent documents. Still not done: intent that only grows and never changes is wrong too. Intent should be stable — and still evolve. The third method: **Drift Detection** — periodically scan the standing codebase against all intent, and surface either code that needs fixing, or intent that needs changing. Together, this is our method: **IIAC — intent–implementation alignment and convergence**. Three operations over one shared constraint store; every write-back to intent passes human confirmation. Alignment makes each change right; convergence makes the trajectory settle.
+> But reviewing PRs against ADRs is **not enough** — that only aligns implementation toward intent, one direction. Sometimes intent grows out of the code: a PR quietly makes a decision nobody recorded. If you can't detect and record it, there is no real alignment. So, the second method: **Decision Capture** — detect new intent created during integration, and write it down as recorded intent. Still not done: intent that only grows and never changes is wrong too. Intent should be stable — and still evolve. The third method: **Drift Detection** — periodically scan the standing codebase against all intent, and surface either code that needs fixing, or intent that needs changing. Together, this is our method: **IIAC — intent–implementation alignment and convergence**. Three operations over one shared constraint store; every write-back to intent passes human confirmation. Alignment makes each change right; convergence makes the trajectory settle.
 
 ### ⑧ 3:40–3:55 · Tab ④ (dashboard glance) — **cut if short on time**
 
 **Actions**: sweep quickly: LIVE card in the conformance feed → drift trends and the AT RISK card → capture queue.
 
-> For an architect it looks like this: the live conformance feed — there's our PR; drift decay trends, with remediate-or-supersede drafts; and the capture queue awaiting triage.
+> For an architect it looks like this: the live conformance feed — there's our PR; drift decay trends — each with a drafted choice: fix the code, or change the intent; and the capture queue awaiting triage.
 
 ### ⑨ 3:55–4:15 · Tab ⑤ screen 2 (What you saw today is one slice)
 
@@ -112,11 +112,11 @@
 
 **Actions**: point left to right across the three cards, then the audit strip.
 
-> In the past, humans wrote the code and reviewed each other. Today, AI writes the code, and humans review and steer in real time — that doesn't scale: one person, one session. And it shouldn't be the future. Code written by AI should be reviewed by AI; humans should manage what only humans can — **intent**. Govern the intent, ensure convergence — with the whole process tracked and auditable.
+> In the past, humans wrote the code and reviewed each other's code. Today, AI writes the code, and humans review and steer in real time — that doesn't scale: one person, one session. And it shouldn't be the future. Code written by AI should be reviewed by AI; humans should manage what only humans can — **intent**. Govern the intent, ensure convergence — with the whole process tracked and auditable.
 
 ### ⑪ 4:40–5:00 · Tab ⑤ screen 4 (Roadmap) → close
 
-> The road is sequenced. If this vision resonates with you, vote for it — let this idea travel down the roadmap. That's our take on innovation that AI works. Thanks!
+> The roadmap is laid out. If this vision resonates with you, vote for it — help this idea travel further down the roadmap. That's our take on *Innovation that AI/works*. Thank you!
 
 ---
 
@@ -124,7 +124,7 @@
 
 1. Zoom transcodes after the meeting ends; the `.mp4` lands under `~/Documents/Zoom/<date-time>.../`
 2. Playback check: duration ≤ 5:00, audio clear, on-screen text readable
-3. Over time: cut ⑥ (contrast, 15 s) first, then ⑧ (dashboard, 15 s)
+3. If over 5:00: cut ⑥ (contrast, 15 s) first, then ⑧ (dashboard, 15 s)
 4. Submit through the organizer's channel
 
 ## D. Emergency Quick Reference
