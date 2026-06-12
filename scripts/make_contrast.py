@@ -49,6 +49,10 @@ TEMPLATE = """<!doctype html>
 </style>
 </head>
 <body class="text-slate-200 min-h-screen p-6">
+<nav class="fixed bottom-3 right-4 z-50 flex gap-4 text-[11px] font-mono text-slate-500 bg-[#0b1020]/70 px-2 py-1 rounded">
+  <a class="hover:text-[#37e8c2]" href="index.html">&larr; slides</a>
+  <a class="hover:text-[#37e8c2]" href="dashboard.html">dashboard &rarr;</a>
+</nav>
 <div class="max-w-7xl mx-auto">
   <div class="text-center mb-5">
     <div class="text-xs uppercase tracking-[0.3em] text-slate-500">same model · same diff</div>
