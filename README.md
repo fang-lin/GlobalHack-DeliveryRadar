@@ -101,9 +101,10 @@ PRs); the other nine are why it matters — see the
   CI-green "bugfix" that violates ADR-001's business driver; the radar's advisory
   review quotes the recorded business rationale (EPIC-512, peak-sale stability)
   and the direction of the fix.
-- **Showcase (slides)**: https://fang-lin.github.io/delivery-radar-pages/
-  ([dashboard](https://fang-lin.github.io/delivery-radar-pages/dashboard.html) ·
-  [grounded-vs-ungrounded contrast](https://fang-lin.github.io/delivery-radar-pages/contrast.html))
+- **Showcase pages** (GitHub Pages):
+  - 🛰️ [Slides — the IIAC showcase](https://fang-lin.github.io/delivery-radar-pages/) (landing: loop · system map · three eras · roadmap)
+  - 📊 [Dashboard — the architect's view](https://fang-lin.github.io/delivery-radar-pages/dashboard.html) (live verdict in the conformance feed; drift/capture are Phase-2 previews)
+  - ⚖️ [Contrast — grounded vs ungrounded](https://fang-lin.github.io/delivery-radar-pages/contrast.html) (same model, same diff, with and without recorded intent)
 
 ## Quickstart
 
