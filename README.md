@@ -93,18 +93,18 @@ requirement IDs in [the spec](docs/requirements/delivery-radar-requirements.en.m
 **4 of 13 capability groups run today.** That ratio is the point: the live
 slice proves the differentiating mechanism (driver-grounded verdicts on real
 PRs); the other nine are why it matters — see the
-[showcase](https://fang-lin.github.io/delivery-radar-pages/).
+[showcase](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/).
 
 ## Live demo
 
-- **Demo PR with a real verdict**: [fang-lin/shop-demo#1](https://github.com/fang-lin/shop-demo/pull/1) —
+- **Demo PR with a real verdict**: [fang-lin/GlobalHack-shop-demo#1](https://github.com/fang-lin/GlobalHack-shop-demo/pull/1) —
   CI-green "bugfix" that violates ADR-001's business driver; the radar's advisory
   review quotes the recorded business rationale (EPIC-512, peak-sale stability)
   and the direction of the fix.
 - **Showcase pages** (GitHub Pages):
-  - 🛰️ [Slides — the IIAC showcase](https://fang-lin.github.io/delivery-radar-pages/) (landing: loop · system map · three eras · roadmap)
-  - 📊 [Dashboard — the architect's view](https://fang-lin.github.io/delivery-radar-pages/dashboard.html) (live verdict in the conformance feed; drift/capture are Phase-2 previews)
-  - ⚖️ [Contrast — grounded vs ungrounded](https://fang-lin.github.io/delivery-radar-pages/contrast.html) (same model, same diff, with and without recorded intent)
+  - 🛰️ [Slides — the IIAC showcase](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/) (landing: loop · system map · three eras · roadmap)
+  - 📊 [Dashboard — the architect's view](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/dashboard.html) (live verdict in the conformance feed; drift/capture are Phase-2 previews)
+  - ⚖️ [Contrast — grounded vs ungrounded](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/contrast.html) (same model, same diff, with and without recorded intent)
 
 ## Quickstart
 
@@ -116,12 +116,12 @@ echo "ANTHROPIC_API_KEY=sk-ant-..." > .env   # gitignored
 .venv/bin/radar extract --adr-dir ../shop-demo/docs/adr
 
 # check a PR diff against in-scope constraints (semantic, driver-grounded)
-gh pr diff 1 -R fang-lin/shop-demo > pr1.diff
+gh pr diff 1 -R fang-lin/GlobalHack-shop-demo > pr1.diff
 .venv/bin/radar check --adr-dir ../shop-demo/docs/adr --diff pr1.diff --save verdicts.json
 
 # project verdicts as an advisory PR review
 .venv/bin/radar comment --adr-dir ../shop-demo/docs/adr --verdicts verdicts.json \
-  --repo fang-lin/shop-demo --pr 1 --post
+  --repo fang-lin/GlobalHack-shop-demo --pr 1 --post
 ```
 
 Tests: `.venv/bin/python -m pytest tests/`

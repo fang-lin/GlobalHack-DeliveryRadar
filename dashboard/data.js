@@ -2,7 +2,7 @@
 // produced by `radar check` on shop-demo PR #1; drift/capture sections are
 // seeded demo data illustrating the Phase 2 product vision.
 window.RADAR_DATA = {
-  repo: "fang-lin/shop-demo",
+  repo: "fang-lin/GlobalHack-shop-demo",
   generated_at: "2026-06-12T14:30:00+02:00",
   kpis: {
     adrs: 2,

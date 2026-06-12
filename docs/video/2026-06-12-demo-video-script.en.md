@@ -53,8 +53,8 @@
 
 | Tab | URL |
 |---|---|
-| ① ADR | `https://github.com/fang-lin/shop-demo/blob/main/docs/adr/ADR-001-inventory-eventual-consistency.md` |
-| ② PR | `https://github.com/fang-lin/shop-demo/pull/1` |
+| ① ADR | `https://github.com/fang-lin/GlobalHack-shop-demo/blob/main/docs/adr/ADR-001-inventory-eventual-consistency.md` |
+| ② PR | `https://github.com/fang-lin/GlobalHack-shop-demo/pull/1` |
 | ③ Contrast | `file:///Users/linfang/Projects/intent-impl-align/dashboard/contrast.html` |
 | ④ Dashboard | `file:///Users/linfang/Projects/intent-impl-align/dashboard/dashboard.html` |
 | ⑤ Slides | `file:///Users/linfang/Projects/intent-impl-align/dashboard/index.html` (four screens: IIAC Loop / system map / three eras / roadmap) |
