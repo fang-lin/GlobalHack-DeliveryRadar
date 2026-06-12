@@ -87,16 +87,16 @@
 **Actions**: scroll to the Context section, sweep the "€400k" sentence → scroll to the `constraints` block, rest on the `driver: EPIC-512` line.
 **操作**：滚到 Context 段，鼠标划过 "€400k" 那句 → 再滚到底部 `constraints` 块，停在 `driver: EPIC-512` 那行。
 
-> 🇬🇧 This is the demo repo; its architectural decisions live in ADRs. ADR-001: inventory reads tolerate five minutes of staleness — a business decision: fresh reads would melt the primary database during peak sales; last peak cost four hundred thousand euros. The key part is this **machine-readable constraint block**: a rule, a scope, and the business driver.
+> 🇬🇧 Let me show you, on a real repo. This is the demo repo; its architectural decisions live in ADRs. ADR-001: inventory reads tolerate five minutes of staleness — a business decision: fresh reads would melt the primary database during peak sales; last peak cost four hundred thousand euros. The key part is this **machine-readable constraint block**: a rule, a scope, and the business driver.
 >
-> 🇨🇳 这是演示仓库，架构决策记在 ADR 里。ADR-001：库存读容忍五分钟陈旧——这是业务决定：大促时实时读会压垮主库，上次大促损失四十万欧。关键是下面这个机器可读的约束块：规则、作用域、业务动因。
+> 🇨🇳 我用一个真实的仓库给你看。这是演示仓库，架构决策记在 ADR 里。ADR-001：库存读容忍五分钟陈旧——这是业务决定：大促时实时读会压垮主库，上次大促损失四十万欧。关键是下面这个机器可读的约束块：规则、作用域、业务动因。
 
 ### ③ 1:10–1:30 · Tab ② (PR #1)
 
 **Actions**: title + description for 3 seconds → point at the green ✅ → glance at `FOR UPDATE` in Files changed → back to Conversation.
 **操作**：标题+描述停 3 秒 → 指绿色 ✅ → 点 Files changed 扫一眼 `FOR UPDATE` → 点回 Conversation。
 
-> 🇬🇧 Now a perfectly normal PR: fixing a customer complaint about stale stock counts — by reading the primary directly, with a row lock. Tests pass, CI is green. Busy reviewers? This merges.
+> 🇬🇧 Now watch a perfectly normal PR come in: fixing a customer complaint about stale stock counts — by reading the primary directly, with a row lock. Tests pass, CI is green. Busy reviewers? This merges.
 >
 > 🇨🇳 来了个再正常不过的 PR：修"库存数字不准"的客诉——直读主库、加行锁。测试全过、CI 绿。评审忙不过来？这就合进去了。
 
@@ -125,9 +125,9 @@ radar check --adr-dir docs/adr --diff pr1.diff --replay ~/Projects/intent-impl-a
 **Actions**: scroll to the 🛰️ review; sweep Rule / Why this rule exists / Evidence / Direction.
 **操作**：滚到 🛰️ 那条评审，鼠标依次划过 Rule / Why this rule exists / Evidence / Direction 四块。
 
-> 🇬🇧 On the PR it lands as this review: the rule, why the rule exists — it quotes the business reason — the exact lines, and the direction of the fix. Advisory; it doesn't block the merge. This is **Conformance**: implementation aligning toward intent.
+> 🇬🇧 And on the PR, it lands as this review: the rule, why the rule exists — it quotes the business reason — the exact lines, and the direction of the fix. Advisory; it doesn't block the merge. This is **Conformance**: implementation aligning toward intent.
 >
-> 🇨🇳 落在 PR 上就是这条评审：规则、规则为何存在（直接引用业务理由）、精确行号、修复方向。建议性，不阻塞合并。这就是 Conformance：实现向意图对齐。
+> 🇨🇳 而在 PR 上，它就落成这条评审：规则、规则为何存在（直接引用业务理由）、精确行号、修复方向。建议性，不阻塞合并。这就是 Conformance：实现向意图对齐。
 
 ### ⑥ 2:30–2:45 · Tab ③ (contrast) — **cut if short on time**
 
@@ -143,42 +143,42 @@ radar check --adr-dir docs/adr --diff pr1.diff --replay ~/Projects/intent-impl-a
 **Actions**: point at the middle pipeline for Capture, the right pipeline for Drift, then the human-confirms gate on the return edge.
 **操作**：说 Capture 时指中间那条管线，说 Drift 时指右边那条，最后指回灌线上的 human confirms 门。
 
-> 🇬🇧 But reviewing PRs against ADRs is **not enough** — that only aligns implementation toward intent, one direction. Sometimes intent grows out of the code: a PR quietly makes a decision nobody recorded. If you can't detect and record it, there is no real alignment. So, the second method: **Decision Capture** — detect new intent created as the code is merged, and write it down as recorded intent. Still not done: intent that only grows and never changes is wrong too. Intent should be stable — and still change over time. The third method: **Drift Detection** — on a regular schedule, scan the whole codebase against all intent, and surface either code that needs fixing, or intent that needs changing. Together, this is our method: **IIAC — intent–implementation alignment and convergence**. Three operations over one shared constraint store; every write-back to intent passes human confirmation. Alignment makes each change right. Convergence keeps the whole thing moving closer to intent — not drifting away.
+> 🇬🇧 So that was the first method. But reviewing PRs against ADRs is **not enough** — that only aligns implementation toward intent, one direction. Sometimes intent grows out of the code: a PR quietly makes a decision nobody recorded. If you can't detect and record it, there is no real alignment. So, the second method: **Decision Capture** — detect new intent created as the code is merged, and write it down as recorded intent. Still not done: intent that only grows and never changes is wrong too. Intent should be stable — and still change over time. The third method: **Drift Detection** — on a regular schedule, scan the whole codebase against all intent, and surface either code that needs fixing, or intent that needs changing. Together, this is our method: **IIAC — intent–implementation alignment and convergence**. Three operations over one shared constraint store; every write-back to intent passes human confirmation. Alignment makes each change right. Convergence keeps the whole thing moving closer to intent — not drifting away.
 >
-> 🇨🇳 但只用 ADR 审 PR 是不够的——这只保证实现向意图对齐，单向。意图有时是从代码里长出来的：PR 悄悄做了个没人记录的决策。识别不了、记录不了，就谈不上真正的对齐。所以第二个方法 Decision Capture——探测集成中产生的新意图，记成意图文档。还没完：意图只增不改也是错的。意图该稳定，也必须随时间演进。第三个方法 Drift Detection——定期把全库对照全部意图扫一遍，反过来发现该修的代码，或该变的意图。合起来就是我们的方法：IIAC——意图与实现的对齐与收敛。三个操作读写同一个约束存储，所有意图写回都要过人工确认。对齐让每一步正确；收敛让整体一直向意图靠拢，而不是越漂越远。
+> 🇨🇳 这是第一个方法。但只用 ADR 审 PR 是不够的——这只保证实现向意图对齐，单向。意图有时是从代码里长出来的：PR 悄悄做了个没人记录的决策。识别不了、记录不了，就谈不上真正的对齐。所以第二个方法 Decision Capture——探测集成中产生的新意图，记成意图文档。还没完：意图只增不改也是错的。意图该稳定，也必须随时间演进。第三个方法 Drift Detection——定期把全库对照全部意图扫一遍，反过来发现该修的代码，或该变的意图。合起来就是我们的方法：IIAC——意图与实现的对齐与收敛。三个操作读写同一个约束存储，所有意图写回都要过人工确认。对齐让每一步正确；收敛让整体一直向意图靠拢，而不是越漂越远。
 
 ### ⑧ 3:40–3:55 · Tab ④ (dashboard glance) — **cut if short on time**
 
 **Actions**: sweep quickly: LIVE card in the conformance feed → drift trends and the AT RISK card → capture queue.
 **操作**：鼠标快速划过：conformance 流里的 LIVE 卡 → drift 趋势和 AT RISK 卡 → capture 队列。
 
-> 🇬🇧 This is the dashboard — the architect's view. Here's the live **conformance** feed. There's our PR. Here are the **drift** trends. For each one, the radar drafts a choice: fix the code, or change the intent. And here's the **capture** queue, waiting for review.
+> 🇬🇧 Put all three together, and you get this — the dashboard, the architect's view. Here's the live **conformance** feed. There's our PR. Here are the **drift** trends. For each one, the radar drafts a choice: fix the code, or change the intent. And here's the **capture** queue, waiting for review.
 >
-> 🇨🇳 这是仪表盘——给架构师看的。这是实时的 conformance 流，刚才那个 PR 就在这。这是 drift 趋势，每一条雷达都起草了一个二选一：修代码，还是改意图。这是 capture 队列，等着审。
+> 🇨🇳 三个操作合在一起，就是这个——仪表盘，给架构师看的。这是实时的 conformance 流，刚才那个 PR 就在这。这是 drift 趋势，每一条雷达都起草了一个二选一：修代码，还是改意图。这是 capture 队列，等着审。
 
 ### ⑨ 3:55–4:15 · Tab ⑤ screen 2 (What you saw today is one slice)
 
 **Actions**: point at the legend and the "4 of 13" stat line, then sweep the dimmed cards.
 **操作**：指一下图例和 "4 of 13" 那行统计，再扫过暗色的卡片。
 
-> 🇬🇧 What you saw today is just a small part of this. We've built a little; the plan behind it is much bigger. But here's the point — the vision is **not a code-review tool**. With IIAC, we want AI-driven development to **converge** under AI's watch — the same way it used to, under ours.
+> 🇬🇧 Now, step back for a second. What you saw today is just a small part of this. We've built a little; the plan behind it is much bigger. But here's the point — the vision is **not a code-review tool**. With IIAC, we want AI-driven development to **converge** under AI's watch — the same way it used to, under ours.
 >
-> 🇨🇳 今天你看到的只是其中很小一部分——我们只做了一点点，背后是大得多的计划。但重点是——我们的愿景不是做一款 code review 工具。我们想用 IIAC，让 AI 驱动的开发在 AI 的监管下收敛——就像它过去在我们人类的监管下收敛一样。
+> 🇨🇳 退一步看。今天你看到的只是其中很小一部分——我们只做了一点点，背后是大得多的计划。但重点是——我们的愿景不是做一款 code review 工具。我们想用 IIAC，让 AI 驱动的开发在 AI 的监管下收敛——就像它过去在我们人类的监管下收敛一样。
 
 ### ⑩ 4:15–4:40 · Tab ⑤ screen 3 (From writing, to steering, to autonomy)
 
 **Actions**: point left to right across the three cards, then the audit strip.
 **操作**：从左到右逐张指过三张卡，最后指底部的审计带。
 
-> 🇬🇧 In the past, humans wrote the code and reviewed each other's code. Today, AI writes the code, and humans review and steer in real time — that doesn't scale: one person, one session. And it shouldn't be the future. Code written by AI should be reviewed by AI; humans should manage what only humans can — **intent**. Govern the intent, ensure convergence — with the whole process tracked and auditable.
+> 🇬🇧 Why does this matter? Think of three eras. In the past, humans wrote the code and reviewed each other's code. Today, AI writes the code, and humans review and steer in real time — that doesn't scale: one person, one session. And it shouldn't be the future. Code written by AI should be reviewed by AI; humans should manage what only humans can — **intent**. Govern the intent, ensure convergence — with the whole process tracked and auditable.
 >
-> 🇨🇳 过去，人写代码，人互相 review。今天，AI 写代码，人来 review、人来实时监管——但撑不远：一个人，盯一个会话。而且这不该是未来。AI 写的代码就该由 AI 来 review；人去管只有人能管的东西——意图。监管意图、确保收敛，全程可跟踪、可审计。
+> 🇨🇳 为什么这重要？看三个时代。过去，人写代码，人互相 review。今天，AI 写代码，人来 review、人来实时监管——但撑不远：一个人，盯一个会话。而且这不该是未来。AI 写的代码就该由 AI 来 review；人去管只有人能管的东西——意图。监管意图、确保收敛，全程可跟踪、可审计。
 
 ### ⑪ 4:40–5:00 · Tab ⑤ screen 4 (Roadmap) → close
 
-> 🇬🇧 The roadmap is laid out. If you believe in this vision, vote for it — help this idea travel further down the roadmap. That's our take on *Innovation that AI/works*. Thank you!
+> 🇬🇧 So here's where we're headed. The roadmap is laid out. If you believe in this vision, vote for it — help this idea travel further down the roadmap. That's our take on *Innovation that AI/works*. Thank you!
 >
-> 🇨🇳 路线已经排好。如果你认同这个愿景，投我们一票——让这个 idea 沿着路线图走得更远。这是我们对 Innovation that AI/works 的回答。谢谢！
+> 🇨🇳 所以，我们要去的方向就在这。路线已经排好。如果你认同这个愿景，投我们一票——让这个 idea 沿着路线图走得更远。这是我们对 Innovation that AI/works 的回答。谢谢！
 
 ---
 
