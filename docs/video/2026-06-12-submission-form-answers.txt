@@ -41,3 +41,30 @@ Every comment carries the "why" — so juniors, non-native speakers and agents a
 THE HUMAN STORY
 
 We built it the way it preaches: an agent wrote most of the code, the human governed intent and confirmed every decision — all recorded in git. The project is its own first case study.
+
+=====================================================================
+ROUND 2 PREP — reinforcement for the two weak spots (Business Impact + Technical Feasibility)
+Not submitted in Round 1. Use these if we advance and need to strengthen the pitch.
+=====================================================================
+
+-----  BUSINESS VALUE — quantified  -----
+
+The cost we attack is review that doesn't scale. On a typical product team, a senior engineer or architect spends 4–8 hours a week answering one recurring question on pull requests: "does this still fit our architecture and the reasons behind it?" That review is the bottleneck — and AI-generated code, arriving many times faster, makes it worse, not better. Delivery Radar automates exactly that question on every PR, so senior time is spent on the genuinely ambiguous cases, not on re-checking settled decisions.
+
+The value compounds with three numbers any client already tracks: the hourly cost of senior review time saved; the cost of a production incident caused by a silently-broken architectural decision (typically five to six figures each); and the slope of architectural decay — the rate at which "we'll fix it later" debt accumulates. Delivery Radar reduces all three.
+
+Where it lands first: AI-heavy engineering orgs and consultancies running many parallel client codebases — exactly Thoughtworks' position. It is horizontally scalable: one constraint-extraction core serves every repository, and onboarding a new codebase costs only the effort of writing decisions down, which good teams already do. For regulated industries (finance, health, public sector) there is a second, harder-to-price value: a complete, queryable audit trail of who decided what, what changed, and why — increasingly a compliance requirement for AI-written software, not a nicety.
+
+-----  TECHNICAL FEASIBILITY — why the LLM judge is trustworthy  -----
+
+The obvious objection: "an LLM judging code will hallucinate — why trust the verdict?" Four design choices answer it, and they are the core of the engineering.
+
+1. Scope-first retrieval. We never ask the model to "review everything." We retrieve only the constraints whose declared scope matches the changed files, so the model judges one specific rule against one specific diff. Narrow questions hallucinate far less than open-ended ones. Over-retrieval is treated as a defect, not a tuning knob.
+
+2. Grounding, not opinion. Each judgment is anchored in the constraint's exact rule, the business reason behind it, and few-shot examples of compliant vs. violating code. The model isn't asked "is this good?" — it's asked "does this diff honor this specific recorded decision?"
+
+3. "Unknown" is a first-class answer. The model is required to return aligned, violated, or unknown in a structured, schema-validated shape, and is explicitly instructed to answer unknown rather than guess when evidence is thin. Low-confidence results are folded into a summary, never pushed as inline "fix this" noise.
+
+4. Advisory by default; gating must be earned. Nothing blocks a merge on a semantic judgment — ever. A check earns the right to block only when it is deterministic AND its precision has been measured on the team's own historical pull requests via a replay harness. We promote checks on evidence, not faith.
+
+Net effect: the failure mode is a false "unknown" or an over-cautious advisory comment a human dismisses in two seconds — never a wrongly-blocked merge. The system is designed so its worst case is harmless, and every verdict plus every human reaction is persisted, so precision is continuously measurable and improvable.
