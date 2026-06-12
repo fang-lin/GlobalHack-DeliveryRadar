@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Delivery Radar — fang-lin/shop-demo</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ["Space Grotesk", "sans-serif"],
+          mono: ["JetBrains Mono", "monospace"],
+        },
+        colors: {
+          ink: "#0b1020",
+          panel: "#11182e",
+          edge: "#1f2b4a",
+          beam: "#37e8c2",
+        },
+      },
+    },
+  };
+</script>
+<style>
+  body { background: radial-gradient(1200px 600px at 75% -10%, #16224a 0%, #0b1020 55%); }
+  .scan { position: relative; overflow: hidden; }
+  .scan::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(110deg, transparent 45%, rgba(55,232,194,.07) 50%, transparent 55%);
+    animation: sweep 6s linear infinite;
+  }
+  @keyframes sweep { from { transform: translateX(-100%);} to { transform: translateX(100%);} }
+</style>
+</head>
+<body class="font-display text-slate-200 min-h-screen">
+<div class="max-w-7xl mx-auto px-6 py-6">
+
+  <!-- top bar -->
+  <header class="flex items-center justify-between pb-5 border-b border-edge">
+    <div class="flex items-center gap-3">
+      <div class="text-3xl">🛰️</div>
+      <div>
+        <div class="text-xl font-bold tracking-tight">Delivery Radar</div>
+        <div class="text-xs text-slate-400">Intent–Implementation Governance</div>
+      </div>
+    </div>
+    <div class="text-right">
+      <div class="font-mono text-sm text-beam" id="repo"></div>
+      <div class="text-xs text-slate-500" id="generated"></div>
+    </div>
+  </header>
+
+  <!-- KPI row -->
+  <section class="grid grid-cols-5 gap-4 mt-6" id="kpis"></section>
+
+  <main class="grid grid-cols-5 gap-4 mt-4">
+    <!-- conformance feed -->
+    <section class="col-span-3">
+      <h2 class="text-sm uppercase tracking-widest text-slate-400 mb-3">
+        Conformance <span class="text-slate-600">· Enforce — PR checks (advisory)</span>
+      </h2>
+      <div id="feed" class="space-y-3"></div>
+    </section>
+
+    <!-- right column: drift + capture -->
+    <section class="col-span-2 space-y-4">
+      <div>
+        <h2 class="text-sm uppercase tracking-widest text-slate-400 mb-3">
+          Drift <span class="text-slate-600">· Audit — standing codebase</span>
+        </h2>
+        <div id="adr-health" class="space-y-2"></div>
+        <div id="at-risk" class="mt-3"></div>
+      </div>
+      <div>
+        <h2 class="text-sm uppercase tracking-widest text-slate-400 mb-3">
+          Capture <span class="text-slate-600">· Decision Notes awaiting triage</span>
+        </h2>
+        <div id="capture"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="mt-8 pt-4 border-t border-edge flex items-center justify-between text-xs text-slate-500">
+    <div class="font-mono">ADR → Constraint → { conformance · drift } → { capture · supersede } → ADR</div>
+    <div class="text-beam font-semibold">machine drafts · human confirms</div>
+  </footer>
+</div>
+
+<script src="data.js"></script>
+<script>
+const D = window.RADAR_DATA;
+const $ = (sel) => document.querySelector(sel);
+
+const RESULT_STYLE = {
+  violated: { badge: "bg-red-500/15 text-red-400 border-red-500/40", label: "VIOLATED", dot: "bg-red-400" },
+  aligned: { badge: "bg-emerald-500/15 text-emerald-400 border-emerald-500/40", label: "ALIGNED", dot: "bg-emerald-400" },
+  unknown: { badge: "bg-slate-500/15 text-slate-300 border-slate-500/40", label: "UNKNOWN", dot: "bg-slate-400" },
+};
+
+$("#repo").textContent = D.repo;
+$("#generated").textContent = "last scan " + new Date(D.generated_at).toLocaleString("en-GB");
+
+// ---- KPIs ----
+const kpis = [
+  ["ADRs", D.kpis.adrs, ""],
+  ["Active constraints", D.kpis.active_constraints, ""],
+  ["Alignment rate", Math.round(D.kpis.alignment_rate * 100) + "%", "last 30 PRs"],
+  ["Open drift violations", D.kpis.open_violations, "default branch"],
+  ["Notes awaiting triage", D.kpis.notes_awaiting_triage, "capture queue"],
+];
+$("#kpis").innerHTML = kpis
+  .map(
+    ([label, value, hint]) => `
+  <div class="scan bg-panel border border-edge rounded-xl p-4">
+    <div class="text-3xl font-bold ${label === "Open drift violations" ? "text-amber-400" : "text-beam"}">${value}</div>
+    <div class="text-xs text-slate-400 mt-1">${label}</div>
+    ${hint ? `<div class="text-[10px] text-slate-600">${hint}</div>` : ""}
+  </div>`
+  )
+  .join("");
+
+// ---- conformance feed ----
+$("#feed").innerHTML = D.conformance_feed
+  .map((pr) => {
+    const verdictHtml = pr.verdicts
+      .map((v) => {
+        const s = RESULT_STYLE[v.result];
+        return `
+      <div class="mt-3 border-t border-edge pt-3">
+        <div class="flex items-center gap-2">
+          <span class="px-2 py-0.5 rounded border text-[11px] font-mono font-semibold ${s.badge}">${s.label}</span>
+          <span class="font-mono text-xs text-slate-400">${v.constraint_id}</span>
+          <span class="text-xs text-slate-500">· driver <span class="text-beam/80 font-mono">${v.driver}</span></span>
+          <span class="ml-auto text-[11px] text-slate-500 font-mono">conf ${v.confidence.toFixed(2)}</span>
+        </div>
+        <div class="text-sm mt-1.5 text-slate-300">${v.constraint_title}</div>
+        <div class="text-xs text-slate-400 mt-1">${v.explanation}</div>
+        <div class="text-[11px] font-mono text-slate-500 mt-1.5">📍 ${v.evidence}</div>
+      </div>`;
+      })
+      .join("");
+    return `
+  <article class="bg-panel border ${pr.live ? "border-beam/50 shadow-[0_0_24px_rgba(55,232,194,.08)]" : "border-edge"} rounded-xl p-4">
+    <div class="flex items-center gap-2">
+      <span class="font-mono text-xs text-slate-500">#${pr.pr}</span>
+      <span class="font-medium text-sm">${pr.title}</span>
+      ${pr.live ? '<span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-beam/15 text-beam border border-beam/40">LIVE</span>' : ""}
+      <span class="ml-auto text-[11px] text-slate-500">@${pr.author}</span>
+      <span class="text-[11px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400">CI ✓</span>
+    </div>
+    ${verdictHtml}
+  </article>`;
+  })
+  .join("");
+
+// ---- drift: ADR health sparklines ----
+function sparkline(points, w = 120, h = 28) {
+  const max = Math.max(...points, 1);
+  const step = w / (points.length - 1);
+  const coords = points.map((p, i) => `${(i * step).toFixed(1)},${(h - 3 - (p / max) * (h - 8)).toFixed(1)}`);
+  return `<svg width="${w}" height="${h}" class="overflow-visible">
+    <polyline points="${coords.join(" ")}" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="${coords.at(-1).split(",")[0]}" cy="${coords.at(-1).split(",")[1]}" r="3" fill="#f59e0b"/>
+  </svg>`;
+}
+
+$("#adr-health").innerHTML = D.drift.adrs
+  .map(
+    (a) => `
+  <div class="bg-panel border border-edge rounded-xl p-3 flex items-center gap-3">
+    <div class="flex-1 min-w-0">
+      <div class="font-mono text-xs text-slate-400">${a.adr}</div>
+      <div class="text-sm truncate">${a.title}</div>
+    </div>
+    ${sparkline(a.trend)}
+    <div class="text-right">
+      <div class="text-lg font-bold ${a.violations >= 4 ? "text-red-400" : "text-amber-400"}">${a.violations}</div>
+      <div class="text-[10px] text-slate-500">violations</div>
+    </div>
+  </div>`
+  )
+  .join("");
+
+// ---- at-risk ADR: machine-drafted binary choice ----
+const risk = D.drift.at_risk;
+$("#at-risk").innerHTML = `
+  <div class="bg-panel border border-red-500/40 rounded-xl p-4">
+    <div class="flex items-center gap-2">
+      <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-red-500/15 text-red-400 border border-red-500/40">AT RISK</span>
+      <span class="font-mono text-xs text-slate-400">${risk.adr}</span>
+      <span class="text-[11px] text-slate-500 ml-auto">${risk.trend_note}</span>
+    </div>
+    <div class="text-sm mt-2">${risk.title}</div>
+    <div class="text-xs text-slate-500 mt-0.5">driver <span class="font-mono text-beam/80">${risk.driver}</span> — is the decision stale, or the code?</div>
+    <div class="grid grid-cols-2 gap-2 mt-3">
+      ${risk.options
+        .map(
+          (o) => `
+        <div class="border border-edge rounded-lg p-3 hover:border-beam/50 transition-colors">
+          <div class="text-xs font-semibold ${o.kind === "remediation" ? "text-emerald-400" : "text-violet-400"}">${o.label}</div>
+          <div class="text-[11px] text-slate-400 mt-1 leading-snug">${o.summary}</div>
+          <button class="mt-2 w-full text-[11px] font-mono py-1 rounded border border-edge text-slate-300 hover:bg-edge">review draft → confirm</button>
+        </div>`
+        )
+        .join("")}
+    </div>
+    <div class="text-[10px] text-slate-600 mt-2 text-center">neither executes without human confirmation (NFR-TRUST-1)</div>
+  </div>`;
+
+// ---- capture queue ----
+$("#capture").innerHTML = D.capture_queue
+  .map(
+    (n) => `
+  <div class="bg-panel border border-edge rounded-xl p-4">
+    <div class="flex items-center gap-2">
+      <span class="font-mono text-xs text-beam">${n.id}</span>
+      <span class="text-[11px] text-slate-500">from PR #${n.pr}</span>
+      <span class="ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded bg-violet-500/15 text-violet-300 border border-violet-500/40">${n.suggested_class}</span>
+    </div>
+    <div class="text-sm mt-2 text-slate-300">${n.detected}</div>
+    <div class="text-[11px] font-mono text-slate-500 mt-1.5">📍 ${n.evidence}</div>
+    <div class="flex gap-2 mt-3">
+      <button class="flex-1 text-[11px] font-mono py-1 rounded border border-edge hover:bg-edge">graduate → draft ADR</button>
+      <button class="flex-1 text-[11px] font-mono py-1 rounded border border-edge hover:bg-edge">route → story / AC</button>
+      <button class="flex-1 text-[11px] font-mono py-1 rounded border border-edge hover:bg-edge text-slate-500">dismiss</button>
+    </div>
+  </div>`
+  )
+  .join("");
+</script>
+</body>
+</html>
