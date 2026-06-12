@@ -68,6 +68,33 @@ questions settled, and the distance-from-intent trend becomes computable at
 all. **No history, no trajectory; no trajectory, no convergence** — *who
 decided, what changed, why*.
 
+## Progress — the vision is big; today's slice is deliberately thin
+
+Built in one hackathon day (2026-06-12). Every 🧭 row already carries stable
+requirement IDs in [the spec](docs/requirements/delivery-radar-requirements.en.md)
+— the vision is sequenced, not vapor.
+
+| # | Capability | Spec | Status |
+|---|---|---|---|
+| 1 | Constraint extraction from ADR blocks | `FR-EXT-1/3` | ✅ **live** |
+| 2 | Scope-first retrieval (noise control) | `NFR-RETRIEVAL-1` | ✅ **live** |
+| 3 | Driver-grounded semantic conformance | `FR-CONF-3..6` | ✅ **live** |
+| 4 | Advisory review on real PRs, evidence-linked | `FR-CONF-7..9` | ✅ **live** (structural comment type) |
+| 5 | Verdict persistence & replay | `NFR-EVAL-1` (partial) | 🟡 basic (`--save` / `--replay`) |
+| 6 | GitHub Action automation (auto-run on PR events) | `FR-INT-1` | 🔜 next |
+| 7 | Decision Capture → Notes → graduation | `FR-CAP-1..9` | 🧭 specified |
+| 8 | Drift engine + decay dashboard | `FR-DRIFT-0..8` | 🧭 specified (dashboard = seeded preview) |
+| 9 | Behavioral intent layer (stories / AC) | §3.1 Phase 2 | 🧭 specified |
+| 10 | Audit trail: verdicts + human signals persisted | `FR-CONF-10` `NFR-EVAL-1` | 🧭 specified |
+| 11 | Historical-replay precision harness | §14 `AC-1/2` | 🧭 specified |
+| 12 | Earned gating (deterministic + proven precision only) | `NFR-GATE-1` | 🧭 specified |
+| 13 | Pre-PR self-check in agent loops → long-horizon autonomy | `FR-CONF-2` | 🧭 specified |
+
+**4 of 13 capability groups run today.** That ratio is the point: the live
+slice proves the differentiating mechanism (driver-grounded verdicts on real
+PRs); the other nine are why it matters — see the
+[showcase](https://fang-lin.github.io/delivery-radar-pages/).
+
 ## Live demo
 
 - **Demo PR with a real verdict**: [fang-lin/shop-demo#1](https://github.com/fang-lin/shop-demo/pull/1) —
@@ -112,33 +139,6 @@ docs/
   video/          showcase operating scripts (zh · en)
   adr/            reserved for this repo's own ADRs (en)
 ```
-
-## Progress — the vision is big; today's slice is deliberately thin
-
-Built in one hackathon day (2026-06-12). Every 🧭 row already carries stable
-requirement IDs in [the spec](docs/requirements/delivery-radar-requirements.en.md)
-— the vision is sequenced, not vapor.
-
-| # | Capability | Spec | Status |
-|---|---|---|---|
-| 1 | Constraint extraction from ADR blocks | `FR-EXT-1/3` | ✅ **live** |
-| 2 | Scope-first retrieval (noise control) | `NFR-RETRIEVAL-1` | ✅ **live** |
-| 3 | Driver-grounded semantic conformance | `FR-CONF-3..6` | ✅ **live** |
-| 4 | Advisory review on real PRs, evidence-linked | `FR-CONF-7..9` | ✅ **live** (structural comment type) |
-| 5 | Verdict persistence & replay | `NFR-EVAL-1` (partial) | 🟡 basic (`--save` / `--replay`) |
-| 6 | GitHub Action automation (auto-run on PR events) | `FR-INT-1` | 🔜 next |
-| 7 | Decision Capture → Notes → graduation | `FR-CAP-1..9` | 🧭 specified |
-| 8 | Drift engine + decay dashboard | `FR-DRIFT-0..8` | 🧭 specified (dashboard = seeded preview) |
-| 9 | Behavioral intent layer (stories / AC) | §3.1 Phase 2 | 🧭 specified |
-| 10 | Audit trail: verdicts + human signals persisted | `FR-CONF-10` `NFR-EVAL-1` | 🧭 specified |
-| 11 | Historical-replay precision harness | §14 `AC-1/2` | 🧭 specified |
-| 12 | Earned gating (deterministic + proven precision only) | `NFR-GATE-1` | 🧭 specified |
-| 13 | Pre-PR self-check in agent loops → long-horizon autonomy | `FR-CONF-2` | 🧭 specified |
-
-**4 of 13 capability groups run today.** That ratio is the point: the live
-slice proves the differentiating mechanism (driver-grounded verdicts on real
-PRs); the other nine are why it matters — see the
-[showcase](https://fang-lin.github.io/delivery-radar-pages/).
 
 Principles that never bend: **machine drafts, human confirms** · advisory by
 default, a check earns the right to block · the constraint is the single shared
