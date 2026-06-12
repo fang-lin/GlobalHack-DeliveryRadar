@@ -119,6 +119,17 @@
     <text x="290" y="605" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600" font-family="Space Grotesk">human confirms ✓</text>
     <text x="560" y="588" fill="#a78bfa" font-size="12" font-family="JetBrains Mono">updated intent → constraints re-extracted ↻</text>
 
+    <!-- the outcome: convergence mini-chart (fills the empty area under column 1) -->
+    <rect x="64" y="398" width="254" height="150" rx="12" fill="#141b33" stroke="#475569" stroke-width="1.5"/>
+    <text x="191" y="420" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="600" font-family="Space Grotesk">distance from intent · over time</text>
+    <line x1="82" y1="528" x2="300" y2="528" stroke="#1f2b4a" stroke-width="1.5" stroke-dasharray="3 4"/>
+    <text x="305" y="531" fill="#475569" font-size="9" font-family="JetBrains Mono">0</text>
+    <polyline points="84,488 124,478 136,482 176,468 188,472 232,455 244,459 296,440" fill="none" stroke="#f87171" stroke-width="2" opacity="0.85"/>
+    <text x="234" y="442" fill="#f87171" font-size="9.5" font-family="JetBrains Mono">without ↗</text>
+    <polyline points="84,488 124,489 132,498 172,499 180,508 222,509 230,518 296,519" fill="none" stroke="#37e8c2" stroke-width="2.5"/>
+    <text x="238" y="512" fill="#37e8c2" font-size="9.5" font-family="JetBrains Mono">with → ≈0</text>
+    <text x="191" y="543" text-anchor="middle" fill="#64748b" font-size="8.5" font-family="JetBrains Mono">flat = conformance · steps = drift</text>
+
     <!-- legend -->
     <rect x="180" y="638" width="14" height="14" rx="4" fill="#11182e" stroke="#a78bfa" stroke-width="2"/>
     <text x="202" y="650" fill="#94a3b8" font-size="12">intent · its updates</text>
@@ -128,26 +139,6 @@
     <text x="682" y="650" fill="#94a3b8" font-size="12">intermediate artifacts</text>
   </svg>
 
-  <!-- convergence strip: the outcome of the three processes -->
-  <svg viewBox="0 0 980 132" class="w-full max-w-5xl mt-1">
-    <text x="18" y="78" fill="#64748b" font-size="10" font-family="JetBrains Mono" transform="rotate(-90 18 78)" text-anchor="middle">distance from intent</text>
-    <line x1="60" y1="108" x2="920" y2="108" stroke="#1f2b4a" stroke-width="1.5" stroke-dasharray="3 5"/>
-    <text x="924" y="112" fill="#475569" font-size="10" font-family="JetBrains Mono">0</text>
-    <text x="490" y="128" text-anchor="middle" fill="#475569" font-size="10" font-family="JetBrains Mono">time →</text>
-
-    <!-- without: divergence compounds -->
-    <polyline points="70,55 160,48 180,53 300,40 320,45 460,30 480,35 640,22 660,27 850,12"
-      fill="none" stroke="#f87171" stroke-width="2" opacity="0.85"/>
-    <text x="862" y="14" fill="#f87171" font-size="11" font-family="Space Grotesk">without — divergence compounds</text>
-
-    <!-- with the loop: flat (conformance) + steps down (drift) -->
-    <polyline points="70,55 190,56 210,68 350,69 370,81 510,82 530,93 700,94 720,103 850,104"
-      fill="none" stroke="#37e8c2" stroke-width="2.5"/>
-    <text x="862" y="106" fill="#37e8c2" font-size="11" font-family="Space Grotesk">with — converges ≈ 0</text>
-
-    <text x="265" y="59" fill="#34d399" font-size="10" font-family="JetBrains Mono">flat = conformance blocks new divergence</text>
-    <text x="585" y="72" fill="#f59e0b" font-size="10" font-family="JetBrains Mono">steps = drift drains the backlog</text>
-  </svg>
   <div class="text-[11px] text-slate-500 mt-1">capture keeps the measure honest — no unrecorded decisions, so "≈ 0" means truly aligned · <span class="text-beam">aligned at every step, convergent over time → deterministic output</span></div>
 </section>
 
