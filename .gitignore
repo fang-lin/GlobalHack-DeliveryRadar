@@ -33,3 +33,6 @@ coverage/
 
 # transient PR diff scratch files at repo root
 /pr1.diff
+
+# Local reference material — not for commit (organizer guide, etc.)
+/docs/reference/
