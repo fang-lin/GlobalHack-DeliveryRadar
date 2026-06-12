@@ -37,10 +37,10 @@
 </style>
 </head>
 <body class="font-display text-slate-200 min-h-screen">
-<div class="max-w-7xl mx-auto px-6 py-6">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
 
   <!-- top bar -->
-  <header class="flex items-center justify-between pb-5 border-b border-edge">
+  <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-4 sm:pb-5 border-b border-edge">
     <div class="flex items-center gap-3">
       <div class="text-3xl">🛰️</div>
       <div>
@@ -48,18 +48,18 @@
         <div class="text-xs text-slate-400">Intent–Implementation Governance</div>
       </div>
     </div>
-    <div class="text-right">
+    <div class="sm:text-right">
       <div class="font-mono text-sm text-beam" id="repo"></div>
       <div class="text-xs text-slate-500" id="generated"></div>
     </div>
   </header>
 
   <!-- KPI row -->
-  <section class="grid grid-cols-5 gap-4 mt-6" id="kpis"></section>
+  <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mt-4 sm:mt-6" id="kpis"></section>
 
-  <main class="grid grid-cols-5 gap-4 mt-4">
+  <main class="grid grid-cols-1 lg:grid-cols-5 gap-4 mt-4">
     <!-- conformance feed -->
-    <section class="col-span-3">
+    <section class="lg:col-span-3">
       <h2 class="text-sm uppercase tracking-widest text-slate-400 mb-3">
         Conformance <span class="text-slate-600">· Enforce — PR checks (advisory)</span>
       </h2>
@@ -67,7 +67,7 @@
     </section>
 
     <!-- right column: drift + capture -->
-    <section class="col-span-2 space-y-4">
+    <section class="lg:col-span-2 space-y-4">
       <div>
         <h2 class="text-sm uppercase tracking-widest text-slate-400 mb-3">
           Drift <span class="text-slate-600">· Audit — standing codebase</span>
@@ -84,7 +84,7 @@
     </section>
   </main>
 
-  <footer class="mt-8 pt-4 border-t border-edge flex items-center justify-between text-xs text-slate-500">
+  <footer class="mt-8 pt-4 border-t border-edge flex flex-col sm:flex-row gap-2 items-center justify-between text-center text-xs text-slate-500">
     <div class="font-mono">ADR → Constraint → { conformance · drift } → { capture · supersede } → ADR</div>
     <div class="text-beam font-semibold">machine drafts · human confirms</div>
   </footer>
@@ -131,7 +131,7 @@ $("#feed").innerHTML = D.conformance_feed
         const s = RESULT_STYLE[v.result];
         return `
       <div class="mt-3 border-t border-edge pt-3">
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
           <span class="px-2 py-0.5 rounded border text-[11px] font-mono font-semibold ${s.badge}">${s.label}</span>
           <span class="font-mono text-xs text-slate-400">${v.constraint_id}</span>
           <span class="text-xs text-slate-500">· driver <span class="text-beam/80 font-mono">${v.driver}</span></span>
@@ -145,7 +145,7 @@ $("#feed").innerHTML = D.conformance_feed
       .join("");
     return `
   <article class="bg-panel border ${pr.live ? "border-beam/50 shadow-[0_0_24px_rgba(55,232,194,.08)]" : "border-edge"} rounded-xl p-4">
-    <div class="flex items-center gap-2">
+    <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
       <span class="font-mono text-xs text-slate-500">#${pr.pr}</span>
       <span class="font-medium text-sm">${pr.title}</span>
       ${pr.live ? '<span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-beam/15 text-beam border border-beam/40">LIVE</span>' : ""}
@@ -189,14 +189,14 @@ $("#adr-health").innerHTML = D.drift.adrs
 const risk = D.drift.at_risk;
 $("#at-risk").innerHTML = `
   <div class="bg-panel border border-red-500/40 rounded-xl p-4">
-    <div class="flex items-center gap-2">
+    <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
       <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-red-500/15 text-red-400 border border-red-500/40">AT RISK</span>
       <span class="font-mono text-xs text-slate-400">${risk.adr}</span>
-      <span class="text-[11px] text-slate-500 ml-auto">${risk.trend_note}</span>
+      <span class="text-[11px] text-slate-500 sm:ml-auto">${risk.trend_note}</span>
     </div>
     <div class="text-sm mt-2">${risk.title}</div>
     <div class="text-xs text-slate-500 mt-0.5">driver <span class="font-mono text-beam/80">${risk.driver}</span> — is the decision stale, or the code?</div>
-    <div class="grid grid-cols-2 gap-2 mt-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
       ${risk.options
         .map(
           (o) => `
