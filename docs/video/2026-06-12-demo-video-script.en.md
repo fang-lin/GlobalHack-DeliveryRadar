@@ -110,7 +110,7 @@ Actions: at extract say "constraints, extracted from the ADRs"; the 20–30 s wa
 
 #### ⑪ 4:40–5:00 · Tab ⑤ screen 4 (roadmap) → close
 
-> The road is sequenced: what you saw runs today; capture and drift next; gating only once precision is proven. **Delivery Radar — keep the why alive.** Thanks!
+> The road is sequenced: what you saw runs today; capture and drift next; gating only once precision is proven. **Delivery Radar — keep the why alive.** That's our take on *innovation that AI works*. Thanks!
 
 ---
 

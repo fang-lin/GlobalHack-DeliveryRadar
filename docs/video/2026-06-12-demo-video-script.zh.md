@@ -130,9 +130,9 @@ gh pr diff 1 -R fang-lin/shop-demo > pr1.diff
 
 #### ⑪ 4:40–5:00 · 标签⑤ 第四屏（路线图）→ 收尾
 
-> 🇬🇧 The road is sequenced: what you saw runs today; capture and drift next; gating only once precision is proven. **Delivery Radar — keep the why alive.** Thanks!
+> 🇬🇧 The road is sequenced: what you saw runs today; capture and drift next; gating only once precision is proven. **Delivery Radar — keep the why alive.** That's our take on *innovation that AI works*. Thanks!
 >
-> 🇨🇳 路线已排好：今天的在跑；capture 和 drift 接着来；gate 等精度证明之后。Keep the why alive。谢谢！
+> 🇨🇳 路线已排好：今天的在跑；capture 和 drift 接着来；gate 等精度证明之后。Keep the why alive——这就是我们对 *Innovation that AI/works* 的回答。谢谢！
 
 ---
 
