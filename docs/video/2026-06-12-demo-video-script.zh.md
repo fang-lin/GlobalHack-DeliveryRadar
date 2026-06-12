@@ -122,11 +122,11 @@ gh pr diff 1 -R fang-lin/shop-demo > pr1.diff
 >
 > 🇨🇳 整个系统已写成规格——每个框都有需求 ID。今天是点亮的脊柱。周围按序排着：行为意图层、确定性检查、capture 分诊、drift 引擎，以及信任阶梯——回放台在你自己的历史上量精度：检查凭实绩才配阻塞。
 
-#### ⑩ 4:00–4:40 · 标签⑤ 第三屏（Two paths, one loop）：先左卡，再右卡（高亮），最后指底部审计带
+#### ⑩ 4:00–4:40 · 标签⑤ 第三屏（writing → steering → autonomy 三联卡）：从左到右逐卡指，最后指底部审计带
 
-> 🇬🇧 Two paths make this matter. **Today, humans write the code** — and the loop keeps intent and implementation converging naturally. But the bigger one: this is an exploration of **how to let coding agents work autonomously for long stretches**. Agents drift. Machine-checkable intent gives them a self-check loop: verify against the decisions *before* opening a PR, capture new decisions as they're made, escalate to a human only at decision points. And the entire process is **tracked and auditable**: every verdict carries its evidence and constraint ID, every confirmation is recorded, intent history lives in git. You can always answer — who decided, what changed, and why.
+> 🇬🇧 Three eras put this in context. **In the past, humans wrote the code** — intent lived in people's heads, and drift was slow enough for review to keep up. **Today, humans steer coding agents in real time** — agents write the code; alignment holds because a human corrects every step, live. That scales to one person, one session. **The exploration: long-horizon autonomy** — recorded, machine-checkable intent replaces real-time steering. The agent self-checks *before* opening a PR, captures new decisions, escalates only at decision points. The human steps out of the loop — alignment stays in. And everything is **tracked and auditable**: every verdict carries evidence and a constraint ID, every confirmation is recorded, intent lives in git — who decided, what changed, why.
 >
-> 🇨🇳 两条路径让这件事重要。今天人写代码——这个环让意图与实现自然收敛。更大的那条：这是在探索**如何让编码 agent 长时间自主工作**。agent 会漂移；机器可查的意图给它自检回路——开 PR 前先对照决策验证、边做边捕获新决策、只在需要决策时升级到人。而且全程**可跟踪可审计**：每个裁定带证据和约束 ID、每次确认有记录、意图历史活在 git 里。永远答得出：谁决定的、改了什么、为什么。
+> 🇨🇳 三个时代看清这件事。**过去：人写代码**——意图在人脑子里，漂移慢到评审跟得上。**今天：人类实时操纵 agent 写代码**——代码已是 agent 写的，对齐靠人盯每一步、实时纠偏，只能扩展到一个人一个会话。**要探索的：长程自主**——记录在案、机器可查的意图取代实时操纵：agent 开 PR 前自检、边做边捕获决策、只在决策点升级到人。人退出回路，对齐留在回路里。而且全程**可跟踪可审计**：裁定带证据和约束 ID、确认有记录、意图活在 git——谁决定的、改了什么、为什么。
 
 #### ⑪ 4:40–5:00 · 标签⑤ 第四屏（路线图）→ 收尾
 

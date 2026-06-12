@@ -171,29 +171,46 @@
 <!-- ============ SLIDE 3: TWO PATHS + AUDITABILITY ============ -->
 <section class="slide flex flex-col items-center justify-center px-6">
   <div class="text-xs uppercase tracking-[0.3em] text-slate-500 mb-1">why this matters</div>
-  <h1 class="text-3xl font-bold mb-10">Two paths, one loop</h1>
+  <h1 class="text-3xl font-bold mb-10">From writing, to steering, to autonomy</h1>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-5 w-full max-w-5xl">
-    <div class="bg-panel border border-edge rounded-2xl p-7">
-      <div class="text-3xl">👩‍💻</div>
-      <div class="font-bold text-lg mt-3">Today — humans write the code</div>
-      <p class="text-sm text-slate-400 mt-3 leading-relaxed">
-        The loop works naturally: every PR is checked against recorded intent,
-        drift is surfaced, implicit decisions get captured. Intent and
-        implementation <span class="text-slate-200">keep converging</span> —
-        instead of drifting apart one green build at a time.
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-6xl items-stretch">
+    <div class="bg-panel border border-edge rounded-2xl p-6 opacity-75">
+      <div class="flex items-center justify-between">
+        <div class="text-3xl">👩‍💻</div>
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-500/10 text-slate-400 border border-slate-500/30">PAST</span>
+      </div>
+      <div class="font-bold text-base mt-3">Humans write the code</div>
+      <p class="text-[13px] text-slate-400 mt-2.5 leading-relaxed">
+        Intent lives in people's heads and meeting rooms. Drift is slow enough
+        that human review mostly keeps up —
+        <span class="text-slate-300">alignment by craftsmanship</span>.
       </p>
     </div>
 
-    <div class="bg-panel border-2 border-beam/60 rounded-2xl p-7 shadow-[0_0_40px_rgba(55,232,194,.1)]">
-      <div class="text-3xl">🤖</div>
-      <div class="font-bold text-lg mt-3 text-beam">The exploration — autonomous agents</div>
-      <p class="text-sm text-slate-400 mt-3 leading-relaxed">
-        Long-running coding agents drift from intent over hours of work.
-        Machine-checkable intent gives them a <span class="text-beam">self-check loop</span>:
-        verify against the decisions <em>before</em> opening a PR, capture new
-        decisions as they're made, escalate to a human only at decision points.
-        <span class="text-slate-200">This is what makes long-horizon autonomy governable.</span>
+    <div class="bg-panel border border-edge rounded-2xl p-6">
+      <div class="flex items-center justify-between">
+        <div class="text-3xl">🕹️</div>
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/30">TODAY</span>
+      </div>
+      <div class="font-bold text-base mt-3">Humans steer agents in real time</div>
+      <p class="text-[13px] text-slate-400 mt-2.5 leading-relaxed">
+        Agents write the code; alignment holds because a human watches every
+        step and corrects drift <em>live</em>, prompt by prompt —
+        <span class="text-slate-300">alignment by supervision. It scales to one person, one session.</span>
+      </p>
+    </div>
+
+    <div class="bg-panel border-2 border-beam/60 rounded-2xl p-6 shadow-[0_0_40px_rgba(55,232,194,.1)]">
+      <div class="flex items-center justify-between">
+        <div class="text-3xl">🤖</div>
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-beam/15 text-beam border border-beam/40">THE EXPLORATION</span>
+      </div>
+      <div class="font-bold text-base mt-3 text-beam">Long-horizon autonomy</div>
+      <p class="text-[13px] text-slate-400 mt-2.5 leading-relaxed">
+        Recorded, <span class="text-beam">machine-checkable intent</span> replaces real-time steering:
+        the agent self-checks <em>before</em> opening a PR, captures new decisions,
+        escalates to a human only at decision points —
+        <span class="text-slate-200">alignment by infrastructure. The human steps out of the loop; alignment stays in.</span>
       </p>
     </div>
   </div>

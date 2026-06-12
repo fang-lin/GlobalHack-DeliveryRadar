@@ -104,9 +104,9 @@ Actions: at extract say "constraints, extracted from the ADRs"; the 20–30 s wa
 
 > We've specified the **whole system** — every box carries requirement IDs. Today you saw the lit spine. Around it, sequenced: the behavioral intent layer, deterministic checks, capture triage, the drift engine — and a trust ladder: a replay harness measuring precision on your repo's *own history*, because a check only earns the right to **block** after it proves itself.
 
-#### ⑩ 4:00–4:40 · Tab ⑤ screen 3 (Two paths, one loop): left card → right card (highlighted) → bottom audit strip
+#### ⑩ 4:00–4:40 · Tab ⑤ screen 3 (writing → steering → autonomy, three cards): point left to right, then the audit strip
 
-> Two paths make this matter. **Today, humans write the code** — and the loop keeps intent and implementation converging naturally. But the bigger one: this is an exploration of **how to let coding agents work autonomously for long stretches**. Agents drift. Machine-checkable intent gives them a self-check loop: verify against the decisions *before* opening a PR, capture new decisions as they're made, escalate to a human only at decision points. And the entire process is **tracked and auditable**: every verdict carries its evidence and constraint ID, every confirmation is recorded, intent history lives in git. You can always answer — who decided, what changed, and why.
+> Three eras put this in context. **In the past, humans wrote the code** — intent lived in people's heads, and drift was slow enough for review to keep up. **Today, humans steer coding agents in real time** — agents write the code; alignment holds because a human corrects every step, live. That scales to one person, one session. **The exploration: long-horizon autonomy** — recorded, machine-checkable intent replaces real-time steering. The agent self-checks *before* opening a PR, captures new decisions, escalates only at decision points. The human steps out of the loop — alignment stays in. And everything is **tracked and auditable**: every verdict carries evidence and a constraint ID, every confirmation is recorded, intent lives in git — who decided, what changed, why.
 
 #### ⑪ 4:40–5:00 · Tab ⑤ screen 4 (roadmap) → close
 
