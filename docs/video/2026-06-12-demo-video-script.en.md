@@ -79,7 +79,7 @@ Actions: at extract say "constraints, extracted from the ADRs"; the 20–30 s wa
 
 **Fallback** (check fails / >30 s):
 ```bash
-.venv/bin/radar check --adr-dir ~/Projects/shop-demo/docs/adr --diff /tmp/pr1.diff --replay artifacts/pr1-verdicts.json
+.venv/bin/radar check --adr-dir ~/Projects/shop-demo/docs/adr --diff pr1.diff --replay artifacts/pr1-verdicts.json
 ```
 
 #### ⑤ 2:00–2:25 · Tab ②: scroll to the 🛰️ comment; sweep Rule / Why / Evidence / Direction
@@ -98,7 +98,7 @@ Actions: at extract say "constraints, extracted from the ADRs"; the 20–30 s wa
 
 #### ⑧ 3:15–3:35 · Tab ⑤ screen 1 (three-pipeline loop): point at the three green ops and the return edge; on the convergence line, point at the bottom chart (red rising vs teal decaying)
 
-> The heart is what we call the **IIAC loop** — intent, implementation, alignment, convergence. ADRs become constraints; conformance enforces, drift audits, capture feeds decisions back. **Alignment makes each change right; convergence makes the whole trajectory settle** — no oscillation, so the process ends in a deterministic, auditable state instead of circling.
+> The heart is what we call the **IIAC loop** — intent, implementation, alignment, convergence. Recorded intent — carried in ADRs, specs, stories — becomes constraints; conformance enforces, drift audits, capture feeds decisions back. **Alignment makes each change right; convergence makes the whole trajectory settle** — no oscillation, so the process ends in a deterministic, auditable state instead of circling.
 
 #### ⑨ 3:35–4:00 · Tab ⑤ screen 2 (system map): point at the legend, then sweep the dimmed cards
 
@@ -106,7 +106,7 @@ Actions: at extract say "constraints, extracted from the ADRs"; the 20–30 s wa
 
 #### ⑩ 4:00–4:40 · Tab ⑤ screen 3 (writing → steering → autonomy, three cards): point left to right, then the audit strip
 
-> Three eras put this in context. **In the past, humans wrote the code** — intent lived in people's heads, and drift was slow enough for review to keep up. **Today, humans steer coding agents in real time** — agents write the code; alignment holds because a human corrects every step, live. That scales to one person, one session. **The exploration: long-horizon autonomy** — recorded, machine-checkable intent replaces real-time steering. The agent self-checks *before* opening a PR, captures new decisions, escalates only at decision points. The human steps out of the loop — alignment stays in. And everything is **tracked and auditable**: every verdict carries evidence and a constraint ID, every confirmation is recorded, intent lives in git — who decided, what changed, why.
+> Three eras put this in context. **In the past, humans wrote the code** — intent lived in people's heads, and drift was slow enough for review to keep up. **Today, humans steer coding agents in real time** — agents write the code; alignment holds because a human corrects every step, live. That scales to one person, one session. **The exploration: long-horizon autonomy** — recorded, machine-checkable intent replaces real-time steering. The agent self-checks *before* opening a PR, captures new decisions, escalates only at decision points. The human steps out of the loop — alignment stays in. And one thing is non-negotiable: the whole loop is **designed to be tracked and auditable — because convergence needs memory**. You cannot converge if you don't know where you've been. Every verdict carries evidence and a constraint ID, every confirmation is recorded, intent lives in git — who decided, what changed, why.
 
 #### ⑪ 4:40–5:00 · Tab ⑤ screen 4 (roadmap) → close
 

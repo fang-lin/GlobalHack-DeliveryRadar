@@ -1,7 +1,7 @@
 # IIAC Loop 图设计说明（视频 slides 第一屏）
 
-> **权威: 中文（本文件） · 翻译: 英文（待更新） · 最后同步: 2026-06-12**
-> 状态：已实现于 `dashboard/slides.html` 第一屏；本文供快速审核，改这里=改图。
+> **权威: 中文（本文件） · 翻译: 英文（`loop-diagram-design.en.md`） · 最后同步: 2026-06-12 · 两版冲突以中文为准**
+> 状态：已实现于 `dashboard/index.html` 第一屏（showcase 落地页）；本文供快速审核，改这里=改图。
 
 ## 一句话
 
@@ -17,7 +17,7 @@
                                   ┌───────────────┬──────────┤（扇出）
                                   ↓               ↓          ↓
                           ┌ Conformance ┐ ┌ Decision Capture ┐ ┌ Drift Detection ┐   ← 绿=检测作业
-                          │ PR open+push │ │   on PR open     │ │ cron·ADR change │
+                          │ PR open+push │ │   on PR open     │ │ cron·intent change │
                                   ↓               ↓                    ↓
                             Report          Decision Note        Drift report        ← 灰=中间产物
                           typed PR review   draft·人工分诊       + 衰减趋势
@@ -33,7 +33,7 @@
 | 区域 | 内容 | 颜色 |
 |---|---|---|
 | 顶带 | **Intent**（副标：carried by ADRs · specs · stories · requirement docs — linked to business drivers）→ extract → **Constraints**（addressable · stable IDs） | 紫 |
-| 三操作 | Conformance（on PR open + push）/ Decision Capture（on PR open）/ Drift Detection（cron · on ADR change） | 绿 |
+| 三操作 | Conformance（on PR open + push）/ Decision Capture（on PR open）/ Drift Detection（cron · on intent change） | 绿 |
 | 中间产物 | Report（typed PR review, advisory）/ Decision Note（draft, on the PR · human triage）/ Drift report（+ decay trend per ADR） | 灰 |
 | 意图更新 | Graduate → intent（architectural → ADR · behavioral → story/AC）/ Supersede → intent；旁支 Remediation issue（灰） | 紫 |
 | 回灌线 | 两条紫线汇入底部回路，穿过虚线小框 **human confirms ✓**，回到 Intent 左侧；标注 `updated intent → constraints re-extracted ↻` | 紫 |

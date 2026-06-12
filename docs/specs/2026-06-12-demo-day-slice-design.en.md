@@ -9,13 +9,13 @@
 - **Layering principle**: the differentiating capability (driver-grounded semantic checking) must be real; everything else may be staged.
 - This slice does not replace the full Phase 1 design; weekend work continues from here.
 
-## 2. Video Narrative (single-take Zoom-meeting walkthrough; run-sheet in `docs/video/2026-06-12-demo-video-script.md`)
+## 2. Video Narrative (single-take Zoom-meeting walkthrough; run-sheet in `docs/video/2026-06-12-demo-video-script.en.md`)
 
 1. Pain: code is produced faster than review-against-why (~30s)
 2. Staging: `shop-demo` + `ADR-001` (business rationale) + machine-readable constraints block + live `radar extract` (~40s)
 3. **Main scene**: CI-green PR → scope retrieval → radar check → real review comment citing ADR clause + business rationale + code lines + fix direction (~70s)
 4. Contrast: ungrounded review is engineering opinion — treats staleness as a bug to fix and even proposes an ADR-violating alternative; grounding turns it into a governable verdict (~30s)
-5. Closed loop: ADR → Constraint → conformance/drift; capture/supersede feed back; "machine drafts, human confirms" (~40s)
+5. The IIAC Loop: Intent (carried by ADRs etc.) → Constraint → conformance/drift; capture/supersede feed back; "machine drafts, human confirms" (~40s)
 6. Dashboard overview: conformance feed (with the real verdict), drift trends, at-risk ADR binary-choice card, Decision Note triage queue (~55s)
 7. Roadmap (Phase 1 running / Phase 2 drift+dashboard / Phase 3 earned gating) + close (~35s)
 

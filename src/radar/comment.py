@@ -90,8 +90,9 @@ def review_markdown(
             "",
         ]
     blocks.append(
-        "_Advisory — this check does not block your merge. The cited ADR is the "
-        "source of truth; react with 👍/👎 to calibrate the checker._"
+        "_Advisory — this check does not block your merge. The recorded intent "
+        "behind the cited ADR is the source of truth; react with 👍/👎 so future "
+        "checks can be calibrated._"
     )
     return "\n".join(blocks)
 

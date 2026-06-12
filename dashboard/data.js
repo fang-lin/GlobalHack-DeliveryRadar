@@ -27,7 +27,7 @@ window.RADAR_DATA = {
           result: "violated",
           confidence: 0.99,
           severity: "high",
-          evidence: "services/inventory/reader.py L16–L23",
+          evidence: "services/inventory/reader.py L19–L23",
           explanation:
             "Removes the compliant cache+replica read path and replaces it with SELECT ... FOR UPDATE against the primary — reintroducing the lock contention that caused the 8x checkout latency degradation during the 2025 peak event (EPIC-512).",
         },
@@ -39,7 +39,7 @@ window.RADAR_DATA = {
           result: "aligned",
           confidence: 0.92,
           severity: "medium",
-          evidence: "services/inventory/reader.py",
+          evidence: "services/inventory/reader.py L16–L22",
           explanation:
             "The diff only modifies how the inventory service reads its own database; no synchronous HTTP call to another service is introduced.",
         },

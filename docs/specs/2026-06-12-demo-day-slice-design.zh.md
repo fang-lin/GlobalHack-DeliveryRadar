@@ -9,13 +9,13 @@
 - **分层原则**：差异化能力（driver 锚定的语义检查）必须真实；其余皆可布景。
 - 本切片不替代 Phase 1 完整设计；周末在此基础上继续。
 
-## 2. 视频叙事（Zoom meeting 一镜到底 walkthrough，run-sheet 见 `docs/video/2026-06-12-demo-video-script.md`）
+## 2. 视频叙事（Zoom meeting 一镜到底 walkthrough，run-sheet 见 `docs/video/2026-06-12-demo-video-script.zh.md`）
 
 1. 痛点：代码生产快于"对照为什么"的评审（~30s）
 2. 布景：`shop-demo` + `ADR-001`（业务理由）+ 机读 constraints 块 + `radar extract` 实跑（~40s）
 3. **主戏**：CI 绿的 PR → scope 检索 → radar check → 真实评审评论引用 ADR 条款 + 业务理由 + 代码行 + 修复方向（~70s）
 4. 对照组：无锚定 review 是工程意见——把陈旧度当 bug 修、甚至提出违反 ADR 的替代方案；锚定后才是可治理的裁定（~30s）
-5. 闭环原理：ADR → Constraint → conformance/drift；capture/supersede 回流；"machine drafts, human confirms"（~40s）
+5. IIAC Loop 原理：Intent（ADR 等为载体）→ Constraint → conformance/drift；capture/supersede 回流；"machine drafts, human confirms"（~40s）
 6. Dashboard 全景：conformance feed（含真裁定）、drift 趋势、at-risk ADR 二选一卡片、Decision Note triage 队列（~55s）
 7. 路线图（Phase 1 已跑通 / Phase 2 drift+dashboard / Phase 3 凭实绩开 gate）+ 收尾（~35s）
 

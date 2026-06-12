@@ -120,7 +120,10 @@ There is exactly one constraint schema (`DM-CONSTRAINT`) and one verdict shape
 - Every new/changed ADR triggers constraint re-extraction and a `drift` rescan.
 
 We name this closed loop the **IIAC Loop**
-(Intent–Implementation–Alignment–Convergence). Its expanded view (the three
+(Intent–Implementation Alignment & Convergence). Auditability is part of the
+methodology, not an accessory: convergence is a trajectory property, and a
+trajectory needs memory — without knowing the past, you cannot converge (this
+is what the persistence in `NFR-EVAL-1` serves). Its expanded view (the three
 pipelines, their artifacts, and the human-confirmation gate on intent
 write-back — only the final convergence requires human confirmation):
 

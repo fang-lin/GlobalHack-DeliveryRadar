@@ -87,7 +87,7 @@ gh pr diff 1 -R fang-lin/shop-demo > pr1.diff
 
 **保底**（check 失败/超 30 秒）：
 ```bash
-.venv/bin/radar check --adr-dir ~/Projects/shop-demo/docs/adr --diff /tmp/pr1.diff --replay artifacts/pr1-verdicts.json
+.venv/bin/radar check --adr-dir ~/Projects/shop-demo/docs/adr --diff pr1.diff --replay artifacts/pr1-verdicts.json
 ```
 
 #### ⑤ 2:00–2:25 · 标签②：滚到 🛰️ 评论，划过 Rule / Why / Evidence / Direction
@@ -112,9 +112,9 @@ gh pr diff 1 -R fang-lin/shop-demo > pr1.diff
 
 #### ⑧ 3:15–3:35 · 标签⑤ 第一屏（三管线闭环图）：先指三个绿色操作和回灌线，说收敛句时指底部曲线（红升 vs 青降）
 
-> 🇬🇧 The heart is what we call the **IIAC loop** — intent, implementation, alignment, convergence. ADRs become constraints; conformance enforces, drift audits, capture feeds decisions back. **Alignment makes each change right; convergence makes the whole trajectory settle** — no oscillation, so the process ends in a deterministic, auditable state instead of circling.
+> 🇬🇧 The heart is what we call the **IIAC loop** — intent, implementation, alignment, convergence. Recorded intent — carried in ADRs, specs, stories — becomes constraints; conformance enforces, drift audits, capture feeds decisions back. **Alignment makes each change right; convergence makes the whole trajectory settle** — no oscillation, so the process ends in a deterministic, auditable state instead of circling.
 >
-> 🇨🇳 核心是闭环——意图、实现、对齐、收敛。ADR 变约束；conformance 执行、drift 审计、capture 喂回决策。**对齐让每一步正确；收敛让整条轨迹安定下来**——不摆动，过程以确定的、可审计的状态收尾，而不是打转。
+> 🇨🇳 核心是 IIAC 环——意图、实现、对齐、收敛。记录在案的意图（由 ADR、spec、story 承载）变约束；conformance 执行、drift 审计、capture 喂回决策。**对齐让每一步正确；收敛让整条轨迹安定下来**——不摆动，过程以确定的、可审计的状态收尾，而不是打转。
 
 #### ⑨ 3:35–4:00 · 标签⑤ 第二屏（全系统地图）：先指图例，再扫暗色卡片
 
@@ -124,9 +124,9 @@ gh pr diff 1 -R fang-lin/shop-demo > pr1.diff
 
 #### ⑩ 4:00–4:40 · 标签⑤ 第三屏（writing → steering → autonomy 三联卡）：从左到右逐卡指，最后指底部审计带
 
-> 🇬🇧 Three eras put this in context. **In the past, humans wrote the code** — intent lived in people's heads, and drift was slow enough for review to keep up. **Today, humans steer coding agents in real time** — agents write the code; alignment holds because a human corrects every step, live. That scales to one person, one session. **The exploration: long-horizon autonomy** — recorded, machine-checkable intent replaces real-time steering. The agent self-checks *before* opening a PR, captures new decisions, escalates only at decision points. The human steps out of the loop — alignment stays in. And everything is **tracked and auditable**: every verdict carries evidence and a constraint ID, every confirmation is recorded, intent lives in git — who decided, what changed, why.
+> 🇬🇧 Three eras put this in context. **In the past, humans wrote the code** — intent lived in people's heads, and drift was slow enough for review to keep up. **Today, humans steer coding agents in real time** — agents write the code; alignment holds because a human corrects every step, live. That scales to one person, one session. **The exploration: long-horizon autonomy** — recorded, machine-checkable intent replaces real-time steering. The agent self-checks *before* opening a PR, captures new decisions, escalates only at decision points. The human steps out of the loop — alignment stays in. And one thing is non-negotiable: the whole loop is **designed to be tracked and auditable — because convergence needs memory**. You cannot converge if you don't know where you've been. Every verdict carries evidence and a constraint ID, every confirmation is recorded, intent lives in git — who decided, what changed, why.
 >
-> 🇨🇳 三个时代看清这件事。**过去：人写代码**——意图在人脑子里，漂移慢到评审跟得上。**今天：人类实时操纵 agent 写代码**——代码已是 agent 写的，对齐靠人盯每一步、实时纠偏，只能扩展到一个人一个会话。**要探索的：长程自主**——记录在案、机器可查的意图取代实时操纵：agent 开 PR 前自检、边做边捕获决策、只在决策点升级到人。人退出回路，对齐留在回路里。而且全程**可跟踪可审计**：裁定带证据和约束 ID、确认有记录、意图活在 git——谁决定的、改了什么、为什么。
+> 🇨🇳 三个时代看清这件事。**过去：人写代码**——意图在人脑子里，漂移慢到评审跟得上。**今天：人类实时操纵 agent 写代码**——代码已是 agent 写的，对齐靠人盯每一步、实时纠偏，只能扩展到一个人一个会话。**要探索的：长程自主**——记录在案、机器可查的意图取代实时操纵：agent 开 PR 前自检、边做边捕获决策、只在决策点升级到人。人退出回路，对齐留在回路里。还有一点不可妥协：整个环按**可跟踪、可审计**设计——**因为收敛需要记忆**，不知道过去走过哪里就谈不上收敛。裁定带证据和约束 ID、确认有记录、意图活在 git——谁决定的、改了什么、为什么。
 
 #### ⑪ 4:40–5:00 · 标签⑤ 第四屏（路线图）→ 收尾
 

@@ -56,14 +56,24 @@ Three operations over one shared contract:
 | **Decision Capture** — produce | PR open | Decision Notes for implicit decisions; graduate to new intent |
 
 *Alignment makes each change right; convergence makes the trajectory settle —
-no oscillation, deterministic output. Every verdict, signal and confirmation is
-recorded: who decided, what changed, why.*
+no oscillation, deterministic output.*
+
+**Auditability is part of the method, not garnish.** Convergence is a property
+of a *trajectory*, and a trajectory needs memory: without recorded verdicts,
+confirmations and intent history you can judge "aligned right now" — but never
+know you are *getting closer*. In AI-led development, where agents write most
+of the code, the audit trail is the system's institutional memory: stable
+constraint IDs make history addressable, recorded confirmations keep settled
+questions settled, and the distance-from-intent trend becomes computable at
+all. **No history, no trajectory; no trajectory, no convergence** — *who
+decided, what changed, why*.
 
 ## Live demo
 
 - **Demo PR with a real verdict**: [fang-lin/shop-demo#1](https://github.com/fang-lin/shop-demo/pull/1) —
   CI-green "bugfix" that violates ADR-001's business driver; the radar's advisory
-  review quotes the recorded rationale (€400k peak-sale incident) and the fix direction.
+  review quotes the recorded business rationale (EPIC-512, peak-sale stability)
+  and the direction of the fix.
 - **Showcase (slides)**: https://fang-lin.github.io/delivery-radar-pages/
   ([dashboard](https://fang-lin.github.io/delivery-radar-pages/dashboard.html) ·
   [grounded-vs-ungrounded contrast](https://fang-lin.github.io/delivery-radar-pages/contrast.html))
@@ -100,17 +110,35 @@ docs/
   specs/          demo-day slice design (zh · en)
   governance/     documentation policy (bilingual, zh authoritative)
   video/          showcase operating scripts (zh · en)
-  adr/            this repo's own ADRs (dogfooding, en)
+  adr/            reserved for this repo's own ADRs (en)
 ```
 
-## Status
+## Progress — the vision is big; today's slice is deliberately thin
 
-Hackathon Phase 1 slice (2026-06-12): constraint extraction, scope-first
-retrieval, driver-grounded semantic conformance and advisory review projection
-run today on real PRs. Capture, the drift engine, the replay-precision harness
-and earned gating are specified (stable requirement IDs in
-`docs/requirements/`) and sequenced — see the
-[roadmap](https://fang-lin.github.io/delivery-radar-pages/slides.html).
+Built in one hackathon day (2026-06-12). Every 🧭 row already carries stable
+requirement IDs in [the spec](docs/requirements/delivery-radar-requirements.en.md)
+— the vision is sequenced, not vapor.
+
+| # | Capability | Spec | Status |
+|---|---|---|---|
+| 1 | Constraint extraction from ADR blocks | `FR-EXT-1/3` | ✅ **live** |
+| 2 | Scope-first retrieval (noise control) | `NFR-RETRIEVAL-1` | ✅ **live** |
+| 3 | Driver-grounded semantic conformance | `FR-CONF-3..6` | ✅ **live** |
+| 4 | Advisory review on real PRs, evidence-linked | `FR-CONF-7..9` | ✅ **live** (structural comment type) |
+| 5 | Verdict persistence & replay | `NFR-EVAL-1` (partial) | 🟡 basic (`--save` / `--replay`) |
+| 6 | GitHub Action automation (auto-run on PR events) | `FR-INT-1` | 🔜 next |
+| 7 | Decision Capture → Notes → graduation | `FR-CAP-1..9` | 🧭 specified |
+| 8 | Drift engine + decay dashboard | `FR-DRIFT-0..8` | 🧭 specified (dashboard = seeded preview) |
+| 9 | Behavioral intent layer (stories / AC) | §3.1 Phase 2 | 🧭 specified |
+| 10 | Audit trail: verdicts + human signals persisted | `FR-CONF-10` `NFR-EVAL-1` | 🧭 specified |
+| 11 | Historical-replay precision harness | §14 `AC-1/2` | 🧭 specified |
+| 12 | Earned gating (deterministic + proven precision only) | `NFR-GATE-1` | 🧭 specified |
+| 13 | Pre-PR self-check in agent loops → long-horizon autonomy | `FR-CONF-2` | 🧭 specified |
+
+**4 of 13 capability groups run today.** That ratio is the point: the live
+slice proves the differentiating mechanism (driver-grounded verdicts on real
+PRs); the other nine are why it matters — see the
+[showcase](https://fang-lin.github.io/delivery-radar-pages/).
 
 Principles that never bend: **machine drafts, human confirms** · advisory by
 default, a check earns the right to block · the constraint is the single shared

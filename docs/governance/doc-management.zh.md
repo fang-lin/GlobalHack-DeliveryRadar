@@ -30,11 +30,12 @@
 
 ```
 docs/
-  governance/      治理文档（本条例等）。双语，中文权威。
-  requirements/    需求规格。双语，中文权威。
-  specs/           设计 spec（brainstorming 产出）。中文权威。
-  plans/           实现计划（writing-plans 产出）。中文权威。
-  adr/             ADR。英文单语（产品产物层）。
+  governance/      policy docs — bilingual, zh authoritative
+  requirements/    requirement specs — bilingual, zh authoritative
+  specs/           design specs — bilingual, zh authoritative
+  plans/           implementation plans — bilingual, zh authoritative
+  video/           showcase scripts & diagram notes — bilingual, zh authoritative
+  adr/             ADRs — English only (product artifact layer)
 ```
 
 说明：设计 spec 不使用工具默认的 `docs/superpowers/specs/` 路径，统一收敛到 `docs/specs/`。

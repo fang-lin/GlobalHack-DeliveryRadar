@@ -30,11 +30,12 @@ Scope: code, identifiers, comments, ADRs (both human-readable body and machine-r
 
 ```
 docs/
-  governance/      Governance documents (this policy etc.). Bilingual, Chinese authoritative.
-  requirements/    Requirements specifications. Bilingual, Chinese authoritative.
-  specs/           Design specs (brainstorming output). Chinese authoritative.
-  plans/           Implementation plans (writing-plans output). Chinese authoritative.
-  adr/             ADRs. English only (product artifact layer).
+  governance/      policy docs — bilingual, zh authoritative
+  requirements/    requirement specs — bilingual, zh authoritative
+  specs/           design specs — bilingual, zh authoritative
+  plans/           implementation plans — bilingual, zh authoritative
+  video/           showcase scripts & diagram notes — bilingual, zh authoritative
+  adr/             ADRs — English only (product artifact layer)
 ```
 
 Note: design specs do not use the tool-default `docs/superpowers/specs/` path; they are consolidated under `docs/specs/`.
