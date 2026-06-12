@@ -118,9 +118,9 @@ gh pr diff 1 -R fang-lin/shop-demo > pr1.diff
 
 #### ⑨ 3:35–4:00 · 标签⑤ 第二屏（全系统地图）：先指图例，再扫暗色卡片
 
-> 🇬🇧 We've specified the **whole system** — every box carries requirement IDs. Today you saw the lit spine. Around it, sequenced: the behavioral intent layer, deterministic checks, capture triage, the drift engine — and a trust ladder: a replay harness measuring precision on your repo's *own history*, because a check only earns the right to **block** after it proves itself.
+> 🇬🇧 We've specified the **whole system** — every box carries requirement IDs; **four of thirteen capability groups run today**, and that ratio is the point. Today you saw the lit spine. Around it, sequenced: the behavioral intent layer, deterministic checks, capture triage, the drift engine — and a trust ladder: a replay harness measuring precision on your repo's *own history*, because a check only earns the right to **block** after it proves itself.
 >
-> 🇨🇳 整个系统已写成规格——每个框都有需求 ID。今天是点亮的脊柱。周围按序排着：行为意图层、确定性检查、capture 分诊、drift 引擎，以及信任阶梯——回放台在你自己的历史上量精度：检查凭实绩才配阻塞。
+> 🇨🇳 整个系统已写成规格——每个框都有需求 ID；**13 组能力今天跑通 4 组**，这个比例本身就是重点。今天是点亮的脊柱。周围按序排着：行为意图层、确定性检查、capture 分诊、drift 引擎，以及信任阶梯——回放台在你自己的历史上量精度：检查凭实绩才配阻塞。
 
 #### ⑩ 4:00–4:40 · 标签⑤ 第三屏（writing → steering → autonomy 三联卡）：从左到右逐卡指，最后指底部审计带
 

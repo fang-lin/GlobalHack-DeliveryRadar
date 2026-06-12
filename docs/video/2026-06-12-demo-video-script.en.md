@@ -102,7 +102,7 @@ Actions: at extract say "constraints, extracted from the ADRs"; the 20–30 s wa
 
 #### ⑨ 3:35–4:00 · Tab ⑤ screen 2 (system map): point at the legend, then sweep the dimmed cards
 
-> We've specified the **whole system** — every box carries requirement IDs. Today you saw the lit spine. Around it, sequenced: the behavioral intent layer, deterministic checks, capture triage, the drift engine — and a trust ladder: a replay harness measuring precision on your repo's *own history*, because a check only earns the right to **block** after it proves itself.
+> We've specified the **whole system** — every box carries requirement IDs; **four of thirteen capability groups run today**, and that ratio is the point. Today you saw the lit spine. Around it, sequenced: the behavioral intent layer, deterministic checks, capture triage, the drift engine — and a trust ladder: a replay harness measuring precision on your repo's *own history*, because a check only earns the right to **block** after it proves itself.
 
 #### ⑩ 4:00–4:40 · Tab ⑤ screen 3 (writing → steering → autonomy, three cards): point left to right, then the audit strip
 
