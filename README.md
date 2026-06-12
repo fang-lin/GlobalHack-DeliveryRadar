@@ -143,3 +143,10 @@ docs/
 Principles that never bend: **machine drafts, human confirms** · advisory by
 default, a check earns the right to block · the constraint is the single shared
 contract.
+
+---
+
+Built at the [Thoughtworks](https://www.thoughtworks.com) **Global Hackathon**
+(June 2026) — organizer and sponsor.
+
+<img src="https://www.thoughtworks.com/etc.clientlibs/thoughtworks/clientlibs/clientlib-site/resources/images/thoughtworks-logo.svg" alt="Thoughtworks" height="22" />
