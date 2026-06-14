@@ -1,14 +1,56 @@
 # 🛰️ Delivery Radar
 
-**Intent–Implementation Alignment & Convergence (IIAC)** — a governance engine
-that keeps code changes aligned with recorded intent (ADRs, specs, stories) and
-makes intent and implementation *converge* over time instead of drifting apart
-one green build at a time.
+**Keep AI-written code true to *why* the system was built.**
 
-> AI writes code faster than anyone can review it against **why** the system is
-> built the way it is. PRs pass every test and still quietly break decisions the
-> team already made. Delivery Radar checks every change against the recorded
-> decisions — and the business reasons behind them.
+When humans wrote the code, a colleague reviewing your PR could ask: *does this
+still fit how we build things — and the reasons behind it?* In the AI era that
+breaks. Code now arrives faster than anyone can review it against intent; PRs
+pass every test and still quietly break decisions the team already made.
+Pointing an agent at the PR to "vibe-review" it isn't the answer — to review
+code, an agent needs a **method**.
+
+Delivery Radar is that method: **Intent–Implementation Alignment & Convergence
+(IIAC)**. It checks every change against the team's recorded decisions *and the
+business reasons behind them*, and keeps intent and implementation converging
+instead of drifting apart one green build at a time.
+
+## See it work
+
+[`GlobalHack-shop-demo` PR #1](https://github.com/fang-lin/GlobalHack-shop-demo/pull/1)
+is a textbook case: a well-meaning *"fix stale stock counts"* bugfix that
+**passes CI completely green** — while quietly reintroducing a database pattern
+the team had explicitly banned. Tests stay silent. Linters stay silent. Here is
+the review Delivery Radar posted on it — real output, **confidence 0.99**:
+
+> 🔴 **VIOLATED** — Inventory reads tolerate eventual consistency · `ADR-001-C1` · severity **high** · confidence **0.99**
+>
+> **Why this rule exists** (driver `EPIC-512`): the business explicitly accepts stock counts up to five minutes stale, in exchange for conversion-critical page latency and primary-database stability during peak sales; checkout does the authoritative re-check at reservation time, so a stale product-page count never oversells.
+>
+> **Evidence:** `services/inventory/reader.py` L19–L23 — the diff removes the cache/replica read path and replaces it with a synchronous `SELECT … FOR UPDATE` on the primary, the exact pattern ADR-001 prohibits.
+
+It quotes the *reason*, points at the exact lines, and gives the direction of
+the fix — as an **advisory** comment that never blocks the merge.
+
+## Why this is new
+
+| | checks | misses |
+|---|---|---|
+| Tests | *does it work?* | whether it still matches intent |
+| Linters | *is it tidy?* | whether it still matches intent |
+| Generic AI review | plausible opinions | the *recorded reason* — and may even propose its own violation |
+| **Delivery Radar** | **the diff against recorded intent + its business driver** | — |
+
+We proved the gap with
+[the same model, same diff, with and without grounding](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/contrast.html).
+Ungrounded, the model treats the staleness as a bug to *fix* and even proposes
+reading the primary directly — itself a violation of ADR-001. Review without a
+method is opinion; grounded in intent, it becomes a **verdict** — addressable,
+measurable, attached to the decision.
+
+> **Why it matters:** a senior engineer spends hours every week answering
+> *"does this still fit our architecture?"* on pull requests — the bottleneck AI
+> code generation makes worse, not better. Delivery Radar automates exactly that
+> question, and turns decision documents from shelf-ware into active guardrails.
 
 ## The IIAC Loop
 
@@ -47,32 +89,28 @@ flowchart TB
     class CONF,CAP,DRIFT op;
 ```
 
-Three operations over one shared contract:
+Three operations over one shared contract — the constraint:
 
 | Operation | Trigger | Output |
 |---|---|---|
 | **Conformance** — enforce | PR open + push | typed, advisory PR review with evidence (ADR clause ↔ code lines) |
+| **Decision Capture** — produce | PR open | Decision Notes for decisions a PR makes implicitly; graduate to new intent |
 | **Drift Detection** — audit | cron · intent change | drift report + decay trends; remediate-or-supersede drafts |
-| **Decision Capture** — produce | PR open | Decision Notes for implicit decisions; graduate to new intent |
 
-*Alignment makes each change right; convergence makes the trajectory settle —
-no oscillation, deterministic output.*
+*Alignment makes each change right; convergence keeps the whole thing moving
+closer to intent instead of drifting away.*
 
-**Auditability is part of the method, not garnish.** Convergence is a property
-of a *trajectory*, and a trajectory needs memory: without recorded verdicts,
-confirmations and intent history you can tell you're aligned *right now* — but
-never whether you're *getting closer*. In AI-led development, where agents write most
-of the code, the audit trail is the system's institutional memory: stable
-constraint IDs make history addressable, recorded confirmations keep settled
-questions settled, and the distance-from-intent trend becomes computable in the
-first place. **No history, no trajectory; no trajectory, no convergence** — *who
-decided, what changed, why*.
+## Responsible & auditable by design
+
+- **Machine drafts, human confirms** — every write-back to intent passes a human gate; nothing executes on its own.
+- **Advisory by default; gating is earned** — a check may block a merge only once it is deterministic *and* its precision has been proven on the repo's own history. Semantic checks never block.
+- **Everything is tracked** — every verdict, its evidence, and every human confirmation is recorded; intent history lives in git, so you can always answer *who decided, what changed, why.* Convergence needs memory: you can't tell you're getting *closer* if you can't see where you've been.
 
 ## Progress — the vision is big; today's slice is deliberately thin
 
-Built in one hackathon day (2026-06-12). Every 🧭 row already carries stable
-requirement IDs in [the spec](docs/requirements/delivery-radar-requirements.en.md)
-— the vision is sequenced, not vapor.
+Every 🧭 row already carries stable requirement IDs in
+[the spec](docs/requirements/delivery-radar-requirements.en.md) — the vision is
+sequenced, not vapor.
 
 | # | Capability | Spec | Status |
 |---|---|---|---|
@@ -90,21 +128,20 @@ requirement IDs in [the spec](docs/requirements/delivery-radar-requirements.en.m
 | 12 | Earned gating (deterministic + proven precision only) | `NFR-GATE-1` | 🧭 specified |
 | 13 | Pre-PR self-check in agent loops → long-horizon autonomy | `FR-CONF-2` | 🧭 specified |
 
-**4 of 13 capability groups run today.** That ratio is the point: the live
-slice proves the differentiating mechanism (driver-grounded verdicts on real
-PRs); the other nine are why it matters — see the
-[showcase](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/).
+**4 of 13 capability groups run today.** That ratio is the point: the live slice
+proves the differentiating mechanism (driver-grounded verdicts on real PRs); the
+other nine are why it matters.
 
-## Live demo
+## Where it's going
 
-- **Demo PR with a real verdict**: [fang-lin/GlobalHack-shop-demo#1](https://github.com/fang-lin/GlobalHack-shop-demo/pull/1) —
-  CI-green "bugfix" that violates ADR-001's business driver; the radar's advisory
-  review quotes the recorded business rationale (EPIC-512, peak-sale stability)
-  and the direction of the fix.
-- **Showcase pages** (GitHub Pages):
-  - 🛰️ [Slides — the IIAC showcase](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/) (landing: loop · system map · three eras · roadmap)
-  - 📊 [Dashboard — the architect's view](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/dashboard.html) (live verdict in the conformance feed; drift/capture are Phase-2 previews)
-  - ⚖️ [Contrast — grounded vs ungrounded](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/contrast.html) (same model, same diff, with and without recorded intent)
+From **writing**, to **steering**, to **autonomy**. Humans used to write code and
+review each other's. Today AI writes the code and humans steer in real time —
+which scales to one person, one session. The aim: recorded, machine-checkable
+intent that lets an agent self-check *before* it opens a PR — so agents work
+unsupervised for longer while humans rise up to govern the *intent*. See the
+[showcase & roadmap](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/)
+([dashboard](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/dashboard.html) ·
+[grounded-vs-ungrounded](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/contrast.html)).
 
 ## Quickstart
 
@@ -149,10 +186,6 @@ docs/
   video/          showcase operating scripts (zh · en)
   adr/            reserved for this repo's own ADRs (en)
 ```
-
-Principles that never bend: **machine drafts, human confirms** · advisory by
-default, a check earns the right to block · the constraint is the single shared
-contract.
 
 ---
 
