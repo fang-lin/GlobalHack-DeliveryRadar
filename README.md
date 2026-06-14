@@ -187,6 +187,49 @@ docs/
   adr/            reserved for this repo's own ADRs (en)
 ```
 
+## FAQ
+
+**Claude Code, Copilot and CodeRabbit already review code. Why build this?**
+Those answer *"is this good code?"* — grounded in the model's general knowledge.
+Delivery Radar answers *"is this still true to the decisions **this team**
+recorded, and the business reasons behind them?"* — a different question.
+Sometimes a team's intent deliberately departs from best practice (e.g. *accept*
+stale inventory reads for peak-sale stability); a generic reviewer fights that
+intent instead of enforcing it. We proved it: ungrounded, the same model treats
+the staleness as a bug and proposes a fix that itself violates the recorded
+decision. **We are not another reviewer — we are the governance layer that makes
+any reviewer (including Claude Code) accountable to recorded intent.** The
+"judge the diff" step is a pluggable LLM call; the value is the intent layer, the
+closed loop, and measurement.
+
+**Then can't I just put my rules in a `CLAUDE.md` / instructions file?**
+That's freeform prose — not addressable, not measurable, not auditable, and
+weighted at the model's discretion. Delivery Radar is the structured version:
+each rule is a discrete, scoped, stable-ID constraint, retrieved only for the
+files a change touches (noise control), producing a structured verdict you can
+score. And `capture` + `drift` keep that rule set **alive** instead of letting it
+rot — a static file can't record new decisions or detect when an old one is stale.
+
+**An LLM judging code will hallucinate — why trust the verdict?**
+Four design choices: (1) scope-first retrieval — the model judges one rule against
+one diff, not "review everything"; (2) grounding in the rule + business reason +
+examples, not open-ended opinion; (3) `unknown` is a first-class, required answer —
+it must say so rather than guess; (4) **advisory by default — gating is earned**:
+a check may block a merge only when it is deterministic *and* its precision has
+been proven on the repo's own history. The worst case is a harmless "unknown" or
+an advisory comment a human dismisses — never a wrongly-blocked merge.
+
+**Does my team have to write ADRs first?**
+It works best for teams that record decisions — and most mature teams already do
+(ADRs, specs, RFCs, tickets). Where intent lives only in people's heads, `capture`
+is the on-ramp: it surfaces decisions a PR makes implicitly and helps record them,
+so the constraint set grows as a byproduct of normal work.
+
+**Is it tied to GitHub / a specific model?**
+No. The constraint store and loop are tool-agnostic; today it runs on the
+Anthropic API and posts via GitHub, but the architecture treats both the model
+and the forge as adapters.
+
 ---
 
 Built at the [Thoughtworks](https://www.thoughtworks.com) **Global Hackathon**
