@@ -89,7 +89,7 @@ operations act on them → every write-back to intent passes the human gate.
 
 ```mermaid
 flowchart TB
-    I[("Intent — source of truth<br/>ADRs · specs · stories, linked to business drivers")]
+    I[("Intent — source of truth<br/>ADRs, RFCs, specs, stories, tickets<br/>linked to business drivers")]
     C[("Constraints<br/>one shared contract · stable IDs")]
     CONF["Conformance<br/>on PR open + push"]
     CAP["Decision Capture<br/>on PR open"]
