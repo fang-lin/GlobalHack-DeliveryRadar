@@ -23,8 +23,8 @@ When humans wrote the code, a colleague reviewing your PR could ask: *does this
 still fit how we build things — and the reasons behind it?* In the AI era that
 breaks. Code now arrives faster than anyone can review it against intent; PRs
 pass every test and still quietly break decisions the team already made.
-Pointing an agent at the PR to "vibe-review" it isn't the answer — to review
-code, an agent needs a **method**.
+Pointing an agent at the PR to "vibe-review" it — eyeball the diff and hope —
+isn't the answer; to review code, an agent needs a **method**.
 
 Delivery Radar is that method: **Intent–Implementation Alignment & Convergence
 (IIAC)**. It checks every change against the team's recorded decisions *and the
@@ -35,8 +35,10 @@ instead of drifting apart one green build at a time.
 
 [`GlobalHack-shop-demo` PR #1](https://github.com/fang-lin/GlobalHack-shop-demo/pull/1)
 is a textbook case: a well-meaning *"fix stale stock counts"* bugfix that
-**passes CI completely green** — while quietly reintroducing a database pattern
-the team had explicitly banned. Tests stay silent. Linters stay silent. Here is
+**passes every automated check (CI) green** — while quietly reintroducing a
+database pattern the team had explicitly banned in an **ADR** (a recorded
+architecture decision — *what* we decided and *why*). Tests stay silent. Linters
+stay silent. Here is
 the review Delivery Radar posted on it (excerpt — [full comment on the PR](https://github.com/fang-lin/GlobalHack-shop-demo/pull/1)):
 
 > 🔴 **VIOLATED** — Inventory reads tolerate eventual consistency · `ADR-001-C1` · severity **high** · confidence **0.99**
@@ -46,7 +48,9 @@ the review Delivery Radar posted on it (excerpt — [full comment on the PR](htt
 > **Evidence:** `services/inventory/reader.py` L19–L23 — the diff removes the cache/replica read path and replaces it with a synchronous `SELECT … FOR UPDATE` on the primary (a row lock that serializes reads), the exact pattern ADR-001 prohibits.
 
 It quotes the *reason*, points at the exact lines, and gives the direction of
-the fix — as an **advisory** comment that never blocks the merge.
+the fix — as an **advisory** comment that never blocks the merge. (The
+confidence is the model's own self-assessment, not a calibrated probability —
+calibrating it is what the replay harness, capability #11, is for.)
 
 Here's the crux: **the staleness wasn't a bug — the team *chose* it.** A generic
 reviewer would try to "fix" it; Delivery Radar enforces it. **Aligning to intent
@@ -62,12 +66,14 @@ existing tool checks.
 | Generic AI review | plausible opinions | the *recorded reason* — and may even propose its own violation |
 | **Delivery Radar** | **the diff against recorded intent + its business driver** | — |
 
-We proved the gap with
-[the same model, same diff, with and without grounding](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/contrast.html).
+We illustrate the gap with a representative case —
+[the same model, same diff, with and without **grounding**](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/contrast.html)
+(grounding = giving the model the team's recorded decisions as context).
 Ungrounded, the model treats the staleness as a bug to *fix* and even proposes
 reading the primary directly — itself a violation of ADR-001. Review without a
 method is opinion; grounded in intent, it becomes a **verdict** — addressable,
-measurable, attached to the decision.
+measurable, attached to the decision. (Measuring this across many PRs — turning
+the illustration into numbers — is the replay harness, capability #11.)
 
 > **Why it matters:** a senior engineer spends hours every week answering
 > *"does this still fit our architecture?"* on pull requests — the bottleneck AI
@@ -126,7 +132,7 @@ closer to intent instead of drifting away.*
 
 - **Machine drafts, human confirms** — every write-back to intent passes a human gate; nothing executes on its own.
 - **Advisory by default; gating is earned** — a check may block a merge only once it is deterministic *and* its precision has been proven on the repo's own history. Semantic checks never block.
-- **Everything is tracked** — every verdict, its evidence, and every human confirmation is recorded; intent history lives in git, so you can always answer *who decided, what changed, why.* Convergence needs memory: you can't tell you're getting *closer* if you can't see where you've been.
+- **Built to be tracked** — verdicts are persisted today (`--save`/`--replay`); the design records every verdict, its evidence, and every human confirmation, with intent history in git, so you can always answer *who decided, what changed, why.* (Full audit trail is capability #10 — `🧭 specified`.) Convergence needs memory: you can't tell you're getting *closer* if you can't see where you've been.
 
 ## 📊 Progress — the vision is big; today's slice is deliberately thin
 
@@ -172,14 +178,14 @@ npm install && npm run build      # TypeScript → dist/; `radar` bin = dist/cli
 echo "ANTHROPIC_API_KEY=sk-ant-..." > .env   # gitignored
 
 # extract constraints from a repo's ADRs
-radar extract --adr-dir ../shop-demo/docs/adr
+radar extract --adr-dir ../GlobalHack-shop-demo/docs/adr
 
 # check a PR diff against in-scope constraints (semantic, driver-grounded)
 gh pr diff 1 -R fang-lin/GlobalHack-shop-demo > pr1.diff
-radar check --adr-dir ../shop-demo/docs/adr --diff pr1.diff --save verdicts.json
+radar check --adr-dir ../GlobalHack-shop-demo/docs/adr --diff pr1.diff --save verdicts.json
 
 # project verdicts as an advisory PR review
-radar comment --adr-dir ../shop-demo/docs/adr --verdicts verdicts.json \
+radar comment --adr-dir ../GlobalHack-shop-demo/docs/adr --verdicts verdicts.json \
   --repo fang-lin/GlobalHack-shop-demo --pr 1 --post
 ```
 
@@ -268,6 +274,21 @@ wrongly-blocked merge.
 
 ---
 
+**❓ Is the verdict repeatable? What about false negatives?**
+
+💡 Honestly: an LLM verdict can vary run-to-run, and we do **not** yet measure
+recall (missed violations) or calibrate the confidence score — that's exactly
+what the replay harness (capability #11) is being built to do, on a repo's own
+history. Two things make that acceptable today: the system is **advisory**, so a
+wrong or unstable verdict costs a dismissed comment, not a blocked merge; and a
+structural honesty in the design — **semantic (LLM) checks stay advisory
+forever; only deterministic checks may ever be promoted to a merge gate, and
+only after measured precision.** We don't dress an LLM's judgement up as
+ground truth; we make it *addressable and measurable* so it can earn trust over
+time.
+
+---
+
 **❓ Does my team have to write ADRs first?**
 
 💡 It works best for teams that record decisions — and most mature teams already
@@ -281,7 +302,7 @@ record them, so the constraint set grows as a byproduct of normal work.
 
 💡 No. The constraint store and loop are tool-agnostic; today it runs on the
 Anthropic API and posts via GitHub, but the architecture treats both the model
-and the forge as adapters.
+and the code host (GitHub, GitLab, …) as adapters.
 
 ---
 
