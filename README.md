@@ -80,20 +80,28 @@ PRs — turning the illustration into numbers — is the replay harness, capabil
 
 ## 🔁 The IIAC Loop
 
+**Read it as a flowchart, top-down — standard shapes carry the meaning:**
+**cylinders** = data stores (Intent, Constraints) · **rectangles** = processes
+(the three operations, plus graduate/supersede) · **parallelograms** = outputs ·
+**diamond** = the human decision. Extract constraints from intent → the three
+operations act on them → every write-back to intent passes the human gate.
+*Each pass aligns one change; the loop drives convergence over time.*
+
 ```mermaid
 flowchart TB
-    I["Intent — source of truth<br/>carried by ADRs · specs · stories · requirement docs"]
-    C["Constraints<br/>addressable · stable IDs"]
+    I[("Intent — source of truth<br/>ADRs · specs · stories, linked to business drivers")]
+    C[("Constraints<br/>one shared contract · stable IDs")]
     CONF["Conformance<br/>on PR open + push"]
     CAP["Decision Capture<br/>on PR open"]
-    DRIFT["Drift Detection<br/>cron · on intent change"]
-    R["Report<br/>typed advisory PR review"]
-    DN["Decision Note<br/>draft · human triage"]
-    DR["Drift report<br/>+ decay trend per ADR"]
-    G["Graduate → intent<br/>architectural → ADR · behavioral → story/AC"]
-    REM["Remediation issue"]
-    SUP["Supersede → intent"]
-    H{{"human confirms ✓"}}
+    DRIFT["Drift Detection<br/>nightly + on intent change"]
+    R[/"Report — advisory PR review"/]
+    DN[/"Decision Note — draft"/]
+    DR[/"Drift report — + decay trend"/]
+    REM[/"Remediation issue<br/>code fix · no intent change"/]
+    G["Graduate → new intent"]
+    SUP["Supersede → replace stale intent"]
+    H{"Human confirms<br/>write-back?"}
+    X(["dismissed — no change"])
 
     I -- extract --> C
     C --> CONF
@@ -101,23 +109,24 @@ flowchart TB
     C --> DRIFT
     CONF --> R
     CAP --> DN
+    DN -- triage --> G
     DRIFT --> DR
-    DN --> G
     DR --> REM
     DR --> SUP
     G --> H
     SUP --> H
-    H -- "updated intent → constraints re-extracted ↻" --> I
+    H -- "yes · re-extract ↻" --> I
+    H -- no --> X
 
-    classDef intent stroke:#7c3aed,stroke-width:2.5px;
-    class I,C,G,SUP,H intent;
+    classDef store stroke:#7c3aed,stroke-width:2.5px;
+    class I,C store;
     classDef op stroke:#059669,stroke-width:2.5px;
     class CONF,CAP,DRIFT op;
-    classDef artifact stroke:#64748b,stroke-width:1.5px,stroke-dasharray:4 3;
-    class R,DN,DR,REM artifact;
+    classDef output stroke:#64748b,stroke-width:1.5px,stroke-dasharray:4 3;
+    class R,DN,DR,REM output;
+    classDef gate stroke:#d97757,stroke-width:2.5px;
+    class G,SUP,H gate;
 ```
-
-<sub>🟣 intent · 🟢 operations · ⬜ intermediate artifacts (dashed)</sub>
 
 Three operations over one shared contract — the constraint[^constraint]:
 
