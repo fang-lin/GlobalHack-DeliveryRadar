@@ -53,7 +53,7 @@ confidence is the model's own self-assessment, not a calibrated probability —
 calibrating it is what the replay harness, capability #11, is for.)
 
 Here's the crux: **the staleness wasn't a bug — the team *chose* it.** A generic
-reviewer would try to "fix" it; Delivery Radar enforces it. **Aligning to intent
+reviewer would try to "fix" it; Delivery Radar defends it. **Aligning to intent
 is not the same as aligning to best practice** — and that gap is exactly what no
 existing tool checks.
 
