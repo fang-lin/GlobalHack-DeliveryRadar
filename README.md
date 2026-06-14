@@ -1,6 +1,23 @@
+<div align="center">
+
 # 🛰️ Delivery Radar
 
-**Keep AI-written code true to *why* the system was built.**
+**Intent–Implementation Alignment & Convergence (IIAC)**
+*Keep AI-written code true to **why** the system was built.*
+
+<a href="https://www.thoughtworks.com"><img src="https://www.thoughtworks.com/etc.clientlibs/thoughtworks/clientlibs/clientlib-site/resources/images/thoughtworks-logo.svg" alt="Thoughtworks" height="30" /></a>
+
+![Thoughtworks Global Hackathon 2026](https://img.shields.io/badge/Thoughtworks-Global%20Hackathon%202026-F2617A)
+![Round 1 — Video Demo](https://img.shields.io/badge/Round%201-Video%20Demo-1f6feb)
+![Built with TypeScript](https://img.shields.io/badge/Built%20with-TypeScript-3178C6?logo=typescript&logoColor=white)
+![Powered by Claude](https://img.shields.io/badge/Powered%20by-Claude%20Sonnet%204.6-D97757)
+![4 of 13 capabilities live](https://img.shields.io/badge/Phase%201-4%2F13%20live-37E8C2)
+
+*Innovation that AI/works™*
+
+</div>
+
+---
 
 When humans wrote the code, a colleague reviewing your PR could ask: *does this
 still fit how we build things — and the reasons behind it?* In the AI era that
