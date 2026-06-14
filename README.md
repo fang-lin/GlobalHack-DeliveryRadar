@@ -204,6 +204,23 @@ docs/
   adr/            reserved for this repo's own ADRs (en)
 ```
 
+## 📖 Glossary
+
+<details>
+<summary><b>Key terms</b> — click to expand</summary>
+
+<br/>
+
+- **Intent** — what the team *meant* to build, and why. Lives in version control as the documents below.
+- **ADR · RFC · spec · ticket** — the documents that carry intent. *ADR* = a recorded architecture decision (decision + reason + consequences); *RFC* = a proposal circulated for comment before deciding; *spec* = detailed requirements; *ticket* = a tracked task/story. Delivery Radar is agnostic to which you use.
+- **Constraint** — one machine-checkable rule extracted from recorded intent. Carries a stable ID, a **scope** (which files it governs), and a link to its business **driver**.
+- **Driver** — the business *reason* behind a decision (an epic / story / incident). Checking against the driver — not just the rule's letter — is what lets Radar catch *"letter honored, reason defeated."*
+- **Verdict** — the result of checking one constraint against a change: `aligned` / `violated` / `unknown`, with evidence, a confidence score, and a fix direction.
+- **Conformance · Drift · Capture** — the three operations (enforce on PRs · audit the standing codebase · record new intent). See [the loop](#-the-iiac-loop).
+- **Alignment vs. convergence** — *alignment* = each change is correct against intent (a point-in-time state); *convergence* = the whole project keeps moving toward intent over time, instead of drifting away (a property of the trajectory).
+
+</details>
+
 ## ❓ FAQ
 
 **❓ Claude Code, Copilot and CodeRabbit already review code. Why build this?**
