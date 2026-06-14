@@ -16,7 +16,7 @@
   export ANTHROPIC_API_KEY=$(sed -n 's/^ANTHROPIC_API_KEY=//p' ~/Projects/intent-impl-align/.env)
   clear
   ```
-  > 若 `radar` 提示 command not found：用绝对路径 `~/Projects/intent-impl-align/.venv/bin/radar` 代替下文所有 `radar`。
+  > 若 `radar` 提示 command not found：用绝对路径 `~/Projects/intent-impl-align/dist/cli.js` 代替下文所有 `radar`（需先 `npm run build`）。
 - [ ] 字号调大：按 `Cmd +` 三次
 - [ ] 下面 4 条命令各预跑一次（练手 + 进命令历史，录制时按 ↑ 调出）：
   ```bash

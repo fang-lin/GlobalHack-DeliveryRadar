@@ -31,6 +31,7 @@
 
 ### 3.2 技术选型（已锁定）
 
+- Round 1 用 Python 构建；**Round 1 之后实现已迁移到 TypeScript**（Node 22、`@anthropic-ai/sdk` + Zod 结构化输出、`js-yaml`、vitest）——行为等价,详见 README。下面几行描述的是录制时的 Round-1 demo。
 - Python 3（miniconda）+ venv + pip；依赖仅 `anthropic`、`PyYAML`（测试加 `pytest`）；CLI 用 `argparse`。
 - 语义检查：`claude-sonnet-4-6`（hackathon workspace 政策禁用 Opus 系），adaptive thinking，`client.messages.parse()` + Pydantic（`DM-VERDICT` 形状）。
 - API key：环境变量优先，回退读项目根 `.env`（已 gitignore）。

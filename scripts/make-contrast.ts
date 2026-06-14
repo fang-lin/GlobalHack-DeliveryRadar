@@ -1,30 +1,33 @@
-"""Generate dashboard/contrast.html — the scene-4 split screen:
-ungrounded baseline review (left) vs Delivery Radar verdict comment (right).
-Both sides are the real, persisted artifacts."""
+/**
+ * Generate dashboard/contrast.html — the scene-4 split screen:
+ * ungrounded baseline review (left) vs Delivery Radar verdict comment (right).
+ * Both sides are the real, persisted artifacts.
+ *
+ * Run:  npx tsx scripts/make-contrast.ts
+ */
+import { readFileSync, writeFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+import { homedir } from "node:os";
+import { loadVerdicts } from "../src/checker.js";
+import { extractFromDir, adrSection } from "../src/extract.js";
+import { reviewMarkdown } from "../src/comment.js";
 
-import json
-import subprocess
-import sys
-from pathlib import Path
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+const ADR_DIR = join(homedir(), "Projects", "shop-demo", "docs", "adr");
 
-ROOT = Path(__file__).parent.parent
+const baseline = readFileSync(join(ROOT, "artifacts", "baseline-review.md"), "utf8");
 
-baseline = (ROOT / "artifacts" / "baseline-review.md").read_text()
-radar = subprocess.run(
-    [
-        str(ROOT / ".venv" / "bin" / "radar"),
-        "comment",
-        "--adr-dir",
-        str(Path.home() / "Projects" / "shop-demo" / "docs" / "adr"),
-        "--verdicts",
-        str(ROOT / "artifacts" / "pr1-verdicts.json"),
-    ],
-    capture_output=True,
-    text=True,
-    check=True,
-).stdout
+// Reproduce `radar comment` output in-process: violated verdicts only.
+const verdicts = loadVerdicts(join(ROOT, "artifacts", "pr1-verdicts.json")).filter(
+  (v) => v.result === "violated",
+);
+const constraints = extractFromDir(ADR_DIR);
+const driverContexts: Record<string, string> = {};
+for (const c of constraints) driverContexts[c.adr] = adrSection(ADR_DIR, c.adr, "Context");
+const radar = reviewMarkdown(verdicts, constraints, driverContexts);
 
-TEMPLATE = """<!doctype html>
+const TEMPLATE = `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
@@ -90,11 +93,12 @@ document.getElementById("right").innerHTML = marked.parse(RIGHT);
 </script>
 </body>
 </html>
-"""
+`;
 
-html = TEMPLATE.replace("__LEFT__", json.dumps(baseline)).replace(
-    "__RIGHT__", json.dumps(radar)
-)
-out = ROOT / "dashboard" / "contrast.html"
-out.write_text(html)
-print(f"wrote {out}", file=sys.stderr)
+const html = TEMPLATE.replace("__LEFT__", JSON.stringify(baseline)).replace(
+  "__RIGHT__",
+  JSON.stringify(radar),
+);
+const out = join(ROOT, "dashboard", "contrast.html");
+writeFileSync(out, html);
+console.error(`wrote ${out}`);

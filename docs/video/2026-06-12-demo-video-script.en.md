@@ -38,7 +38,7 @@
   export ANTHROPIC_API_KEY=$(sed -n 's/^ANTHROPIC_API_KEY=//p' ~/Projects/intent-impl-align/.env)
   clear
   ```
-  > If `radar` says command not found: replace every `radar` below with the absolute path `~/Projects/intent-impl-align/.venv/bin/radar`.
+  > If `radar` says command not found: replace every `radar` below with the absolute path `~/Projects/intent-impl-align/dist/cli.js` (after `npm run build`).
 - [ ] Increase font size: `Cmd +` three times
 - [ ] Pre-run each command once (rehearsal + shell history; recall with ↑ while recording):
   ```bash

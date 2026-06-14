@@ -36,3 +36,7 @@ coverage/
 
 # Local reference material — not for commit (organizer guide, etc.)
 /docs/reference/
+
+# Node / TypeScript
+node_modules/
+dist/

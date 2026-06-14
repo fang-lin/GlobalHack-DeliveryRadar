@@ -109,29 +109,38 @@ PRs); the other nine are why it matters — see the
 ## Quickstart
 
 ```bash
-python3 -m venv .venv && .venv/bin/pip install -e .
+npm install && npm run build      # TypeScript → dist/; `radar` bin = dist/cli.js
 echo "ANTHROPIC_API_KEY=sk-ant-..." > .env   # gitignored
 
 # extract constraints from a repo's ADRs
-.venv/bin/radar extract --adr-dir ../shop-demo/docs/adr
+radar extract --adr-dir ../shop-demo/docs/adr
 
 # check a PR diff against in-scope constraints (semantic, driver-grounded)
 gh pr diff 1 -R fang-lin/GlobalHack-shop-demo > pr1.diff
-.venv/bin/radar check --adr-dir ../shop-demo/docs/adr --diff pr1.diff --save verdicts.json
+radar check --adr-dir ../shop-demo/docs/adr --diff pr1.diff --save verdicts.json
 
 # project verdicts as an advisory PR review
-.venv/bin/radar comment --adr-dir ../shop-demo/docs/adr --verdicts verdicts.json \
+radar comment --adr-dir ../shop-demo/docs/adr --verdicts verdicts.json \
   --repo fang-lin/GlobalHack-shop-demo --pr 1 --post
 ```
 
-Tests: `.venv/bin/python -m pytest tests/`
+`radar` resolves via the `bin` entry once built (or `npm link` / a symlink to
+`dist/cli.js`); during development use `npm run radar -- <args>` (tsx). Tests: `npm test` (vitest).
+
+## Tech stack
+
+TypeScript (Node 22) · `@anthropic-ai/sdk` with Zod-typed structured outputs
+(`messages.parse` + `zodOutputFormat`) · `js-yaml` for ADR constraint blocks ·
+`vitest` for tests. Semantic checks run on `claude-sonnet-4-6` with adaptive
+thinking. Deterministic checks (Phase 2) will shell out to semgrep.
 
 ## Repository layout
 
 ```
-src/radar/        CLI + core: extract / retrieve / check / comment
-tests/            fixture-based tests (ADR parsing, scope retrieval)
-dashboard/        static demo pages (dashboard, slides, contrast)
+src/              CLI + core (TypeScript): cli · extract · retrieve · diff · checker · comment · models(zod)
+tests/            vitest tests + fixtures (ADR parsing, scope retrieval)
+scripts/          baseline-review · make-contrast (tsx)
+dashboard/        static demo pages (slides=index, dashboard, contrast)
 artifacts/        persisted verdicts + baseline output (replayable)
 docs/
   requirements/   full build spec (zh authoritative · en mirror)

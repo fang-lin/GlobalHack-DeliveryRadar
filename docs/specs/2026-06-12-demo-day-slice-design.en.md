@@ -31,6 +31,7 @@
 
 ### 3.2 Tech Choices (locked)
 
+- Round 1 was built in Python; **post-Round-1 the implementation was migrated to TypeScript** (Node 22, `@anthropic-ai/sdk` + Zod structured outputs, `js-yaml`, vitest) — behavior-equivalent, see README. The lines below describe the Round-1 demo as recorded.
 - Python 3 (miniconda) + venv + pip; deps only `anthropic`, `PyYAML` (+ `pytest` for tests); CLI via `argparse`.
 - Semantic check: `claude-sonnet-4-6` (hackathon workspace policy blocks Opus-tier models), adaptive thinking, `client.messages.parse()` + Pydantic (`DM-VERDICT` shape).
 - API key: env var first, fallback to `.env` at repo root (gitignored).
