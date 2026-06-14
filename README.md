@@ -27,7 +27,7 @@ Pointing an agent at the PR to "vibe-review" it — eyeball the diff and hope �
 isn't the answer; to review code, an agent needs a **method**.
 
 Delivery Radar is that method: **Intent–Implementation Alignment & Convergence
-(IIAC)**. It checks every change against the team's recorded decisions *and the
+(IIAC)**[^iiac]. It checks every change against the team's recorded decisions *and the
 business reasons behind them*, and keeps intent and implementation converging
 instead of drifting apart one green build at a time.
 
@@ -36,9 +36,8 @@ instead of drifting apart one green build at a time.
 [`GlobalHack-shop-demo` PR #1](https://github.com/fang-lin/GlobalHack-shop-demo/pull/1)
 is a textbook case: a well-meaning *"fix stale stock counts"* bugfix that
 **passes every automated check (CI) green** — while quietly reintroducing a
-database pattern the team had explicitly banned in an **ADR** (a recorded
-architecture decision — *what* we decided and *why*). Tests stay silent. Linters
-stay silent. Here is
+database pattern the team had explicitly banned in an **ADR**[^adr]. Tests stay
+silent. Linters stay silent. Here is
 the review Delivery Radar posted on it (excerpt — [full comment on the PR](https://github.com/fang-lin/GlobalHack-shop-demo/pull/1)):
 
 > 🔴 **VIOLATED** — Inventory reads tolerate eventual consistency · `ADR-001-C1` · severity **high** · confidence **0.99**
@@ -64,16 +63,15 @@ existing tool checks.
 | Tests | *does it work?* | whether it still matches intent |
 | Linters | *is it tidy?* | whether it still matches intent |
 | Generic AI review | plausible opinions | the *recorded reason* — and may even propose its own violation |
-| **Delivery Radar** | **the diff against recorded intent + its business driver** | — |
+| **Delivery Radar** | **the diff against recorded intent + its business driver**[^driver] | — |
 
 We illustrate the gap with a representative case —
-[the same model, same diff, with and without **grounding**](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/contrast.html)
-(grounding = giving the model the team's recorded decisions as context).
+[the same model, same diff, with and without grounding](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/contrast.html)[^grounding].
 Ungrounded, the model treats the staleness as a bug to *fix* and even proposes
 reading the primary directly — itself a violation of ADR-001. Review without a
-method is opinion; grounded in intent, it becomes a **verdict** — addressable,
-measurable, attached to the decision. (Measuring this across many PRs — turning
-the illustration into numbers — is the replay harness, capability #11.)
+method is opinion; grounded in intent, it becomes a **verdict**[^verdict] —
+addressable, measurable, attached to the decision. (Measuring this across many
+PRs — turning the illustration into numbers — is the replay harness, capability #11.)
 
 > **Why it matters:** a senior engineer spends hours every week answering
 > *"does this still fit our architecture?"* on pull requests — the bottleneck AI
@@ -115,9 +113,13 @@ flowchart TB
     class I,C,G,SUP,H intent;
     classDef op stroke:#059669,stroke-width:2.5px;
     class CONF,CAP,DRIFT op;
+    classDef artifact stroke:#64748b,stroke-width:1.5px,stroke-dasharray:4 3;
+    class R,DN,DR,REM artifact;
 ```
 
-Three operations over one shared contract — the constraint:
+<sub>🟣 intent · 🟢 operations · ⬜ intermediate artifacts (dashed)</sub>
+
+Three operations over one shared contract — the constraint[^constraint]:
 
 | Operation | Trigger | Output |
 |---|---|---|
@@ -215,24 +217,11 @@ docs/
   adr/            reserved for this repo's own ADRs (en)
 ```
 
-## 📖 Glossary
-
-<details>
-<summary><b>Key terms</b> — click to expand</summary>
-
-<br/>
-
-- **Intent** — what the team *meant* to build, and why. Lives in version control as the documents below.
-- **ADR · RFC · spec · ticket** — the documents that carry intent. *ADR* = a recorded architecture decision (decision + reason + consequences); *RFC* = a proposal circulated for comment before deciding; *spec* = detailed requirements; *ticket* = a tracked task/story. Delivery Radar is agnostic to which you use.
-- **Constraint** — one machine-checkable rule extracted from recorded intent. Carries a stable ID, a **scope** (which files it governs), and a link to its business **driver**.
-- **Driver** — the business *reason* behind a decision (an epic / story / incident). Checking against the driver — not just the rule's letter — is what lets Radar catch *"letter honored, reason defeated."*
-- **Verdict** — the result of checking one constraint against a change: `aligned` / `violated` / `unknown`, with evidence, a confidence score, and a fix direction.
-- **Conformance · Drift · Capture** — the three operations (enforce on PRs · audit the standing codebase · record new intent). See [the loop](#-the-iiac-loop).
-- **Alignment vs. convergence** — *alignment* = each change is correct against intent (a point-in-time state); *convergence* = the whole project keeps moving toward intent over time, instead of drifting away (a property of the trajectory).
-
-</details>
-
 ## ❓ FAQ
+
+> 💡 Key terms (**ADR**, **driver**, **constraint**, **verdict**, **grounding**, **IIAC**) carry a footnote marker at first use — click the superscript to jump to its definition.
+
+
 
 **❓ Claude Code, Copilot and CodeRabbit already review code. Why build this?**
 
@@ -241,7 +230,7 @@ knowledge. Delivery Radar answers *"is this still true to the decisions **this
 team** recorded, and the business reasons behind them?"* — a different question.
 Sometimes a team's intent deliberately departs from best practice (e.g. *accept*
 stale inventory reads for peak-sale stability); a generic reviewer fights that
-intent instead of enforcing it. We proved it: ungrounded, the same model treats
+intent instead of enforcing it. We show it: ungrounded, the same model treats
 the staleness as a bug and proposes a fix that itself violates the recorded
 decision. **We are not another reviewer — we are the governance layer that makes
 any reviewer (including Claude Code) accountable to recorded intent.** The
@@ -310,3 +299,10 @@ Built at the [Thoughtworks](https://www.thoughtworks.com) **Global Hackathon**
 (June 2026), organized and sponsored by Thoughtworks. *Innovation that AI/works™*
 
 <img src="https://www.thoughtworks.com/etc.clientlibs/thoughtworks/clientlibs/clientlib-site/resources/images/thoughtworks-logo.svg" alt="Thoughtworks — Innovation that AI/works™" height="22" />
+
+[^iiac]: **IIAC** — Intent–Implementation Alignment & Convergence. *Alignment* = each change is correct against intent (point-in-time); *convergence* = the whole project keeps moving toward intent over time instead of drifting (the trajectory). Convergence needs memory — you can't tell you're getting closer if you can't see where you've been.
+[^adr]: **ADR** — Architecture Decision Record: a recorded decision (decision + reason + consequences). Alongside RFCs, specs, stories and tickets, it's one of the documents that carry *intent*; Delivery Radar is agnostic to which you use.
+[^grounding]: **Grounding** — giving the model the team's recorded decision (rule + business reason + examples) as context, so it judges against *intent* rather than general best practice.
+[^constraint]: **Constraint** — one machine-checkable rule extracted from recorded intent. Carries a stable ID, a *scope* (which files it governs), and a link to its business *driver*.
+[^driver]: **Driver** — the business *reason* behind a decision (an epic / story / incident). Checking against the driver — not just the rule's letter — is what catches *"letter honored, reason defeated."*
+[^verdict]: **Verdict** — the result of checking one constraint against a change: `aligned` / `violated` / `unknown`, with evidence, a confidence score, and a fix direction.
