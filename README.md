@@ -37,7 +37,7 @@ instead of drifting apart one green build at a time.
 is a textbook case: a well-meaning *"fix stale stock counts"* bugfix that
 **passes CI completely green** — while quietly reintroducing a database pattern
 the team had explicitly banned. Tests stay silent. Linters stay silent. Here is
-the review Delivery Radar posted on it — real output, **confidence 0.99**:
+the review Delivery Radar posted on it (excerpt — [full comment on the PR](https://github.com/fang-lin/GlobalHack-shop-demo/pull/1)):
 
 > 🔴 **VIOLATED** — Inventory reads tolerate eventual consistency · `ADR-001-C1` · severity **high** · confidence **0.99**
 >
