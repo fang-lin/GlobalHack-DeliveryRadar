@@ -43,10 +43,15 @@ the review Delivery Radar posted on it — real output, **confidence 0.99**:
 >
 > **Why this rule exists** (driver `EPIC-512`): the business explicitly accepts stock counts up to five minutes stale, in exchange for conversion-critical page latency and primary-database stability during peak sales; checkout does the authoritative re-check at reservation time, so a stale product-page count never oversells.
 >
-> **Evidence:** `services/inventory/reader.py` L19–L23 — the diff removes the cache/replica read path and replaces it with a synchronous `SELECT … FOR UPDATE` on the primary, the exact pattern ADR-001 prohibits.
+> **Evidence:** `services/inventory/reader.py` L19–L23 — the diff removes the cache/replica read path and replaces it with a synchronous `SELECT … FOR UPDATE` on the primary (a row lock that serializes reads), the exact pattern ADR-001 prohibits.
 
 It quotes the *reason*, points at the exact lines, and gives the direction of
 the fix — as an **advisory** comment that never blocks the merge.
+
+Here's the crux: **the staleness wasn't a bug — the team *chose* it.** A generic
+reviewer would try to "fix" it; Delivery Radar enforces it. **Aligning to intent
+is not the same as aligning to best practice** — and that gap is exactly what no
+existing tool checks.
 
 ## ✨ Why this is new
 
