@@ -14,7 +14,7 @@ Delivery Radar is that method: **Intent–Implementation Alignment & Convergence
 business reasons behind them*, and keeps intent and implementation converging
 instead of drifting apart one green build at a time.
 
-## See it work
+## 🎬 See it work
 
 [`GlobalHack-shop-demo` PR #1](https://github.com/fang-lin/GlobalHack-shop-demo/pull/1)
 is a textbook case: a well-meaning *"fix stale stock counts"* bugfix that
@@ -31,7 +31,7 @@ the review Delivery Radar posted on it — real output, **confidence 0.99**:
 It quotes the *reason*, points at the exact lines, and gives the direction of
 the fix — as an **advisory** comment that never blocks the merge.
 
-## Why this is new
+## ✨ Why this is new
 
 | | checks | misses |
 |---|---|---|
@@ -52,7 +52,7 @@ measurable, attached to the decision.
 > code generation makes worse, not better. Delivery Radar automates exactly that
 > question, and turns decision documents from shelf-ware into active guardrails.
 
-## The IIAC Loop
+## 🔁 The IIAC Loop
 
 ```mermaid
 flowchart TB
@@ -100,13 +100,13 @@ Three operations over one shared contract — the constraint:
 *Alignment makes each change right; convergence keeps the whole thing moving
 closer to intent instead of drifting away.*
 
-## Responsible & auditable by design
+## 🛡️ Responsible & auditable by design
 
 - **Machine drafts, human confirms** — every write-back to intent passes a human gate; nothing executes on its own.
 - **Advisory by default; gating is earned** — a check may block a merge only once it is deterministic *and* its precision has been proven on the repo's own history. Semantic checks never block.
 - **Everything is tracked** — every verdict, its evidence, and every human confirmation is recorded; intent history lives in git, so you can always answer *who decided, what changed, why.* Convergence needs memory: you can't tell you're getting *closer* if you can't see where you've been.
 
-## Progress — the vision is big; today's slice is deliberately thin
+## 📊 Progress — the vision is big; today's slice is deliberately thin
 
 Every 🧭 row already carries stable requirement IDs in
 [the spec](docs/requirements/delivery-radar-requirements.en.md) — the vision is
@@ -132,7 +132,7 @@ sequenced, not vapor.
 proves the differentiating mechanism (driver-grounded verdicts on real PRs); the
 other nine are why it matters.
 
-## Where it's going
+## 🚀 Where it's going
 
 From **writing**, to **steering**, to **autonomy**. Humans used to write code and
 review each other's. Today AI writes the code and humans steer in real time —
@@ -143,7 +143,7 @@ unsupervised for longer while humans rise up to govern the *intent*. See the
 ([dashboard](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/dashboard.html) ·
 [grounded-vs-ungrounded](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/contrast.html)).
 
-## Quickstart
+## ⚡ Quickstart
 
 ```bash
 npm install && npm run build      # TypeScript → dist/; `radar` bin = dist/cli.js
@@ -164,14 +164,14 @@ radar comment --adr-dir ../shop-demo/docs/adr --verdicts verdicts.json \
 `radar` resolves via the `bin` entry once built (or `npm link` / a symlink to
 `dist/cli.js`); during development use `npm run radar -- <args>` (tsx). Tests: `npm test` (vitest).
 
-## Tech stack
+## 🧰 Tech stack
 
 TypeScript (Node 22) · `@anthropic-ai/sdk` with Zod-typed structured outputs
 (`messages.parse` + `zodOutputFormat`) · `js-yaml` for ADR constraint blocks ·
 `vitest` for tests. Semantic checks run on `claude-sonnet-4-6` with adaptive
 thinking. Deterministic checks (Phase 2) will shell out to semgrep.
 
-## Repository layout
+## 🗂️ Repository layout
 
 ```
 src/              CLI + core (TypeScript): cli · extract · retrieve · diff · checker · comment · models(zod)
@@ -187,12 +187,13 @@ docs/
   adr/            reserved for this repo's own ADRs (en)
 ```
 
-## FAQ
+## ❓ FAQ
 
-**Claude Code, Copilot and CodeRabbit already review code. Why build this?**
-Those answer *"is this good code?"* — grounded in the model's general knowledge.
-Delivery Radar answers *"is this still true to the decisions **this team**
-recorded, and the business reasons behind them?"* — a different question.
+**❓ Claude Code, Copilot and CodeRabbit already review code. Why build this?**
+
+💡 Those answer *"is this good code?"* — grounded in the model's general
+knowledge. Delivery Radar answers *"is this still true to the decisions **this
+team** recorded, and the business reasons behind them?"* — a different question.
 Sometimes a team's intent deliberately departs from best practice (e.g. *accept*
 stale inventory reads for peak-sale stability); a generic reviewer fights that
 intent instead of enforcing it. We proved it: ungrounded, the same model treats
@@ -202,31 +203,44 @@ any reviewer (including Claude Code) accountable to recorded intent.** The
 "judge the diff" step is a pluggable LLM call; the value is the intent layer, the
 closed loop, and measurement.
 
-**Then can't I just put my rules in a `CLAUDE.md` / instructions file?**
-That's freeform prose — not addressable, not measurable, not auditable, and
+---
+
+**❓ Then can't I just put my rules in a `CLAUDE.md` / instructions file?**
+
+💡 That's freeform prose — not addressable, not measurable, not auditable, and
 weighted at the model's discretion. Delivery Radar is the structured version:
 each rule is a discrete, scoped, stable-ID constraint, retrieved only for the
 files a change touches (noise control), producing a structured verdict you can
 score. And `capture` + `drift` keep that rule set **alive** instead of letting it
 rot — a static file can't record new decisions or detect when an old one is stale.
 
-**An LLM judging code will hallucinate — why trust the verdict?**
-Four design choices: (1) scope-first retrieval — the model judges one rule against
-one diff, not "review everything"; (2) grounding in the rule + business reason +
-examples, not open-ended opinion; (3) `unknown` is a first-class, required answer —
-it must say so rather than guess; (4) **advisory by default — gating is earned**:
-a check may block a merge only when it is deterministic *and* its precision has
-been proven on the repo's own history. The worst case is a harmless "unknown" or
-an advisory comment a human dismisses — never a wrongly-blocked merge.
+---
 
-**Does my team have to write ADRs first?**
-It works best for teams that record decisions — and most mature teams already do
-(ADRs, specs, RFCs, tickets). Where intent lives only in people's heads, `capture`
-is the on-ramp: it surfaces decisions a PR makes implicitly and helps record them,
-so the constraint set grows as a byproduct of normal work.
+**❓ An LLM judging code will hallucinate — why trust the verdict?**
 
-**Is it tied to GitHub / a specific model?**
-No. The constraint store and loop are tool-agnostic; today it runs on the
+💡 Four design choices: (1) scope-first retrieval — the model judges one rule
+against one diff, not "review everything"; (2) grounding in the rule + business
+reason + examples, not open-ended opinion; (3) `unknown` is a first-class,
+required answer — it must say so rather than guess; (4) **advisory by default —
+gating is earned**: a check may block a merge only when it is deterministic *and*
+its precision has been proven on the repo's own history. The worst case is a
+harmless "unknown" or an advisory comment a human dismisses — never a
+wrongly-blocked merge.
+
+---
+
+**❓ Does my team have to write ADRs first?**
+
+💡 It works best for teams that record decisions — and most mature teams already
+do (ADRs, specs, RFCs, tickets). Where intent lives only in people's heads,
+`capture` is the on-ramp: it surfaces decisions a PR makes implicitly and helps
+record them, so the constraint set grows as a byproduct of normal work.
+
+---
+
+**❓ Is it tied to GitHub / a specific model?**
+
+💡 No. The constraint store and loop are tool-agnostic; today it runs on the
 Anthropic API and posts via GitHub, but the architecture treats both the model
 and the forge as adapters.
 
