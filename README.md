@@ -78,7 +78,7 @@ addressable, measurable, attached to the decision.
 while the *same model* ungrounded misses **3 of 4** intent-specific violations (recall **0.25**).
 On one, the ungrounded reviewer even *argues for* a `node-fetch` import — unaware the team had
 already decided (ADR014, superseding ADR013) to move to native `fetch`.
-[See the measured evidence ›](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/contrast.html#evidence)
+[See the measured evidence ›](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/evidence)
 (this is the replay harness, capability #11; a seeded corpus, so the numbers are illustrative —
 `npm run eval` reproduces them).
 
@@ -172,7 +172,7 @@ sequenced, not vapor.
 | 8 | Drift engine + decay dashboard | `FR-DRIFT-0..8` | 🧭 specified (dashboard = seeded preview) |
 | 9 | Behavioral intent layer (stories / AC) | §3.1 Phase 2 | 🧭 specified |
 | 10 | Audit trail: verdicts + human signals persisted | `FR-CONF-10` `NFR-EVAL-1` | 🧭 specified |
-| 11 | Historical-replay precision harness | §14 `AC-1/2` | 🟡 first results — grounded P/R/F1 = 1.00 vs ungrounded R = 0.25 on 7 real Backstage-ADR cases ([evidence](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/contrast.html#evidence)) |
+| 11 | Historical-replay precision harness | §14 `AC-1/2` | 🟡 first results — grounded P/R/F1 = 1.00 vs ungrounded R = 0.25 on 7 real Backstage-ADR cases ([evidence](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/evidence)) |
 | 12 | Earned gating (deterministic + proven precision only) | `NFR-GATE-1` | 🧭 specified |
 | 13 | Pre-PR self-check in agent loops → long-horizon autonomy | `FR-CONF-2` | 🧭 specified |
 
@@ -187,9 +187,9 @@ review each other's. Today AI writes the code and humans steer in real time —
 which scales to one person, one session. The aim: recorded, machine-checkable
 intent that lets an agent self-check *before* it opens a PR — so agents work
 unsupervised for longer while humans rise up to govern the *intent*. See the
-[showcase & roadmap](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/)
-([dashboard](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/dashboard.html) ·
-[grounded-vs-ungrounded](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/contrast.html)).
+[showcase](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/)
+([dashboard](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/dashboard) ·
+[measured evidence](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/evidence)).
 
 ## ⚡ Quickstart
 
