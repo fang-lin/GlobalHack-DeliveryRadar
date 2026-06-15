@@ -327,7 +327,8 @@ export default function Overview() {
       </section>
 
       {/* explore the showcases */}
-      <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <section>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
@@ -367,6 +368,7 @@ export default function Overview() {
             </Link>
           </CardContent>
         </Card>
+        </div>
       </section>
 
       {/* closing */}
