@@ -38,3 +38,49 @@
   rationale: >
     Docs-only change (*.md). No code constraint is in scope, so radar must not
     fire — a retrieval-precision check.
+
+- id: adr006-react-fc-violated
+  diff: eval/cases/adr006-react-fc.diff
+  target_constraint: ADR-BS006-C1
+  gold: violated
+  capability: conformance
+  realness: constructed-probe
+  rationale: >
+    Adds a component typed `const StatusLabel: React.FC<Props>` — violates ADR006
+    (avoid React.FC). No real PR adds React.FC because lint blocks it, so this is a
+    probe; the point is the soul case: a generic best-practice reviewer treats
+    React.FC as perfectly fine, so only the grounded checker flags it.
+
+- id: adr014-nodefetch-supersede
+  diff: eval/cases/adr014-nodefetch.diff
+  target_constraint: ADR-BS014-C1
+  gold: violated
+  capability: conformance
+  realness: real-code
+  source: packages/backend-defaults/src/entrypoints/urlReader/lib/GithubUrlReader.ts
+  rationale: >
+    Real Backstage code importing `node-fetch`. It complied with ADR013 (which
+    mandated node-fetch) but ADR014 supersedes it with native fetch, so the import
+    is now drift from current intent — a Supersede case.
+
+- id: adr007-adhoc-mock-violated
+  diff: eval/cases/adr007-adhoc-mock.diff
+  target_constraint: ADR-BS007-C1
+  gold: violated
+  capability: conformance
+  realness: constructed-representative
+  rationale: >
+    A test that stubs the network via `global.fetch = jest.fn()` — the ad-hoc
+    mocking ADR007 prohibits (use MSW). Representative of the ~11 global.fetch
+    mocks still in the repo.
+
+- id: adr007-msw-aligned
+  diff: eval/cases/adr007-msw-aligned.diff
+  target_constraint: ADR-BS007-C1
+  gold: aligned
+  capability: conformance
+  realness: real-code
+  source: packages/integration/src/gitlab/GitLabIntegration.test.ts
+  rationale: >
+    Real Backstage test mocking HTTP with MSW (setupServer + rest handlers) —
+    compliant with ADR007. Tests that grounding does not over-flag.

@@ -1,0 +1,21 @@
+diff --git a/plugins/foo-backend/src/api/FooClient.test.ts b/plugins/foo-backend/src/api/FooClient.test.ts
+index 111aaa..222bbb 100644
+--- a/plugins/foo-backend/src/api/FooClient.test.ts
++++ b/plugins/foo-backend/src/api/FooClient.test.ts
+@@ -1,6 +1,16 @@
+ import { FooClient } from './FooClient';
+
++beforeEach(() => {
++  // stub out the network so the client thinks the API returned an empty list
++  global.fetch = jest.fn().mockResolvedValue({
++    ok: true,
++    json: async () => ({ items: [] }),
++  } as any);
++});
++
+ describe('FooClient', () => {
+   it('lists items', async () => {
+     const client = new FooClient({ baseUrl: 'http://example.test' });
+     expect(await client.list()).toEqual([]);
+   });
+ });

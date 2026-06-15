@@ -1,0 +1,12 @@
+diff --git a/packages/backend-defaults/src/entrypoints/urlReader/lib/GithubUrlReader.ts b/packages/backend-defaults/src/entrypoints/urlReader/lib/GithubUrlReader.ts
+index 65e6eb7..0a8e63b 100644
+--- a/packages/backend-defaults/src/entrypoints/urlReader/lib/GithubUrlReader.ts
++++ b/packages/backend-defaults/src/entrypoints/urlReader/lib/GithubUrlReader.ts
+@@ -33,6 +33,7 @@ import { ReadUrlResponseFactory } from './ReadUrlResponseFactory';
+ import { Readable } from 'stream';
++import fetch, { RequestInit, Response } from 'node-fetch';
+
+@@ -371,7 +372,7 @@ export class GithubUrlReader implements UrlReaderService {
+     const init: RequestInit = { headers: { ...this.getRequestOptions() } };
+     const response = await fetch(urlAsString, init);
+     return ReadUrlResponseFactory.fromNodeJSReadable(response.body);

@@ -23,5 +23,45 @@
     "result": "aligned",
     "confidence": 0.9,
     "explanation": "The diff simply adds a documentation sentence explaining how to override the backend base URL. No code logic, security, or correctness issues are introduced."
+  },
+  "grounded:adr007-adhoc-mock-violated": {
+    "result": "violated",
+    "confidence": 0.99,
+    "explanation": "The test stubs HTTP by reassigning `global.fetch` with `jest.fn().mockResolvedValue(...)`, which is explicitly prohibited by ADR-BS007-C1. MSW's `setupServer` with `rest`/`http` handlers must be used instead."
+  },
+  "ungrounded:adr007-adhoc-mock-violated": {
+    "result": "violated",
+    "confidence": 0.85,
+    "explanation": "The `global.fetch` mock is set in `beforeEach` but never restored in an `afterEach`, so the stub leaks into any test files that run afterward in the same Jest worker, potentially causing false positives or hard-to-diagnose failures. Add `afterEach(() => jest.restoreAllMocks())` or save and restore the original `global.fetch` to prevent the leak."
+  },
+  "grounded:adr006-react-fc-violated": {
+    "result": "violated",
+    "confidence": 0.99,
+    "explanation": "The new component `StatusLabel` is typed as `React.FC<StatusLabelProps>`, which is explicitly prohibited by ADR-BS006-C1. This implicitly injects a `children` prop and uses the banned typing pattern."
+  },
+  "ungrounded:adr006-react-fc-violated": {
+    "result": "aligned",
+    "confidence": 0.9,
+    "explanation": "The component is a straightforward, well-typed presentational badge that maps a constrained union type to a CSS class and display text. No issues with the implementation."
+  },
+  "grounded:adr014-nodefetch-supersede": {
+    "result": "violated",
+    "confidence": 0.99,
+    "explanation": "The diff explicitly adds `import fetch, { RequestInit, Response } from 'node-fetch'`, which is precisely the import pattern prohibited by ADR-BS014-C1. Node.js 20+ provides native global `fetch`, `RequestInit`, and `Response` without any import."
+  },
+  "ungrounded:adr014-nodefetch-supersede": {
+    "result": "aligned",
+    "confidence": 0.75,
+    "explanation": "Explicitly importing `fetch`, `RequestInit`, and `Response` from `node-fetch` is appropriate here because `node-fetch` provides a Node.js-style readable stream body, which is required by `ReadUrlResponseFactory.fromNodeJSReadable`; relying on the global `fetch` (Node 18+) would yield a Web `ReadableStream` instead. The `Response` import isn't visible in use within this diff, but it may be referenced elsewhere in the file."
+  },
+  "grounded:adr007-msw-aligned": {
+    "result": "aligned",
+    "confidence": 0.98,
+    "explanation": "The diff introduces MSW-based HTTP mocking via setupServer with rest.get handlers, exactly as required by ADR-BS007-C1. No hand-rolled fetch stubs, global.fetch reassignments, or nock usage are present."
+  },
+  "ungrounded:adr007-msw-aligned": {
+    "result": "unknown",
+    "confidence": 0.55,
+    "explanation": "The MSW server setup follows a standard pattern, but the intercepted URL `https://h.com/api/v4` looks like a placeholder or truncated hostname rather than a realistic GitLab test URL. Without seeing the rest of the test file it's impossible to confirm whether this handler actually matches the URLs used in the tests, or if it will silently never fire."
   }
 }

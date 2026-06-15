@@ -1,0 +1,16 @@
+diff --git a/plugins/catalog/src/components/StatusLabel.tsx b/plugins/catalog/src/components/StatusLabel.tsx
+new file mode 100644
+index 0000000..1a2b3c4
+--- /dev/null
++++ b/plugins/catalog/src/components/StatusLabel.tsx
+@@ -0,0 +1,9 @@
++import React from 'react';
++
++type StatusLabelProps = {
++  state: 'ok' | 'error' | 'pending';
++};
++
++/** Small badge shown next to a catalog entity's processing state. */
++export const StatusLabel: React.FC<StatusLabelProps> = ({ state }) => (
++  <span className={`status status--${state}`}>{state}</span>
++);

@@ -1,0 +1,15 @@
+diff --git a/packages/integration/src/gitlab/GitLabIntegration.test.ts b/packages/integration/src/gitlab/GitLabIntegration.test.ts
+index 111aaa..222bbb 100644
+--- a/packages/integration/src/gitlab/GitLabIntegration.test.ts
++++ b/packages/integration/src/gitlab/GitLabIntegration.test.ts
+@@ -15,6 +15,18 @@ import { GitLabIntegration } from './GitLabIntegration';
++import { setupServer } from 'msw/node';
++import { rest } from 'msw';
++
++const server = setupServer(
++  rest.get('https://h.com/api/v4', (_req, res, ctx) => res(ctx.json({ ok: true }))),
++);
++
++beforeAll(() => server.listen());
++afterEach(() => server.resetHandlers());
++afterAll(() => server.close());
