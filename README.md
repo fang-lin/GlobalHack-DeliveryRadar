@@ -70,8 +70,17 @@ We illustrate the gap with a representative case —
 Ungrounded, the model treats the staleness as a bug to *fix* and even proposes
 reading the primary directly — itself a violation of ADR-001. Review without a
 method is opinion; grounded in intent, it becomes a **verdict**[^verdict] —
-addressable, measurable, attached to the decision. (Measuring this across many
-PRs — turning the illustration into numbers — is the replay harness, capability #11.)
+addressable, measurable, attached to the decision.
+
+**And we measured that gap.** Across 7 cases built on
+[Spotify Backstage's own published ADRs](https://github.com/backstage/backstage/tree/master/docs/architecture-decisions)
+— real merged PRs and real code — the grounded checker scores **precision/recall/F1 = 1.00**,
+while the *same model* ungrounded misses **3 of 4** intent-specific violations (recall **0.25**).
+On one, the ungrounded reviewer even *argues for* a `node-fetch` import — unaware the team had
+already decided (ADR014, superseding ADR013) to move to native `fetch`.
+[See the measured evidence ›](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/contrast.html#evidence)
+(this is the replay harness, capability #11; a seeded corpus, so the numbers are illustrative —
+`npm run eval` reproduces them).
 
 > **Why it matters:** a senior engineer spends hours every week answering
 > *"does this still fit our architecture?"* on pull requests — the bottleneck AI
@@ -163,7 +172,7 @@ sequenced, not vapor.
 | 8 | Drift engine + decay dashboard | `FR-DRIFT-0..8` | 🧭 specified (dashboard = seeded preview) |
 | 9 | Behavioral intent layer (stories / AC) | §3.1 Phase 2 | 🧭 specified |
 | 10 | Audit trail: verdicts + human signals persisted | `FR-CONF-10` `NFR-EVAL-1` | 🧭 specified |
-| 11 | Historical-replay precision harness | §14 `AC-1/2` | 🧭 specified |
+| 11 | Historical-replay precision harness | §14 `AC-1/2` | 🟡 first results — grounded P/R/F1 = 1.00 vs ungrounded R = 0.25 on 7 real Backstage-ADR cases ([evidence](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/contrast.html#evidence)) |
 | 12 | Earned gating (deterministic + proven precision only) | `NFR-GATE-1` | 🧭 specified |
 | 13 | Pre-PR self-check in agent loops → long-horizon autonomy | `FR-CONF-2` | 🧭 specified |
 
