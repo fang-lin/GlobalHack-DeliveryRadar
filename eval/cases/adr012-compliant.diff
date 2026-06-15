@@ -1,0 +1,12 @@
+diff --git a/plugins/catalog/src/components/EntityTimestamp.tsx b/plugins/catalog/src/components/EntityTimestamp.tsx
+index 1111111aaaa..2222222bbbb 100644
+--- a/plugins/catalog/src/components/EntityTimestamp.tsx
++++ b/plugins/catalog/src/components/EntityTimestamp.tsx
+@@ -8,7 +8,12 @@ import { DateTime } from 'luxon';
+
+ export const EntityTimestamp = ({ iso }: { iso: string }) => {
+-  return <span>{iso}</span>;
++  // Show the entity's last-seen time in the viewer's own locale.
++  const text = DateTime.fromISO(iso).toLocaleString(DateTime.DATETIME_MED);
++  return <span title={iso}>{text}</span>;
+ };

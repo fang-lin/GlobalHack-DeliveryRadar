@@ -1,0 +1,241 @@
+/**
+ * Replay / precision harness (capability #11).
+ *
+ * Runs two arms over a HUMAN-labelled corpus of real Backstage diffs:
+ *   - GROUNDED   = the radar conformance checker, with the ADR rule + business
+ *                  driver + few-shot examples (src/checker.ts checkConstraint).
+ *   - UNGROUNDED = the same model, same diff, but NO ADR/constraint — a generic
+ *                  best-practice reviewer.
+ * Both verdicts are scored against the gold label hand-set in eval/cases.yaml.
+ * The harness never asks the model for the gold label.
+ *
+ * It quantifies the project's core claim — aligning to intent ≠ aligning to best
+ * practice — by showing grounding catches project-specific violations the
+ * ungrounded reviewer misses, without over-flagging compliant code.
+ *
+ * Run:  npx tsx scripts/eval.ts            (live; caches verdicts to eval/.verdict-cache.json)
+ *       npx tsx scripts/eval.ts --replay   (no API calls; reuses the cache)
+ */
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
+import yaml from "js-yaml";
+import type Anthropic from "@anthropic-ai/sdk";
+import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import { extractFromDir, adrSection } from "../src/extract.js";
+import { loadDiff } from "../src/diff.js";
+import { retrieve } from "../src/retrieve.js";
+import { makeClient, checkConstraint, DEFAULT_MODEL } from "../src/checker.js";
+import { SemanticCheckOutputSchema } from "../src/models.js";
+
+const ADR_DIR = "eval/adr";
+const CASES = "eval/cases.yaml";
+const CACHE = "eval/.verdict-cache.json";
+const REPORT = "eval/report.md";
+
+type Gold = "aligned" | "violated" | "unknown" | "out-of-scope";
+
+interface Case {
+  id: string;
+  diff: string;
+  target_constraint: string | null;
+  gold: Gold;
+  capability: string;
+  source?: string;
+  rationale?: string;
+  realness?: string;
+}
+
+interface ArmResult {
+  result: string; // aligned | violated | unknown | no-fire | FIRED
+  confidence?: number;
+  explanation?: string;
+  note?: string;
+}
+
+const UNGROUNDED_SYSTEM =
+  "You are an experienced senior software engineer doing a pre-merge code review. " +
+  "Judge the diff ONLY by general software-engineering best practice and the code itself — " +
+  "you have NO access to any project-specific architecture decisions, ADRs, or style guide. " +
+  "Return result 'violated' if the diff introduces a real problem worth flagging (bug, bad " +
+  "practice, risk), 'aligned' if it looks fine, or 'unknown' if you genuinely cannot tell. " +
+  "Keep the explanation to one or two sentences.";
+
+async function ungroundedReview(
+  client: Anthropic,
+  diffText: string,
+  model: string,
+): Promise<ArmResult> {
+  const resp = await client.messages.parse({
+    model,
+    max_tokens: 4000,
+    thinking: { type: "adaptive" },
+    system: UNGROUNDED_SYSTEM,
+    messages: [{ role: "user", content: "Review this diff:\n```diff\n" + diffText + "\n```" }],
+    output_config: { format: zodOutputFormat(SemanticCheckOutputSchema) },
+  });
+  if (resp.parsed_output == null) throw new Error("ungrounded: no structured verdict");
+  const o = SemanticCheckOutputSchema.parse(resp.parsed_output);
+  return { result: o.result, confidence: o.confidence, explanation: o.explanation };
+}
+
+function fmt(x: number | null): string {
+  return x == null ? "  – " : x.toFixed(2);
+}
+
+function violatedPRF(rows: Row[], pick: (r: Row) => ArmResult) {
+  let tp = 0, fp = 0, fn = 0;
+  for (const row of rows) {
+    if (!["aligned", "violated", "unknown"].includes(row.cs.gold)) continue; // in-scope only
+    const predV = pick(row).result === "violated";
+    const goldV = row.cs.gold === "violated";
+    if (goldV && predV) tp++;
+    else if (!goldV && predV) fp++;
+    else if (goldV && !predV) fn++;
+  }
+  const p = tp + fp ? tp / (tp + fp) : null;
+  const r = tp + fn ? tp / (tp + fn) : null;
+  const f1 = p && r ? (2 * p * r) / (p + r) : null;
+  return { tp, fp, fn, p, r, f1 };
+}
+
+interface Row { cs: Case; grounded: ArmResult; ungrounded: ArmResult; }
+
+async function main(): Promise<void> {
+  const replay = process.argv.includes("--replay");
+  const model = DEFAULT_MODEL;
+  const cases = yaml.load(readFileSync(CASES, "utf8")) as Case[];
+  const constraints = extractFromDir(ADR_DIR);
+
+  let cache: Record<string, ArmResult> = {};
+  if (existsSync(CACHE)) cache = JSON.parse(readFileSync(CACHE, "utf8"));
+  const client = replay ? null : makeClient();
+  let calls = 0;
+
+  const rows: Row[] = [];
+  for (const cs of cases) {
+    const fileDiffs = loadDiff(cs.diff);
+    const pairs = retrieve(constraints, fileDiffs);
+    const diffText = fileDiffs.map((d) => d.text).join("\n\n");
+
+    // ---- GROUNDED arm ----
+    let grounded: ArmResult;
+    const gKey = `grounded:${cs.id}`;
+    if (cs.target_constraint) {
+      const pair = pairs.find(([c]) => c.id === cs.target_constraint);
+      if (!pair) {
+        grounded = { result: "no-fire", note: "target constraint NOT retrieved (scope gap)" };
+      } else if (cache[gKey] && (replay || true)) {
+        grounded = cache[gKey];
+      } else if (replay) {
+        grounded = { result: "?", note: "no cached verdict — run live first" };
+      } else {
+        const [c, diffs] = pair;
+        const ctx = adrSection(ADR_DIR, c.adr, "Context");
+        const v = await checkConstraint(client!, c, diffs, ctx, model);
+        calls++;
+        grounded = { result: v.result, confidence: v.confidence, explanation: v.explanation };
+        cache[gKey] = grounded;
+      }
+    } else {
+      // expected out-of-scope: correct iff retrieval fired nothing
+      grounded =
+        pairs.length === 0
+          ? { result: "no-fire" }
+          : { result: "FIRED", note: `retrieval over-fired: ${pairs.map(([c]) => c.id).join(",")}` };
+    }
+
+    // ---- UNGROUNDED arm ----
+    let ungrounded: ArmResult;
+    const uKey = `ungrounded:${cs.id}`;
+    if (cache[uKey]) {
+      ungrounded = cache[uKey];
+    } else if (replay) {
+      ungrounded = { result: "?", note: "no cached verdict — run live first" };
+    } else {
+      ungrounded = await ungroundedReview(client!, diffText, model);
+      calls++;
+      cache[uKey] = ungrounded;
+    }
+
+    rows.push({ cs, grounded, ungrounded });
+  }
+
+  if (!replay) {
+    mkdirSync("eval", { recursive: true });
+    writeFileSync(CACHE, JSON.stringify(cache, null, 2));
+  }
+
+  // ---- render ----
+  const mark = (pred: string, gold: Gold, retrieval = false): string => {
+    if (gold === "out-of-scope") return retrieval ? (pred === "no-fire" ? "✓" : "✗") : "·";
+    return pred === gold ? "✓" : pred === "violated" || gold === "violated" ? "✗" : "·";
+  };
+  const lines: string[] = [];
+  const pad = (s: string, n: number) => (s + " ".repeat(n)).slice(0, n);
+  lines.push(
+    pad("CASE", 26) + pad("GOLD", 13) + pad("GROUNDED", 16) + "UNGROUNDED",
+  );
+  lines.push("-".repeat(72));
+  for (const { cs, grounded, ungrounded } of rows) {
+    lines.push(
+      pad(cs.id, 26) +
+        pad(cs.gold, 13) +
+        pad(`${grounded.result} ${mark(grounded.result, cs.gold, true)}`, 16) +
+        `${ungrounded.result} ${mark(ungrounded.result, cs.gold)}`,
+    );
+  }
+  const g = violatedPRF(rows, (r) => r.grounded);
+  const u = violatedPRF(rows, (r) => r.ungrounded);
+  const oos = rows.filter((r) => r.cs.gold === "out-of-scope");
+  const oosOk = oos.filter((r) => r.grounded.result === "no-fire").length;
+
+  lines.push("");
+  lines.push("violated-class detection (in-scope cases):");
+  lines.push(`  GROUNDED    P=${fmt(g.p)} R=${fmt(g.r)} F1=${fmt(g.f1)}   (tp=${g.tp} fp=${g.fp} fn=${g.fn})`);
+  lines.push(`  UNGROUNDED  P=${fmt(u.p)} R=${fmt(u.r)} F1=${fmt(u.f1)}   (tp=${u.tp} fp=${u.fp} fn=${u.fn})`);
+  lines.push(`retrieval precision (out-of-scope respected): ${oosOk}/${oos.length}`);
+  if (!replay) lines.push(`\n(live: ${calls} model calls on ${model}; cached to ${CACHE})`);
+  const out = lines.join("\n");
+  console.log("\n" + out + "\n");
+
+  // ---- report.md ----
+  const md: string[] = [];
+  md.push("# Delivery Radar — eval report (grounded vs ungrounded)\n");
+  md.push(
+    `Corpus: ${cases.length} human-labelled cases on **real Backstage ADRs**. ` +
+      `Model: \`${model}\`. Ground truth is hand-labelled in \`eval/cases.yaml\` — ` +
+      `the harness never asks the model for the gold label.\n`,
+  );
+  md.push("| case | gold | grounded | ungrounded | source |");
+  md.push("|---|---|---|---|---|");
+  for (const { cs, grounded, ungrounded } of rows) {
+    const src = cs.source ? `[PR](${cs.source})` : cs.realness ?? "";
+    md.push(
+      `| \`${cs.id}\` | ${cs.gold} | ${grounded.result} ${mark(grounded.result, cs.gold, true)} | ${ungrounded.result} ${mark(ungrounded.result, cs.gold)} | ${src} |`,
+    );
+  }
+  md.push("");
+  md.push("## Violated-class detection (in-scope cases)\n");
+  md.push("| arm | precision | recall | F1 | tp | fp | fn |");
+  md.push("|---|---|---|---|---|---|---|");
+  md.push(`| **grounded** | ${fmt(g.p)} | ${fmt(g.r)} | ${fmt(g.f1)} | ${g.tp} | ${g.fp} | ${g.fn} |`);
+  md.push(`| ungrounded | ${fmt(u.p)} | ${fmt(u.r)} | ${fmt(u.f1)} | ${u.tp} | ${u.fp} | ${u.fn} |`);
+  md.push(`\nRetrieval precision (out-of-scope respected): **${oosOk}/${oos.length}**.\n`);
+  md.push("## Per-case rationale\n");
+  for (const { cs, grounded, ungrounded } of rows) {
+    md.push(`- **${cs.id}** (gold: ${cs.gold}) — ${(cs.rationale ?? "").trim()}`);
+    if (grounded.explanation) md.push(`  - grounded: _${grounded.explanation.trim()}_`);
+    if (ungrounded.explanation) md.push(`  - ungrounded: _${ungrounded.explanation.trim()}_`);
+  }
+  md.push(
+    "\n> Honesty: small seeded corpus — numbers are illustrative, not a statistical " +
+      "accuracy claim. The point is that the grounded↔ungrounded gap reproduces on real, " +
+      "maintainer-authored ADRs, and that the harness scales to real history.\n",
+  );
+  writeFileSync(REPORT, md.join("\n"));
+  console.error(`wrote ${REPORT}`);
+}
+
+main().catch((e) => {
+  console.error(e instanceof Error ? e.stack ?? e.message : String(e));
+  process.exit(1);
+});

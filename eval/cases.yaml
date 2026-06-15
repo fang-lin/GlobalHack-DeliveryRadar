@@ -1,0 +1,40 @@
+# Labelled eval corpus — real Backstage intent (ADRs) + real/representative diffs.
+# gold is HUMAN-labelled by reading the diff against the ADR. The harness never
+# asks the model for the gold label. See docs/specs/2026-06-15-eval-corpus-design.zh.md
+#
+# Vertical slice (ADR-BS012). More ADRs (006 React.FC, 014 fetch, 007 MSW) follow
+# once this runs.
+
+- id: adr012-violated-pr28986
+  diff: eval/cases/adr012-toformat-pr28986.diff
+  target_constraint: ADR-BS012-C1
+  gold: violated
+  capability: conformance
+  realness: real-merged-pr
+  source: https://github.com/backstage/backstage/pull/28986
+  rationale: >
+    A merged, CI-green PR titled "Fix date parsing and formatting in
+    convertTimeToLocalTimezone" that STILL returns a custom
+    toFormat('yyyy-MM-dd hh:mm:ss ZZZZ') for a value shown in the UI — violates
+    ADR012 (use locale presets). An ungrounded best-practice reviewer sees only
+    "date formatting, looks fine".
+
+- id: adr012-aligned-preset
+  diff: eval/cases/adr012-compliant.diff
+  target_constraint: ADR-BS012-C1
+  gold: aligned
+  capability: conformance
+  realness: constructed-compliant-example
+  rationale: >
+    Renders a timestamp via DateTime.toLocaleString(DateTime.DATETIME_MED) —
+    compliant with ADR012. Tests that grounding does not over-flag.
+
+- id: out-of-scope-docs
+  diff: eval/cases/out-of-scope-docs.diff
+  target_constraint: null
+  gold: out-of-scope
+  capability: retrieval
+  realness: representative
+  rationale: >
+    Docs-only change (*.md). No code constraint is in scope, so radar must not
+    fire — a retrieval-precision check.

@@ -1,0 +1,8 @@
+diff --git a/docs/getting-started/configuration.md b/docs/getting-started/configuration.md
+index aaaa111..bbbb222 100644
+--- a/docs/getting-started/configuration.md
++++ b/docs/getting-started/configuration.md
+@@ -3,3 +3,5 @@
+ To configure the catalog, edit `app-config.yaml`.
++
++You can override the backend base URL with the `backend.baseUrl` setting.

@@ -1,0 +1,27 @@
+{
+  "grounded:adr012-violated-pr28986": {
+    "result": "violated",
+    "confidence": 0.97,
+    "explanation": "The updated function still returns `strDateTime.toFormat('yyyy-MM-dd hh:mm:ss ZZZZ')`, a hard-coded custom pattern string, for the value that is ultimately displayed to users. This directly violates the prohibition on using `toFormat(...)` for UI-displayed dates."
+  },
+  "ungrounded:adr012-violated-pr28986": {
+    "result": "aligned",
+    "confidence": 0.72,
+    "explanation": "The refactoring is cleaner: using `toISOString()` and `DateTime.fromISO` is more robust than calling `toLocaleString()` then parsing with a fixed format string. One pre-existing issue (`hh` is 12-hour clock, should be `HH` for 24-hour) is carried over but not introduced by this diff. The implicit assumption that string inputs are ISO-formatted should be consistent with callers."
+  },
+  "grounded:adr012-aligned-preset": {
+    "result": "aligned",
+    "confidence": 0.98,
+    "explanation": "The diff replaces a raw ISO string display with `DateTime.fromISO(iso).toLocaleString(DateTime.DATETIME_MED)`, which is exactly the locale-aware preset pattern mandated by ADR-BS012-C1. No custom `toFormat` pattern strings are introduced."
+  },
+  "ungrounded:adr012-aligned-preset": {
+    "result": "aligned",
+    "confidence": 0.85,
+    "explanation": "The change correctly converts an ISO timestamp to a locale-aware human-readable string while preserving the raw ISO value as a tooltip, which is a straightforward and sensible improvement. No edge cases like invalid ISO strings are handled, but that's a minor omission rather than a blocking issue."
+  },
+  "ungrounded:out-of-scope-docs": {
+    "result": "aligned",
+    "confidence": 0.9,
+    "explanation": "The diff simply adds a documentation sentence explaining how to override the backend base URL. No code logic, security, or correctness issues are introduced."
+  }
+}

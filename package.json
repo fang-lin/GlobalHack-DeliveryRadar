@@ -9,6 +9,7 @@
   "scripts": {
     "build": "tsc",
     "radar": "tsx src/cli.ts",
+    "eval": "tsx scripts/eval.ts",
     "test": "vitest run"
   },
   "dependencies": {
