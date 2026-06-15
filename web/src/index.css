@@ -41,3 +41,16 @@
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
+
+/* homepage "deck": each section is one screen; scrolling snaps page-by-page.
+   Desktop only — on small screens content stacks tall, so we keep normal scroll. */
+.deck-main > section { scroll-margin-top: 3.75rem; }
+@media (min-width: 1024px) {
+  html.deck { scroll-snap-type: y proximity; }
+  .deck-main > section {
+    min-height: calc(100vh - 3.5rem);
+    scroll-snap-align: start;
+    padding-top: 2.25rem;
+    padding-bottom: 2.25rem;
+  }
+}

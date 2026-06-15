@@ -63,9 +63,19 @@ export default function App() {
       </main>
 
       <footer className="mt-12 border-t border-border/70">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-5 py-6 text-xs text-muted-foreground">
-          <span>Delivery Radar — Intent–Implementation Alignment &amp; Convergence</span>
-          <span>Thoughtworks AI/works Global Hackathon 2026 · advisory, never blocks · static demo data</span>
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-6 text-xs text-muted-foreground">
+          <span>Delivery Radar — Intent–Implementation Alignment &amp; Convergence · advisory, never blocks</span>
+          <span className="flex items-center gap-1.5">
+            built at
+            <img
+              src="https://www.thoughtworks.com/etc.clientlibs/thoughtworks/clientlibs/clientlib-site/resources/images/thoughtworks-logo.svg"
+              alt="Thoughtworks"
+              className="h-3.5"
+              style={{ filter: "brightness(0) invert(0.8)" }}
+            />
+            <span className="italic">Innovation that AI/works™</span>
+            · Global Hackathon 2026
+          </span>
         </div>
       </footer>
     </div>

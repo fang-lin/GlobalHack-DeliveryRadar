@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, FlaskConical, LayoutDashboard, Search } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -137,8 +138,14 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 }
 
 export default function Overview() {
+  // turn the document into a page-by-page "deck" while on the homepage (desktop)
+  useEffect(() => {
+    document.documentElement.classList.add("deck");
+    return () => document.documentElement.classList.remove("deck");
+  }, []);
+
   return (
-    <div className="space-y-20">
+    <div className="deck-main space-y-16 lg:space-y-0">
       {/* hero */}
       <section className="pt-4 text-center">
         <Eyebrow>intent → implementation → alignment → convergence</Eyebrow>
@@ -368,8 +375,15 @@ export default function Overview() {
         <div className="mt-2 font-mono text-primary">
           keep the <span className="italic">why</span> alive
         </div>
-        <div className="mt-2 text-xs text-muted-foreground">
-          our take on <span className="italic">Innovation that AI/works™</span>
+        <div className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+          <span>built at</span>
+          <img
+            src="https://www.thoughtworks.com/etc.clientlibs/thoughtworks/clientlibs/clientlib-site/resources/images/thoughtworks-logo.svg"
+            alt="Thoughtworks"
+            className="h-4"
+            style={{ filter: "brightness(0) invert(0.85)" }}
+          />
+          <span className="italic">Innovation that AI/works™</span>
         </div>
       </section>
     </div>
