@@ -224,12 +224,14 @@ thinking. Deterministic checks (Phase 2) will shell out to semgrep.
 ```
 src/              CLI + core (TypeScript): cli · extract · retrieve · diff · checker · comment · models(zod)
 tests/            vitest tests + fixtures (ADR parsing, scope retrieval)
-scripts/          baseline-review · make-contrast (tsx)
-dashboard/        static demo pages (slides=index, dashboard, contrast)
+scripts/          eval (replay/precision harness) · baseline-review · make-contrast (tsx)
+eval/             benchmark on real Backstage ADRs: cases.yaml · adr/ · cases/ · report.md · results.json
+web/              React + shadcn showcase SPA (Vite): Overview / Dashboard / Evidence — built → GitHub Pages
+dashboard/        legacy static pages; index.html remains the source SVG for the SPA's IIAC Loop diagram
 artifacts/        persisted verdicts + baseline output (replayable)
 docs/
   requirements/   full build spec (zh authoritative · en mirror)
-  specs/          design specs — demo-day slice, IIAC Loop diagram (zh · en)
+  specs/          design specs — demo-day slice, IIAC Loop diagram, eval corpus (zh · en)
   governance/     documentation policy (bilingual, zh authoritative)
   video/          showcase operating scripts (zh · en)
   adr/            reserved for this repo's own ADRs (en)
