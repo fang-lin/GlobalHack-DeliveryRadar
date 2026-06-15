@@ -232,7 +232,38 @@ async function main(): Promise<void> {
       "maintainer-authored ADRs, and that the harness scales to real history.\n",
   );
   writeFileSync(REPORT, md.join("\n"));
-  console.error(`wrote ${REPORT}`);
+
+  // ---- machine-readable results for the showcase (contrast page) ----
+  const results = {
+    model,
+    n: cases.length,
+    rows: rows.map(({ cs, grounded, ungrounded }) => ({
+      id: cs.id,
+      gold: cs.gold,
+      adr: cs.target_constraint,
+      capability: cs.capability,
+      realness: cs.realness ?? null,
+      source: cs.source ?? null,
+      grounded: {
+        result: grounded.result,
+        confidence: grounded.confidence ?? null,
+        explanation: grounded.explanation ?? null,
+      },
+      ungrounded: {
+        result: ungrounded.result,
+        confidence: ungrounded.confidence ?? null,
+        explanation: ungrounded.explanation ?? null,
+      },
+    })),
+    metrics: {
+      grounded: { p: g.p, r: g.r, f1: g.f1, tp: g.tp, fp: g.fp, fn: g.fn },
+      ungrounded: { p: u.p, r: u.r, f1: u.f1, tp: u.tp, fp: u.fp, fn: u.fn },
+      retrieval: { ok: oosOk, total: oos.length },
+    },
+  };
+  writeFileSync("eval/results.json", JSON.stringify(results, null, 2));
+  writeFileSync("eval/eval-data.js", `window.EVAL_DATA = ${JSON.stringify(results, null, 2)};\n`);
+  console.error(`wrote ${REPORT}, eval/results.json, eval/eval-data.js`);
 }
 
 main().catch((e) => {

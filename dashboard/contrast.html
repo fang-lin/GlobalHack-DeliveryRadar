@@ -52,6 +52,44 @@
     left: treats staleness as a bug to fix — and proposes a primary read, <span class="text-amber-400">itself an ADR-001 violation</span>
     · right: cites the decision, its reason, the evidence, the direction
   </div>
+
+  <!-- ===== Measured evidence (eval harness) ===== -->
+  <section id="evidence" class="mt-14 border-t border-[#1f2b4a] pt-10">
+    <div class="text-center mb-6">
+      <div class="text-xs uppercase tracking-[0.3em] text-slate-500">measured · not cherry-picked</div>
+      <h2 class="text-2xl font-bold mt-1">The same gap, quantified on real Backstage ADRs</h2>
+      <p class="text-sm text-slate-400 mt-2 max-w-3xl mx-auto">
+        Both arms run over <span id="ev-n" class="text-slate-200 font-semibold"></span> human-labelled cases built on
+        <a class="text-[#37e8c2] hover:underline" target="_blank" rel="noopener"
+           href="https://github.com/backstage/backstage/tree/master/docs/architecture-decisions">Spotify&nbsp;Backstage's own published ADRs</a>
+        — real merged PRs and real code. Ground truth is hand-labelled; the harness never asks the model for the answer.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto mb-7" id="ev-metrics"></div>
+
+    <div class="max-w-3xl mx-auto overflow-x-auto">
+      <table class="w-full text-sm border-collapse">
+        <thead>
+          <tr class="text-slate-400 text-xs uppercase tracking-wider border-b border-[#1f2b4a]">
+            <th class="text-left py-2 pr-3 font-medium">case</th>
+            <th class="text-left py-2 px-2 font-medium">gold</th>
+            <th class="text-left py-2 px-2 font-medium">grounded</th>
+            <th class="text-left py-2 px-2 font-medium">ungrounded</th>
+          </tr>
+        </thead>
+        <tbody id="ev-rows" class="font-mono text-[12px]"></tbody>
+      </table>
+    </div>
+
+    <div id="ev-quote" class="max-w-3xl mx-auto mt-8"></div>
+
+    <p class="text-center text-xs text-slate-500 mt-6 max-w-3xl mx-auto">
+      Seeded corpus — numbers are illustrative, not a statistical accuracy claim. The point: the grounded↔ungrounded
+      gap reproduces on real, maintainer-authored ADRs, and the harness scales to real history.
+      Reproduce with <code class="text-slate-400">npm run eval</code>.
+    </p>
+  </section>
 </div>
 <script>
 const LEFT = "# Ungrounded AI review (same model, no ADR grounding)\n\n## Review\n\nThis change solves the symptom by introducing several serious problems. I would not approve it.\n\n---\n\n### Critical: `FOR UPDATE` on a display read\n\n```python\n\"SELECT quantity FROM stock WHERE sku = %s FOR UPDATE\"\n```\n\n`FOR UPDATE` acquires an **exclusive row-level lock**. It is designed for write transactions where you are about to modify the row (e.g., decrementing stock during checkout). Using it on a product-page display means:\n\n- Every concurrent product page hit for the same SKU will **queue behind each other**, serializing all reads.\n- Any actual write (purchase, restock) will be **blocked** until every in-flight page view releases its lock.\n- Under normal traffic this will cause lock contention, timeouts, and potentially cascading failures on the primary.\n- The lock scope depends entirely on when/whether the caller commits or rolls back the surrounding transaction, which is not managed here at all.\n\nRemove `FOR UPDATE`. A plain `SELECT` is correct for a read.\n\n---\n\n### Major: Entire cache + replica path removed, all reads now hit primary\n\nThe cache and replica existed to absorb read traffic. Product pages are almost always read-heavy. Bypassing both on every page view will put severe load on the primary under any meaningful traffic. This is a scalability regression that could take the primary down.\n\n---\n\n### Major: Root cause is almost certainly cache invalidation, not the cache itself\n\nThe stale-count problem is almost certainly one of:\n\n1. Cache TTL is too long.\n2. Stock-mutation code (purchase, restock) doesn't invalidate `stock:{sku}`.\n\nDeleting the cache is the wrong fix. The right fix is to invalidate (or update) the cache entry whenever stock changes, and/or shorten the TTL.\n\n---\n\n### Minor: No null guard for unknown SKU\n\n```python\nreturn int(row[0])   # TypeError if row is None (SKU not in table)\n```\n\nThe original code had the same gap, but it's worth fixing here.\n\n---\n\n### Suggested direction\n\n```python\ndef get_stock(self, sku: str) -> int:\n    cached = self.cache.get(f\"stock:{sku}\")\n    if cached is not None:\n        return int(cached)\n    # Read from replica for display; cache result with a short TTL.\n    value = self.replica_db.query_stock(sku)\n    self.cache.set(f\"stock:{sku}\", value, ttl=CACHE_TTL_SECONDS)\n    return value\n```\n\nAnd in whatever code decrements stock (checkout path):\n\n```python\nself.cache.delete(f\"stock:{sku}\")   # or set the new value directly\n```\n\nIf you genuinely need sub-second freshness on the product page (unusual), read from the primary with a plain `SELECT` — no lock, no cache bypass for writes.\n";
@@ -61,6 +99,72 @@ let leftHtml = marked.parse(LEFT);
 leftHtml = leftHtml.replace(/(read from the primary with a plain <code>SELECT<\/code>|read from the primary with a plain SELECT)/i, "<mark>$1</mark>");
 document.getElementById("left").innerHTML = leftHtml;
 document.getElementById("right").innerHTML = marked.parse(RIGHT);
+</script>
+
+<!-- measured-evidence data + render -->
+<script src="eval-data.js"></script>
+<script>
+(function () {
+  const D = window.EVAL_DATA;
+  if (!D) return;
+  const f = (x) => (x == null ? "–" : x.toFixed(2));
+  document.getElementById("ev-n").textContent = D.n;
+
+  const gm = D.metrics.grounded, um = D.metrics.ungrounded, rt = D.metrics.retrieval;
+  const gViol = gm.tp + gm.fn, uViol = um.tp + um.fn;
+  const cards = [
+    { cls: "border-[#37e8c2]/50 bg-[#37e8c2]/5", tag: "GROUNDED", tagcls: "bg-[#37e8c2]/15 text-[#37e8c2] border-[#37e8c2]/40",
+      sub: "Delivery Radar — ADR + driver", big: "F1 " + f(gm.f1), line: "P " + f(gm.p) + " · R " + f(gm.r),
+      note: "catches " + gm.tp + "/" + gViol + " violations · " + gm.fp + " false alarms · retrieval " + rt.ok + "/" + rt.total },
+    { cls: "border-[#1f2b4a]", tag: "UNGROUNDED", tagcls: "bg-slate-500/15 text-slate-300 border-slate-500/40",
+      sub: "same model — no recorded intent", big: "F1 " + f(um.f1), line: "P " + f(um.p) + " · R " + f(um.r),
+      note: "misses " + um.fn + "/" + uViol + " intent-specific violations" },
+  ];
+  document.getElementById("ev-metrics").innerHTML = cards.map((m) =>
+    '<div class="rounded-xl border ' + m.cls + ' p-4">' +
+      '<div class="flex items-center gap-2"><span class="text-[10px] font-mono px-2 py-0.5 rounded border ' + m.tagcls + '">' + m.tag + "</span>" +
+      '<span class="text-xs text-slate-400">' + m.sub + "</span></div>" +
+      '<div class="mt-2 text-2xl font-bold text-slate-100">' + m.big + "</div>" +
+      '<div class="text-sm text-slate-300 font-mono">' + m.line + "</div>" +
+      '<div class="text-xs text-slate-500 mt-1">' + m.note + "</div></div>"
+  ).join("");
+
+  function cell(arm, row) {
+    const txt = row[arm].result;
+    let ok;
+    if (row.gold === "out-of-scope") {
+      if (arm === "ungrounded") return '<span class="text-slate-500">' + txt + " ·</span>";
+      ok = row.grounded.result === "no-fire";
+    } else ok = txt === row.gold;
+    const mk = ok ? '<span class="text-[#37e8c2]">✓</span>' : '<span class="text-amber-400">✗</span>';
+    return '<span class="' + (ok ? "text-slate-200" : "text-amber-300") + '">' + txt + "</span> " + mk;
+  }
+  const goldMap = { violated: "text-rose-300", aligned: "text-emerald-300", unknown: "text-slate-400", "out-of-scope": "text-slate-500" };
+  document.getElementById("ev-rows").innerHTML = D.rows.map((row) => {
+    const id = row.source
+      ? '<a class="text-slate-300 hover:text-[#37e8c2] hover:underline" target="_blank" rel="noopener" href="' + row.source + '">' + row.id + "</a>"
+      : '<span class="text-slate-300">' + row.id + "</span>";
+    return '<tr class="border-b border-[#141d35]">' +
+      '<td class="py-2 pr-3">' + id + "</td>" +
+      '<td class="py-2 px-2"><span class="' + (goldMap[row.gold] || "text-slate-400") + '">' + row.gold + "</span></td>" +
+      '<td class="py-2 px-2">' + cell("grounded", row) + "</td>" +
+      '<td class="py-2 px-2">' + cell("ungrounded", row) + "</td></tr>";
+  }).join("");
+
+  const q = D.rows.find((r) => /nodefetch|node-fetch/.test(r.id));
+  if (q) {
+    document.getElementById("ev-quote").innerHTML =
+      '<div class="text-xs uppercase tracking-[0.2em] text-slate-500 text-center mb-3">why “best practice” isn’t enough</div>' +
+      '<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">' +
+        '<div class="rounded-xl border border-[#1f2b4a] bg-[#11182e] p-4">' +
+          '<div class="text-[10px] font-mono mb-2"><span class="px-2 py-0.5 rounded bg-slate-500/15 text-slate-300 border border-slate-500/40">UNGROUNDED → ' + q.ungrounded.result + "</span></div>" +
+          '<p class="text-sm text-slate-300 italic">“' + q.ungrounded.explanation + "”</p></div>" +
+        '<div class="rounded-xl border border-[#37e8c2]/50 bg-[#11182e] p-4 shadow-[0_0_32px_rgba(55,232,194,.07)]">' +
+          '<div class="text-[10px] font-mono mb-2"><span class="px-2 py-0.5 rounded bg-[#37e8c2]/15 text-[#37e8c2] border border-[#37e8c2]/40">GROUNDED → ' + q.grounded.result + "</span></div>" +
+          '<p class="text-sm text-slate-200 italic">“' + q.grounded.explanation + "”</p></div></div>" +
+      '<p class="text-center text-xs text-slate-500 mt-3">A capable generic reviewer <span class="text-amber-300">argues for</span> the <code>node-fetch</code> import on solid technical grounds — unaware the team already decided (ADR014, superseding ADR013) to move to native <code>fetch</code>.</p>';
+  }
+})();
 </script>
 </body>
 </html>
