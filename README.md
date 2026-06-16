@@ -187,9 +187,12 @@ review each other's. Today AI writes the code and humans steer in real time —
 which scales to one person, one session. The aim: recorded, machine-checkable
 intent that lets an agent self-check *before* it opens a PR — so agents work
 unsupervised for longer while humans rise up to govern the *intent*. See the
-[showcase](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/)
-([dashboard](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/dashboard) ·
-[measured evidence](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/evidence)).
+[showcase](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/) — dashboards
+([shop-demo](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/dashboard) ·
+[Backstage](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/dashboard/backstage))
+and evidence
+([measured](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/evidence) ·
+[worked example](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/evidence/example)).
 
 ## ⚡ Quickstart
 

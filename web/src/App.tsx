@@ -2,7 +2,9 @@ import { NavLink, Route, Routes } from "react-router-dom";
 import { Radar, Github } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Overview from "@/pages/Overview";
-import Dashboard from "@/pages/Dashboard";
+import DashboardLayout from "@/pages/DashboardLayout";
+import { DashboardView } from "@/components/DashboardView";
+import { DASHBOARDS } from "@/data/dashboards";
 import Evidence from "@/pages/Evidence";
 import EvidenceLayout from "@/pages/EvidenceLayout";
 import EvidenceExample from "@/pages/EvidenceExample";
@@ -59,7 +61,10 @@ export default function App() {
       <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-8">
         <Routes>
           <Route path="/" element={<Overview />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<DashboardLayout />}>
+            <Route index element={<DashboardView data={DASHBOARDS["shop-demo"]} />} />
+            <Route path="backstage" element={<DashboardView data={DASHBOARDS.backstage} />} />
+          </Route>
           <Route path="/evidence" element={<EvidenceLayout />}>
             <Route index element={<Evidence />} />
             <Route path="example" element={<EvidenceExample />} />
