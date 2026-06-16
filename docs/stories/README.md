@@ -12,3 +12,12 @@ Work-unit records for Delivery Radar's **own** development — we dogfood our ow
 | ST-0002 | Port legacy-dashboard content into the SPA, retire `dashboard/` | In progress | ADR-0001 |
 | ST-0003 | Migrate the contrast worked example into the SPA (Evidence sub-page) | Done | ADR-0002 |
 | ST-0004 | Two dashboards — rich shop-demo (parity) + Backstage | Done | ADR-0002 |
+| ST-0005 | `radar capture` — draft Decision Notes from a PR | Todo | — |
+| ST-0006 | `radar drift` — scan the codebase for drift | Todo | — |
+| ST-0007 | Conformance — richer comment projection types | Todo | — |
+| ST-0008 | Dogfood — run the radar on this repo (VIS-4) | Todo | (ADR TBD) |
+| ST-0009 | IIAC `SKILL.md` (methodology as a skill) | Todo · backlog | — |
+| ST-0010 | radar as investigative agent + pre-PR self-check | Todo · backlog | — |
+| ST-0011 | Migrate radar Python → TypeScript | Done | ADR-0003 |
+| ST-0012 | Replay/precision eval harness (Backstage) | Done | — |
+| ST-0013 | GitHub Action — auto-run on PR events | Todo · backlog | — |
