@@ -235,7 +235,8 @@ docs/
   specs/          design specs — demo-day slice, IIAC Loop diagram, eval corpus (zh · en)
   governance/     documentation policy (bilingual, zh authoritative)
   video/          showcase run-sheet (bilingual) + submission-form answers
-  adr/            reserved for this repo's own ADRs (en)
+  adr/            the project's own ADRs — dogfooding IIAC on ourselves (en)
+  stories/        work-unit stories for our own development — every code change has one (en)
 ```
 
 ## ❓ FAQ
