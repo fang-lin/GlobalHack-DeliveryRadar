@@ -40,7 +40,9 @@ isn't the answer; to review code, an agent needs a **method**.
 Delivery Radar is that method: **Intent–Implementation Alignment & Convergence
 (IIAC)**[^iiac]. It checks every change against the team's recorded decisions *and the
 business reasons behind them*, and keeps intent and implementation converging
-instead of drifting apart one green build at a time.
+instead of drifting[^drift] apart one green build at a time.
+
+> 💡 Key terms (**IIAC**, **ADR**, **driver**, **constraint**, **verdict**, **grounding**, **drift**, **supersede**) carry a footnote marker at first use — click the superscript to jump to its definition.
 
 ## 🎬 See it work
 
@@ -76,7 +78,7 @@ test, or generic AI review checks.
 | Generic AI review | plausible opinions | the *recorded reason* — and may even propose its own violation |
 | **Delivery Radar** | **the diff against recorded intent + its business driver**[^driver] | — |
 
-We illustrate the gap with a representative case —
+**A worked example.** We illustrate the gap with a representative case —
 [the same model, same diff, with and without grounding](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/evidence/example)[^grounding].
 Ungrounded, the model treats the staleness as a bug to *fix* and even proposes
 reading the primary directly — itself a violation of ADR-001. Review without a
@@ -160,7 +162,7 @@ Three operations over one shared contract — the constraint[^constraint]:
 |---|---|---|
 | **Conformance** — enforce | PR open + push | typed, advisory PR review with evidence (ADR clause ↔ code lines) |
 | **Decision Capture** — produce | PR open | Decision Notes for decisions a PR makes implicitly; graduate to new intent |
-| **Drift Detection** — audit | cron · intent change | drift report + decay trends; remediate-or-supersede drafts |
+| **Drift Detection** — audit | cron · intent change | drift report + decay trends; remediate-or-supersede[^supersede] drafts |
 
 *Alignment makes each change right; convergence keeps the whole thing moving
 closer to intent instead of drifting away.*
@@ -261,10 +263,6 @@ docs/
 
 ## ❓ FAQ
 
-> 💡 Key terms (**ADR**, **driver**, **constraint**, **verdict**, **grounding**, **IIAC**) carry a footnote marker at first use — click the superscript to jump to its definition.
-
-
-
 **❓ Claude Code, Copilot and CodeRabbit already review code. Why build this?**
 
 💡 Those answer *"is this good code?"* — grounded in the model's general
@@ -348,3 +346,5 @@ Built at the [Thoughtworks](https://www.thoughtworks.com) **Global Hackathon**
 [^constraint]: **Constraint** — one machine-checkable rule extracted from recorded intent. Carries a stable ID, a *scope* (which files it governs), and a link to its business *driver*.
 [^driver]: **Driver** — the business *reason* behind a decision (an epic / story / incident). Checking against the driver — not just the rule's letter — is what catches *"letter honored, reason defeated."*
 [^verdict]: **Verdict** — the result of checking one constraint against a change: `aligned` / `violated` / `unknown`, with evidence, a confidence score, and a fix direction.
+[^drift]: **Drift** — implementation moving away from *current* intent over time (the opposite of convergence). Detected by scanning the standing codebase, not a single diff; tracked as a decay trend per ADR.
+[^supersede]: **Supersede** — replacing a recorded decision with a new one when the *intent itself* should change (vs. *remediation*, which fixes code to match unchanged intent). Note: once intent is superseded, code still matching the old decision becomes a live conformance violation of the new one — which is why a superseded-intent case can be scored under conformance.
