@@ -1,6 +1,6 @@
 # Zoom Showcase Operating Script (~5 min, single take)
 
-> **Authoritative version: Chinese (`2026-06-12-demo-video-script.zh.md`) · This file: synchronized English translation — use this one when narrating in English · Last synced: 2026-06-12 · On conflict, the Chinese version prevails.**
+> **Bilingual run-sheet — English narration script + Chinese pronunciation cheat-sheet and notes. Single source (the standalone Chinese file was folded in here).**
 
 > Narrative spine: pose the problem (humans can't review at AI speed; vibe review won't do) → quick Conformance showcase → reveal the method, IIAC (three methods in logical progression) → the vision (not a review tool — convergence of AI-driven development) → three eras → roadmap + the ask.
 

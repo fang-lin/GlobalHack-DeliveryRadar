@@ -233,7 +233,7 @@ docs/
   requirements/   full build spec (zh authoritative · en mirror)
   specs/          design specs — demo-day slice, IIAC Loop diagram, eval corpus (zh · en)
   governance/     documentation policy (bilingual, zh authoritative)
-  video/          showcase operating scripts (zh · en)
+  video/          showcase run-sheet (bilingual) + submission-form answers
   adr/            reserved for this repo's own ADRs (en)
 ```
 
