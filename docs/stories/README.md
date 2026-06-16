@@ -10,5 +10,5 @@ Work-unit records for Delivery Radar's **own** development — we dogfood our ow
 |---|---|---|---|
 | ST-0001 | Rebuild the showcase as a React SPA | Done | ADR-0001 |
 | ST-0002 | Port legacy-dashboard content into the SPA, retire `dashboard/` | In progress | ADR-0001 |
-| ST-0003 | Migrate the contrast worked example into the SPA (Evidence sub-page) | In progress | ADR-0002 |
+| ST-0003 | Migrate the contrast worked example into the SPA (Evidence sub-page) | Done | ADR-0002 |
 | ST-0004 | Two dashboards — rich shop-demo + a second subject | Todo (blocked) | ADR-0002 |

@@ -66,7 +66,7 @@ existing tool checks.
 | **Delivery Radar** | **the diff against recorded intent + its business driver**[^driver] | — |
 
 We illustrate the gap with a representative case —
-[the same model, same diff, with and without grounding](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/contrast.html)[^grounding].
+[the same model, same diff, with and without grounding](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/evidence/example)[^grounding].
 Ungrounded, the model treats the staleness as a bug to *fix* and even proposes
 reading the primary directly — itself a violation of ADR-001. Review without a
 method is opinion; grounded in intent, it becomes a **verdict**[^verdict] —

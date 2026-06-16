@@ -4,6 +4,8 @@ import { cn } from "@/lib/utils";
 import Overview from "@/pages/Overview";
 import Dashboard from "@/pages/Dashboard";
 import Evidence from "@/pages/Evidence";
+import EvidenceLayout from "@/pages/EvidenceLayout";
+import EvidenceExample from "@/pages/EvidenceExample";
 
 const NAV = [
   { to: "/", label: "Overview", end: true },
@@ -58,7 +60,10 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Overview />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/evidence" element={<Evidence />} />
+          <Route path="/evidence" element={<EvidenceLayout />}>
+            <Route index element={<Evidence />} />
+            <Route path="example" element={<EvidenceExample />} />
+          </Route>
         </Routes>
       </main>
 

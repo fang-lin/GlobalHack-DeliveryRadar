@@ -1,6 +1,6 @@
 # ST-0003: Migrate the shop-demo worked example (contrast.html) into the SPA as an Evidence sub-page
 
-- **Status:** In progress
+- **Status:** Done (2026-06-16)
 - **Type:** showcase / frontend
 - **Implements:** ADR-0002
 
@@ -10,9 +10,9 @@ As a judge, I want to see — side by side — how the same model reviews the sa
 
 ## Acceptance criteria
 
-- [ ] `/evidence` gains a sub-nav: **Measured benchmark** (Backstage) + **Worked example** (shop-demo).
-- [ ] The worked example reproduces `contrast.html`'s ungrounded-vs-grounded side-by-side (the cache PR), **rebuilt in React** (`react-markdown`), dark-themed, **not iframed**.
-- [ ] Deploys to GitHub Pages; README / links updated; the legacy `contrast.html` link (README line 69) repointed to the SPA sub-page.
+- [x] `/evidence` gains a sub-nav: **Measured benchmark** (Backstage) + **Worked example** (shop-demo). (nested routes + `EvidenceLayout`)
+- [x] The worked example reproduces `contrast.html`'s ungrounded-vs-grounded side-by-side (the cache PR), **rebuilt in React** (`react-markdown`), dark-themed, **not iframed**.
+- [x] Deploys to GitHub Pages; the README worked-example link repointed to `#/evidence/example`.
 
 ## Notes
 
