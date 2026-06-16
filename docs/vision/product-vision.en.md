@@ -6,6 +6,8 @@
 
 It manages Delivery Radar's **concept-level requirements** — what it fundamentally is, its positioning, its scope — not a feature list. It sits **above** the requirements spec (SRS, `docs/requirements/`): concepts are incubated and refined here, **distilled into the README / showcase only once stable**, and settled decisions are extracted into the project's own ADRs. **Evolving concepts do not get dumped straight into the README.**
 
+**Two vision docs**: ① `vision-log.zh.md` — the raw idea log (Chinese-only, low-friction, append-as-we-talk); ② **this file** — the continuously-refined summary distilled from it. Ideas ferment in the log → graduate into this summary → settle into ADRs.
+
 Document chain (its shape is IIAC itself):
 
 > **Vision (this doc, concept) → ADR (settled decisions) → requirements spec (how to build) → README / showcase (public distillation)**

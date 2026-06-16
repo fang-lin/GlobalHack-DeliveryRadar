@@ -230,7 +230,7 @@ web/              React + shadcn showcase SPA (Vite): Overview / Dashboard / Evi
 dashboard/        legacy static pages; index.html remains the source SVG for the SPA's IIAC Loop diagram
 artifacts/        persisted verdicts + baseline output (replayable)
 docs/
-  vision/         product vision & scope — concept-level requirements (zh authoritative · en mirror)
+  vision/         product vision — idea log (zh) + refined summary & scope (zh authoritative · en mirror)
   requirements/   full build spec (zh authoritative · en mirror)
   specs/          design specs — demo-day slice, IIAC Loop diagram, eval corpus (zh · en)
   governance/     documentation policy (bilingual, zh authoritative)

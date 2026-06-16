@@ -6,6 +6,8 @@
 
 管理 Delivery Radar 的**概念级需求**——本质、定位、范围,而不是功能清单。它坐在需求规格（SRS, `docs/requirements/`）**之上**:概念在这里酝酿与打磨,**稳定后才蒸馏进 README / showcase**,定下来的关键决策抽成项目自己的 ADR。**不把还在演化的概念直接堆进 README。**
 
+**两类 vision 文档**:① `vision-log.zh.md` —— 聊 vision 时的**原始想法记录**(只中文、低摩擦、随手 append);② **本文** —— 从 log 提炼的**持续严谨的综述(summary)**。想法在 log 里发酵 → 成熟后提炼进本文 → 定下来抽成 ADR。
+
 文档链(形状即 IIAC 本身):
 
 > **Vision（本文,概念）→ ADR（定下来的决策）→ 需求规格（怎么造）→ README / showcase（对外蒸馏）**
