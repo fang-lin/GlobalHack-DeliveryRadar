@@ -11,13 +11,24 @@
 ![Round 1 — Video Demo](https://img.shields.io/badge/Round%201-Video%20Demo-1f6feb)
 ![Built with TypeScript](https://img.shields.io/badge/Built%20with-TypeScript-3178C6?logo=typescript&logoColor=white)
 ![Powered by Claude](https://img.shields.io/badge/Powered%20by-Claude%20Sonnet%204.6-D97757)
-![4 of 13 capabilities live](https://img.shields.io/badge/Phase%201-4%2F13%20live-37E8C2)
+![Phase 1 — core mechanism live](https://img.shields.io/badge/Phase%201-core%20mechanism%20live%20%284%2F13%29-37E8C2)
 
 *Innovation that AI/works™*
 
 </div>
 
 ---
+
+**The same Claude model, reviewing the same real Backstage pull request, calls it clean —
+until it is given the team's recorded decision. Then it catches the violation.** Across 7 cases
+built on Backstage's own ADRs, grounding takes the catch rate on intent-specific violations from
+**1 of 4 to 4 of 4** ([the measured evidence ›](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/evidence)).
+
+Delivery Radar isn't another code reviewer — it's the **governance layer that makes any reviewer
+(including Claude Code) accountable to a team's recorded intent.** It checks each change against the
+decisions a team wrote down *and the business reason behind them*, not generic best practice.
+**Aligning to intent is not the same as aligning to best practice** — and no linter, test, or generic
+AI review checks that gap.
 
 When humans wrote the code, a colleague reviewing your PR could ask: *does this
 still fit how we build things — and the reasons behind it?* In the AI era that
@@ -53,8 +64,8 @@ calibrating it is what the replay harness, capability #11, is for.)
 
 Here's the crux: **the staleness wasn't a bug — the team *chose* it.** A generic
 reviewer would try to "fix" it; Delivery Radar defends it. **Aligning to intent
-is not the same as aligning to best practice** — and that gap is exactly what no
-existing tool checks.
+is not the same as aligning to best practice** — and that gap is what no linter,
+test, or generic AI review checks.
 
 ## ✨ Why this is new
 
@@ -72,15 +83,17 @@ reading the primary directly — itself a violation of ADR-001. Review without a
 method is opinion; grounded in intent, it becomes a **verdict**[^verdict] —
 addressable, measurable, attached to the decision.
 
-**And we measured that gap.** Across 7 cases built on
+**And we measured that gap.** We built 7 cases on
 [Spotify Backstage's own published ADRs](https://github.com/backstage/backstage/tree/master/docs/architecture-decisions)
-— real merged PRs and real code — the grounded checker scores **precision/recall/F1 = 1.00**,
-while the *same model* ungrounded misses **3 of 4** intent-specific violations (recall **0.25**).
-On one, the ungrounded reviewer even *argues for* a `node-fetch` import — unaware the team had
-already decided (ADR014, superseding ADR013) to move to native `fetch`.
+— **4 violations + 3 controls**; three cases are a real merged PR and real repo code, the other four
+are constructed probes against those real ADRs. The headline is the **delta**: the *same model* catches
+only **1 of 4** violations ungrounded (recall **0.25**) but **4 of 4** once grounded in the ADR and its
+driver (recall **1.00**, zero false alarms). On one, the ungrounded reviewer even *argues for* a
+`node-fetch` import — unaware the team had already decided (ADR014, superseding ADR013) to move to
+native `fetch`.
 [See the measured evidence ›](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/evidence)
-(this is the replay harness, capability #11; a seeded corpus, so the numbers are illustrative —
-`npm run eval` reproduces them).
+(the replay harness, capability #11; a small **seeded corpus — illustrative, not a statistical claim**;
+`npm run eval` reproduces it).
 
 > **Why it matters:** a senior engineer spends hours every week answering
 > *"does this still fit our architecture?"* on pull requests — the bottleneck AI
@@ -95,6 +108,10 @@ already decided (ADR014, superseding ADR013) to move to native `fetch`.
 **diamond** = the human decision. Extract constraints from intent → the three
 operations act on them → every write-back to intent passes the human gate.
 *Each pass aligns one change; the loop drives convergence over time.*
+
+*Colour groups the loop stages:* 🟣 data stores · 🟢 the three operations · 🟠 the write-back
+gate (graduate / supersede / human confirm) · ⬜ advisory outputs (dashed). The stadium
+(`dismissed`) is a no-op.
 
 ```mermaid
 flowchart TB
@@ -164,7 +181,7 @@ sequenced, not vapor.
 |---|---|---|---|
 | 1 | Constraint extraction from ADR blocks | `FR-EXT-1/3` | ✅ **live** |
 | 2 | Scope-first retrieval (noise control) | `NFR-RETRIEVAL-1` | ✅ **live** |
-| 3 | Driver-grounded semantic conformance | `FR-CONF-3..6` | ✅ **live** |
+| 3 | Driver-grounded semantic conformance | `FR-CONF-3,4,6` | ✅ **live** |
 | 4 | Advisory review on real PRs, evidence-linked | `FR-CONF-7..9` | ✅ **live** (structural comment type) |
 | 5 | Verdict persistence & replay | `NFR-EVAL-1` (partial) | 🟡 basic (`--save` / `--replay`) |
 | 6 | GitHub Action automation (auto-run on PR events) | `FR-INT-1` | 🔜 next |
@@ -172,7 +189,7 @@ sequenced, not vapor.
 | 8 | Drift engine + decay dashboard | `FR-DRIFT-0..8` | 🧭 specified (dashboard = seeded preview) |
 | 9 | Behavioral intent layer (stories / AC) | §3.1 Phase 2 | 🧭 specified |
 | 10 | Audit trail: verdicts + human signals persisted | `FR-CONF-10` `NFR-EVAL-1` | 🧭 specified |
-| 11 | Historical-replay precision harness | §14 `AC-1/2` | 🟡 first results — grounded P/R/F1 = 1.00 vs ungrounded R = 0.25 on 7 real Backstage-ADR cases ([evidence](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/evidence)) |
+| 11 | Historical-replay precision harness | §14 `AC-1/2` | 🟡 first results — on 7 Backstage-ADR cases (4 violations): grounded recall 1.00 vs ungrounded 0.25 ([evidence](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/evidence)) |
 | 12 | Earned gating (deterministic + proven precision only) | `NFR-GATE-1` | 🧭 specified |
 | 13 | Pre-PR self-check in agent loops → long-horizon autonomy | `FR-CONF-2` | 🧭 specified |
 
