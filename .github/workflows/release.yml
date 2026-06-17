@@ -1,0 +1,79 @@
+name: Release & Deploy
+
+on:
+  push:
+    branches: [main]
+
+# Default to read-only; each job widens only what it needs.
+permissions:
+  contents: read
+
+concurrency:
+  group: release-deploy
+  cancel-in-progress: false
+
+jobs:
+  # semantic-release: version + CHANGELOG + git tag + GitHub Release from Conventional Commits.
+  release:
+    name: semantic-release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write       # push the release commit + tag
+      issues: write         # comment on released issues/PRs
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0      # semantic-release needs full history + tags
+          persist-credentials: true
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm exec semantic-release
+
+  # Publish the showcase SPA to GitHub Pages from this repo (no separate -pages repo, no secret).
+  deploy:
+    name: deploy showcase to Pages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Build SPA
+        run: pnpm --filter delivery-radar-web build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/dist
+
+      - id: deploy
+        uses: actions/deploy-pages@v4

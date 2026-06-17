@@ -1,0 +1,4 @@
+# pnpm workspace: the repo root is the radar package; `web/` is the showcase SPA.
+# One `pnpm install` at the root installs both; target a package with `pnpm --filter`.
+packages:
+  - 'web'

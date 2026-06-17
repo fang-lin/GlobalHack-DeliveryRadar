@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# A newer push to the same branch/PR cancels the in-flight run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: lint · typecheck · test · build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint — radar
+        run: pnpm lint
+
+      - name: Lint — web
+        run: pnpm --filter delivery-radar-web lint
+
+      - name: Typecheck + build — radar
+        run: pnpm build
+
+      - name: Unit tests — radar
+        run: pnpm test
+
+      - name: Typecheck — web
+        run: pnpm --filter delivery-radar-web typecheck
+
+      - name: Build — web
+        run: pnpm --filter delivery-radar-web build

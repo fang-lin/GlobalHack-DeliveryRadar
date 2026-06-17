@@ -22,3 +22,4 @@ Work-unit records for Delivery Radar's **own** development — we dogfood our ow
 | ST-0012 | Replay/precision eval harness (Backstage) | Done | — |
 | ST-0013 | GitHub Action — auto-run on PR events | Todo · backlog | — |
 | ST-0014 | Responsive / mobile layout for the showcase SPA | Done | ADR-0001 |
+| ST-0015 | CI/CD pipeline (GitHub Actions) — lint · unit tests · typecheck/build · semantic-release · deploy Pages | In progress (planning) | ADR-0004 (TBD) |
