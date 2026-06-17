@@ -1,6 +1,6 @@
 # ST-0017: Bump CI/CD GitHub Actions to current (Node 24) majors
 
-- **Status:** In review — actions bumped; both workflows green; Node 20 annotation gone. Pending maintainer sign-off.
+- **Status:** Done (2026-06-17) — actions on current Node 24 majors; both workflows green; Node 20 annotation gone; maintainer signed off.
 - **Type:** infra / tooling / maintenance
 - **Relates to:** ST-0015 / ADR-0004 (the pipeline)
 
@@ -20,7 +20,7 @@ As the maintainer, I want the workflow actions on their current majors (Node 24 
 |---|---|---|
 | Automated | `ci.yml` + `release.yml` runs on `main` | ✅ both green 2026-06-17 (CI run 27695345432 · Release&Deploy 27695345400) — **no Node 20 annotation** |
 | Live / web behaviour | `qa-engineer` — N/A (CI-internal); deploy re-ran, site returns 200 | ✅ |
-| Maintainer sign-off | maintainer confirms green + warning gone | ⬜ pending |
+| Maintainer sign-off | maintainer confirms green + warning gone | ✅ 2026-06-17 |
 
 ## Notes
 
