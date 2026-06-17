@@ -17,11 +17,15 @@ As a <role>, I want <capability>, so that <outcome>.
 
 ## Verification / QA
 
-How each AC is checked **before Done** — we don't self-declare Done (see the verification gate in `README.md`):
+Status flips to **Done** only after this gate passes (see `README.md`). **Fill the `result` column in as you verify** — a finished story must show a concrete `qa-engineer` verdict, not just the intent to run it.
 
-- **Automated:** CI green on the PR — lint · typecheck · unit tests · build.
-- **`qa-engineer` agent** (`.claude/agents/qa-engineer.md`): for any live/deployed/web behaviour (redirects, routes, rendering, responsive) — produces a pass/fail evidence table. Dispatch it (or, for code-only stories, note "N/A — covered by CI/tests").
-- **Maintainer sign-off:** the maintainer reviews/tests and confirms → only then flip the status to **Done**.
+| gate | how | result (fill in) |
+|---|---|---|
+| Automated | CI on the PR — lint · typecheck · unit tests · build | ⬜ pending → ✅ green (run #___) |
+| Live / web behaviour | **`qa-engineer`** agent (`.claude/agents/qa-engineer.md`) — pass/fail evidence table | ⬜ N/A (code-only) · ⬜ pending · ✅ ___/___ pass — paste or link the table |
+| Maintainer sign-off | maintainer reviews/tests the result | ⬜ pending → ✅ \<who\>, \<date\> |
+
+> Example of a filled-in QA table: ST-0016 (the `qa-engineer` run that verified the `-pages` redirects, 8/8).
 
 ## Notes
 
