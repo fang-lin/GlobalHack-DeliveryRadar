@@ -1,6 +1,6 @@
 # ST-0016: Redirect all pre-migration `-pages` showcase links to the new Pages site
 
-- **Status:** In progress — redirect shell built (the `-pages` repo, this session); **per-link browser verification pending**.
+- **Status:** Done (2026-06-17) — `qa-engineer` verified all 8 redirects map correctly (8/8 pass); maintainer signed off.
 - **Type:** infra / migration
 - **Relates to:** ADR-0004 (the deploy migration that changed the URL), ST-0015 (the pipeline).
 
@@ -50,7 +50,7 @@ Also covered (not from any README, kept as a safety net): `…-pages/slides.html
 - [x] The `-pages` redirect shell maps each link to its **specific** new route — legacy `.html` via hardcoded targeted redirects, hash routes by preserving `location.hash` — **not** all to the homepage.
 - [x] Hash mechanism verified in-browser on the deepest route (`#/dashboard/backstage` → correct); legacy `.html` targets curl-confirmed.
 - [x] The `qa-engineer` agent (`.claude/agents/qa-engineer.md`) walked the checklist — **all 8 cases PASS** (2026-06-17): curl-extracted targets, hash-concat logic, + headless-Chrome end-to-end on `#/evidence`. No fixes needed.
-- [ ] **Maintainer** final sign-off (optional spot-check of any row) → then ST-0016 is Done.
+- [x] **Maintainer** signed off (2026-06-17) → Done.
 
 ## Notes
 
