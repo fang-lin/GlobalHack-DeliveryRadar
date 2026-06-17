@@ -22,7 +22,7 @@
 **The same Claude model, reviewing the same real Backstage pull request, calls it clean —
 until it is given the team's recorded decision. Then it catches the violation.** Across 7 cases
 built on Backstage's own ADRs, grounding takes the catch rate on intent-specific violations from
-**1 of 4 to 4 of 4** ([the measured evidence ›](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/evidence)).
+**1 of 4 to 4 of 4** ([the measured evidence ›](https://fang-lin.github.io/GlobalHack-DeliveryRadar/#/evidence)).
 
 Delivery Radar isn't another code reviewer — it's the **governance layer that makes any reviewer
 (including Claude Code) accountable to a team's recorded intent.** It checks each change against the
@@ -79,7 +79,7 @@ test, or generic AI review checks.
 | **Delivery Radar** | **the diff against recorded intent + its business driver**[^driver] | — |
 
 **A worked example.** We illustrate the gap with a representative case —
-[the same model, same diff, with and without grounding](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/evidence/example)[^grounding].
+[the same model, same diff, with and without grounding](https://fang-lin.github.io/GlobalHack-DeliveryRadar/#/evidence/example)[^grounding].
 Ungrounded, the model treats the staleness as a bug to *fix* and even proposes
 reading the primary directly — itself a violation of ADR-001. Review without a
 method is opinion; grounded in intent, it becomes a **verdict**[^verdict] —
@@ -93,9 +93,9 @@ only **1 of 4** violations ungrounded (recall **0.25**) but **4 of 4** once grou
 driver (recall **1.00**, zero false alarms). On one, the ungrounded reviewer even *argues for* a
 `node-fetch` import — unaware the team had already decided (ADR014, superseding ADR013) to move to
 native `fetch`.
-[See the measured evidence ›](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/evidence)
+[See the measured evidence ›](https://fang-lin.github.io/GlobalHack-DeliveryRadar/#/evidence)
 (the replay harness, capability #11; a small **seeded corpus — illustrative, not a statistical claim**;
-`npm run eval` reproduces it).
+`pnpm eval` reproduces it).
 
 > **Why it matters:** a senior engineer spends hours every week answering
 > *"does this still fit our architecture?"* on pull requests — the bottleneck AI
@@ -191,7 +191,7 @@ sequenced, not vapor.
 | 8 | Drift engine + decay dashboard | `FR-DRIFT-0..8` | 🧭 specified (dashboard = seeded preview) |
 | 9 | Behavioral intent layer (stories / AC) | §3.1 Phase 2 | 🧭 specified |
 | 10 | Audit trail: verdicts + human signals persisted | `FR-CONF-10` `NFR-EVAL-1` | 🧭 specified |
-| 11 | Historical-replay precision harness | §14 `AC-1/2` | 🟡 first results — on 7 Backstage-ADR cases (4 violations): grounded recall 1.00 vs ungrounded 0.25 ([evidence](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/evidence)) |
+| 11 | Historical-replay precision harness | §14 `AC-1/2` | 🟡 first results — on 7 Backstage-ADR cases (4 violations): grounded recall 1.00 vs ungrounded 0.25 ([evidence](https://fang-lin.github.io/GlobalHack-DeliveryRadar/#/evidence)) |
 | 12 | Earned gating (deterministic + proven precision only) | `NFR-GATE-1` | 🧭 specified |
 | 13 | Pre-PR self-check in agent loops → long-horizon autonomy | `FR-CONF-2` | 🧭 specified |
 
@@ -206,17 +206,17 @@ review each other's. Today AI writes the code and humans steer in real time —
 which scales to one person, one session. The aim: recorded, machine-checkable
 intent that lets an agent self-check *before* it opens a PR — so agents work
 unsupervised for longer while humans rise up to govern the *intent*. See the
-[showcase](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/) — dashboards
-([shop-demo](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/dashboard) ·
-[Backstage](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/dashboard/backstage))
+[showcase](https://fang-lin.github.io/GlobalHack-DeliveryRadar/) — dashboards
+([shop-demo](https://fang-lin.github.io/GlobalHack-DeliveryRadar/#/dashboard) ·
+[Backstage](https://fang-lin.github.io/GlobalHack-DeliveryRadar/#/dashboard/backstage))
 and evidence
-([measured](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/evidence) ·
-[worked example](https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/evidence/example)).
+([measured](https://fang-lin.github.io/GlobalHack-DeliveryRadar/#/evidence) ·
+[worked example](https://fang-lin.github.io/GlobalHack-DeliveryRadar/#/evidence/example)).
 
 ## ⚡ Quickstart
 
 ```bash
-npm install && npm run build      # TypeScript → dist/; `radar` bin = dist/cli.js
+pnpm install && pnpm build        # TypeScript → dist/; `radar` bin = dist/cli.js
 echo "ANTHROPIC_API_KEY=sk-ant-..." > .env   # gitignored
 
 # extract constraints from a repo's ADRs
@@ -231,8 +231,10 @@ radar comment --adr-dir ../GlobalHack-shop-demo/docs/adr --verdicts verdicts.jso
   --repo fang-lin/GlobalHack-shop-demo --pr 1 --post
 ```
 
-`radar` resolves via the `bin` entry once built (or `npm link` / a symlink to
-`dist/cli.js`); during development use `npm run radar -- <args>` (tsx). Tests: `npm test` (vitest).
+`radar` resolves via the `bin` entry once built (or `pnpm link` / a symlink to
+`dist/cli.js`); during development use `pnpm radar -- <args>` (tsx). Tests: `pnpm test` (vitest).
+
+> **Monorepo (pnpm workspaces):** the repo root is the radar; `web/` is the showcase SPA. One `pnpm install` at the root installs both; `corepack` provisions pnpm (no global install). **CI/CD (GitHub Actions):** `ci.yml` lints, typechecks, tests and builds on every PR; `release.yml` runs `semantic-release` (version + CHANGELOG + GitHub Release from Conventional Commits, GitHub-only) and auto-deploys the showcase to Pages on `main` — no manual build/cp. See ADR-0004.
 
 ## 🧰 Tech stack
 
