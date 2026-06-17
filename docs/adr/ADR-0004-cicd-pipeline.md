@@ -26,3 +26,37 @@ Automate everything in **GitHub Actions**, on **Node 22**:
 - **One manual step the workflow can't do for you:** set repo **Settings → Pages → Source = "GitHub Actions"** once. `deploy-pages` needs `permissions: pages: write, id-token: write`; semantic-release needs `contents: write` (uses the built-in `GITHUB_TOKEN`, no PAT).
 - The Anthropic-API **eval harness stays out of CI** (it costs money — hackathon key) — manual / `workflow_dispatch` only.
 - The radar-on-PR product action (ST-0013) is unaffected and remains separate.
+
+## Machine-checkable constraints
+
+We dogfood this ADR: `radar extract` reads the block below; `radar check` evaluates PR diffs against it (advisory). One-off local checks for now; wiring it into CI is a later story.
+
+```constraints
+- id: ADR-0004-C1
+  adr: ADR-0004
+  title: CI/CD config must not embed secrets
+  rule: >
+    GitHub Actions workflows and any committed CI/CD configuration must never
+    contain hardcoded secrets, tokens, API keys, or credentials. Secrets may be
+    referenced only via GitHub Actions secrets (the secrets context) or OIDC —
+    never inlined as a literal value in a committed file.
+  polarity: prohibition
+  driver: NFR-SEC — data-security red line (never commit keys/credentials)
+  scope:
+    paths: [".github/workflows/**"]
+    layers: ["ci"]
+  check:
+    type: semantic
+    matcher: null
+    examples:
+      compliant:
+        - "token set from the secrets context, e.g. secrets.GITHUB_TOKEN"
+        - "env var sourced from a repository/organization secret"
+      violating:
+        - "ANTHROPIC_API_KEY: sk-ant-<literal-value-committed-in-yaml>"
+        - "token: ghp_<literal-personal-access-token>"
+  enforce: advisory
+  severity: high
+  status: active
+  superseded_by: null
+```
