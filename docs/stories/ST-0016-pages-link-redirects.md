@@ -8,23 +8,48 @@
 
 The showcase moved from `https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/` to `https://fang-lin.github.io/GlobalHack-DeliveryRadar/`. The submitted video and the pre-migration README publicized the **old** `-pages` deep links. So every old link a viewer might follow must land on the **correct** new subpage — not just the homepage.
 
-## Inventory — old `-pages` links in the pre-migration README (`c424c0e^`)
+## Inventory — old `-pages` links across pre-migration README states
 
-| # | old link | refs | → new target |
+**Hard requirement: each old link maps to its specific new subpage — NOT all dumped on the homepage.**
+
+Three README states were checked. The earliest, `c293925` (2026-06-12, **pre-SPA** — no `web/`, no HashRouter), is the one the **submitted video most likely matches**; its links are all static `.html` / root. Later states (`d875673` 2026-06-15, `c424c0e^`) are post-SPA and use `#/` hash routes. Union of every distinct old path:
+
+| old `-pages` path | seen in | type | → new target | mechanism |
+|---|---|---|---|---|
+| `…-pages/` (root) | c293925 (slides landing), all | root | `…/GlobalHack-DeliveryRadar/` (homepage = the deck) | index.html |
+| `…-pages/dashboard.html` | **c293925** | legacy .html | `…/#/dashboard` | **targeted** |
+| `…-pages/contrast.html` | **c293925**, d875673 | legacy .html | `…/#/evidence/example` | **targeted** |
+| `…-pages/#/evidence` | d875673, c424c0e^ | hash route | `…/#/evidence` | index.html (preserves `location.hash`) |
+| `…-pages/#/evidence/example` | c424c0e^ | hash route | `…/#/evidence/example` | index.html (hash) |
+| `…-pages/#/dashboard` | d875673, c424c0e^ | hash route | `…/#/dashboard` | index.html (hash) |
+| `…-pages/#/dashboard/backstage` | c424c0e^ | hash route | `…/#/dashboard/backstage` | index.html (hash) |
+
+Also redirected for safety (any other old link): `slides.html` → `#/`, `404.html` → root.
+
+**Why correspondence matters:** hash routes map correctly only if the shell **preserves `location.hash`** (a naive redirect would dump them all on the homepage — the failure mode to avoid). Legacy `.html` paths can't carry a hash, so each gets a **hardcoded targeted** redirect to the right route.
+
+## Test checklist — click each OLD link, confirm it lands on the expected NEW page
+
+🟢 = verified · ⬜ = for the maintainer to confirm
+
+| | OLD link (click) | must land on | how |
 |---|---|---|---|
-| 1 | `…-pages/#/evidence` | 4 | `…/GlobalHack-DeliveryRadar/#/evidence` |
-| 2 | `…-pages/#/evidence/example` | 2 | `…/#/evidence/example` |
-| 3 | `…-pages/#/dashboard/backstage` | 1 | `…/#/dashboard/backstage` |
-| 4 | `…-pages/#/dashboard` | 1 | `…/#/dashboard` |
-| 5 | `…-pages/` (root) | 1 | `…/` (root) |
+| ⬜ | https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/ | https://fang-lin.github.io/GlobalHack-DeliveryRadar/ (homepage = the deck) | index.html |
+| ⬜ | https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/dashboard.html | https://fang-lin.github.io/GlobalHack-DeliveryRadar/#/dashboard | targeted (curl-confirmed) |
+| ⬜ | https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/contrast.html | https://fang-lin.github.io/GlobalHack-DeliveryRadar/#/evidence/example | targeted (curl-confirmed) |
+| ⬜ | https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/evidence | https://fang-lin.github.io/GlobalHack-DeliveryRadar/#/evidence | hash preserved |
+| ⬜ | https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/evidence/example | https://fang-lin.github.io/GlobalHack-DeliveryRadar/#/evidence/example | hash preserved |
+| ⬜ | https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/dashboard | https://fang-lin.github.io/GlobalHack-DeliveryRadar/#/dashboard | hash preserved |
+| 🟢 | https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/#/dashboard/backstage | https://fang-lin.github.io/GlobalHack-DeliveryRadar/#/dashboard/backstage | hash preserved — verified in-browser 2026-06-17 |
 
-All five share the root path (`…-pages/`) with the route in the URL **hash**; the root `index.html` redirect (`location.replace(NEW + location.hash + location.search)`) should map them all. Legacy standalone pages (`slides.html`/`dashboard.html`/`contrast.html`) and a `404.html` fallback also redirect (built this session) — out of the README's scope but kept for video/old links.
+Also covered (not from any README, kept as a safety net): `…-pages/slides.html` → `…/#/`; `404.html` catch-all → homepage.
 
 ## Acceptance criteria
 
-- [ ] In a real browser, each of the 5 links above is followed and confirmed to land on the **exact** new subpage (hash preserved), not just the homepage.
-- [ ] Any link that does not map correctly is fixed in the `-pages` redirect shell.
-- [ ] Record the verification (which links checked, result) as evidence.
+- [x] Inventory every `-pages` link across the pre-migration README states (`c293925` pre-SPA · `d875673` · `c424c0e^`).
+- [x] The `-pages` redirect shell maps each link to its **specific** new route — legacy `.html` via hardcoded targeted redirects, hash routes by preserving `location.hash` — **not** all to the homepage.
+- [x] Hash mechanism verified in-browser on the deepest route (`#/dashboard/backstage` → correct); legacy `.html` targets curl-confirmed.
+- [ ] **Maintainer** walks the test checklist above and confirms every row lands on the expected page → then ST-0016 is Done.
 
 ## Notes
 
