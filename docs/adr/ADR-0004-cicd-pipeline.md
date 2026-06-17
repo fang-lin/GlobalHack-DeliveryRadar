@@ -19,6 +19,22 @@ Automate everything in **GitHub Actions**, on **Node 22**:
 4. **semantic-release is GitHub-only**: version + `CHANGELOG.md` + git tag + GitHub Release from **Conventional Commits**. **No npm publish.**
 5. **One product version = the radar/CLI.** The `web/` showcase is the CLI's **documentation** and is *not* separately versioned — it always builds from the same commit as the CLI (same repo, deployed on every `main` push), so it cannot drift out of sync. semantic-release ignores `web`/`showcase`-scoped commits (via `commit-analyzer.releaseRules`), so site/doc changes **redeploy** the showcase but do **not** bump the CLI version (correct semver — docs don't change the CLI's API). If browsable multi-version docs (v1 vs v2) are ever needed, adopt a docs framework with versioning (Docusaurus/Starlight) — out of scope now.
 
+## Pipeline design
+
+```mermaid
+flowchart TD
+    PR["Pull request: open / sync"] --> CI["ci.yml (advisory)<br/>lint · typecheck · vitest · build"]
+    CI --> RV{"review + merge"}
+    RV -->|merge| MAIN["push to main"]
+    MAIN --> REL["release.yml › release job<br/>semantic-release (Conventional Commits)<br/>version · CHANGELOG · tag · GitHub Release<br/>web/showcase scope → no version bump"]
+    MAIN --> DEP["release.yml › deploy job<br/>pnpm build web → configure-pages →<br/>upload-pages-artifact → deploy-pages"]
+    DEP --> PAGES["GitHub Pages<br/>fang-lin.github.io/GlobalHack-DeliveryRadar"]
+    REL -.->|release commit, skip ci| MAIN
+    DOG["radar check / dogfood<br/>one-off + manual today; CI integration = ST-0013"] -.-> PR
+```
+
+Triggers, jobs, and artifacts are all **advisory and secret-free** (per the decisions above). On every push to `main` the two `release.yml` jobs run independently: `release` cuts a version only when commits warrant it, while `deploy` always republishes the showcase. The dashed `radar check` node is the dogfood (ADR-0004-C1) — run one-off/locally today; wiring it into CI on PRs is deferred to ST-0013.
+
 ## Consequences
 
 - **Public URL changes** from `https://fang-lin.github.io/GlobalHack-DeliveryRadar-pages/` to **`https://fang-lin.github.io/GlobalHack-DeliveryRadar/`**. Update any link that pointed at the old URL; the old one keeps serving its last deploy until the `-pages` repo is deleted (maintainer's call — not deleted here).
