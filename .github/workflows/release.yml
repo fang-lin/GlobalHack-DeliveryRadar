@@ -69,7 +69,11 @@ jobs:
       - name: Build SPA
         run: pnpm --filter delivery-radar-web build
 
+      # enablement: true lets the workflow turn on Pages (source = GitHub Actions)
+      # via GITHUB_TOKEN on first run — no manual Settings → Pages step needed.
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
