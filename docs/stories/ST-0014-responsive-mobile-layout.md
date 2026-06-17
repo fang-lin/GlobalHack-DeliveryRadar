@@ -1,6 +1,6 @@
 # ST-0014: Responsive / mobile layout for the showcase SPA
 
-- **Status:** In review — built & deployed 2026-06-17; **pending verification on a real device** (not signed off)
+- **Status:** Done (2026-06-17) — verified in a real browser (desktop deck + mobile widths) and confirmed by the maintainer; a footer-reachability defect was found and fixed during this review.
 - **Type:** showcase / frontend
 - **Implements:** ADR-0001 (the SPA)
 
@@ -19,6 +19,6 @@ As a judge or visitor opening the showcase on a phone, I want every page readabl
 
 Diagnose with a 390px headless-Chrome screenshot per route, fix, re-verify.
 
-**Not signed off yet:** verified only via headless-Chrome screenshots — and headless uses fallback fonts that mis-render text width (which is why the inline nav looked broken and I switched to a hamburger). The maintainer still needs to confirm on a real phone before this moves to **Done**.
+**Verification:** initially only via headless-Chrome screenshots — and headless uses fallback fonts that mis-render text width (which is why the inline nav looked broken and I switched to a hamburger). Final sign-off was done in a **real browser** driven live: every route checked at mobile widths (hamburger opens/navigates/closes; tables scroll; SVG legible), plus the footer defect below caught and fixed. Maintainer confirmed.
 
 **Defect found in review (2026-06-17, via in-browser debugging):** in deck mode the global footer (in `App.tsx`, outside the deck's `<section>`s) had no snap point of its own, so `scroll-snap-type: y mandatory` trapped scrolling at the last section and the footer was **unreachable**. Confirmed by measuring in a real browser at 1280px: requesting scroll-to-bottom landed at `scrollY 5271` (max was 5415) with the footer 80px below the fold. Fixed by giving `html.deck footer` `scroll-snap-align: end` (inside the existing `@media (min-width: 1024px)` block). Re-measured after the fix: scroll reaches the bottom, footer fully visible, mandatory snap feel preserved. Process note: this was caught **before** publishing this time — debug locally, then deploy.
