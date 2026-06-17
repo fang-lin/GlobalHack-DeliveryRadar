@@ -1,6 +1,6 @@
 # ST-0015: CI/CD pipeline (GitHub Actions)
 
-- **Status:** In progress — building (decisions locked, see below); will go to the maintainer for review/test before Done.
+- **Status:** Done (2026-06-17) — pipeline live (CI + semantic-release `v1.0.0` + auto-deploy to Pages); maintainer confirmed the live site at the new URL.
 - **Type:** infra / tooling
 - **Relates to:** ADR-0004 (to be written once the deploy target is chosen); distinct from [ST-0013](ST-0013-github-action.md) (that runs the *radar* on PRs — a product feature; this is the *repo's own* build/test/deploy).
 

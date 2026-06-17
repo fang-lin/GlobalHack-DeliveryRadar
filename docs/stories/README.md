@@ -4,7 +4,9 @@ Work-unit records for Delivery Radar's **own** development — we dogfood our ow
 
 **Convention:** every code-work item gets a story here (`ST-NNN`); architectural decisions get an ADR in `docs/adr/`; commit messages cite the IDs (e.g. `feat(web): … (ST-0001)`). Stories are English (product artifact). A story links to the ADR it implements (if any) and to its commits.
 
-**Status values:** `Todo` · `In progress` · `Done` · `Dropped`.
+**Status values:** `Todo` · `In progress` · `In review` · `Done` · `Dropped`. (`In review` = work complete, awaiting the verification gate.)
+
+**Template & verification gate:** copy [`TEMPLATE.md`](TEMPLATE.md) for new stories. Every story carries a **Verification / QA** section — nothing flips to `Done` until it passes the gate: **CI green** + the [`qa-engineer`](../../.claude/agents/qa-engineer.md) agent's pass/fail check for any live/web behaviour + **maintainer sign-off** (we don't self-declare Done).
 
 | ID | Title | Status | ADR |
 |---|---|---|---|
@@ -22,5 +24,5 @@ Work-unit records for Delivery Radar's **own** development — we dogfood our ow
 | ST-0012 | Replay/precision eval harness (Backstage) | Done | — |
 | ST-0013 | GitHub Action — auto-run on PR events | Todo · backlog | — |
 | ST-0014 | Responsive / mobile layout for the showcase SPA | Done | ADR-0001 |
-| ST-0015 | CI/CD pipeline (GitHub Actions) — lint · unit tests · typecheck/build · semantic-release · deploy Pages | In progress (built; sign-off pending) | ADR-0004 |
+| ST-0015 | CI/CD pipeline (GitHub Actions) — lint · unit tests · typecheck/build · semantic-release · deploy Pages | Done | ADR-0004 |
 | ST-0016 | Redirect pre-migration `-pages` showcase links to the new Pages site | In progress | ADR-0004 |
