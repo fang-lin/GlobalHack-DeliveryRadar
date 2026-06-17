@@ -152,8 +152,8 @@ export default function Evidence() {
           />
         </div>
 
-        <div className="mt-4 overflow-hidden rounded-xl border border-border">
-          <table className="w-full text-sm">
+        <div className="mt-4 overflow-x-auto rounded-xl border border-border">
+          <table className="w-full min-w-[34rem] text-sm">
             <thead className="bg-card/60 text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
                 <th className="px-4 py-2.5 text-left font-medium">case</th>

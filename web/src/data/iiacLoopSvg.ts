@@ -1,5 +1,5 @@
 export const IIAC_LOOP_SVG = `
-  <svg viewBox="0 0 980 672" style="width:100%;height:auto;max-width:980px;margin:0 auto;display:block">
+  <svg viewBox="0 0 980 672" style="width:100%;height:auto;min-width:520px;max-width:980px;margin:0 auto;display:block">
     <defs>
       <marker id="mSlate" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8"/></marker>
       <marker id="mViolet" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#a78bfa"/></marker>

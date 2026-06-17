@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { NavLink, Route, Routes } from "react-router-dom";
-import { Radar, Github } from "lucide-react";
+import { Radar, Github, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Overview from "@/pages/Overview";
 import DashboardLayout from "@/pages/DashboardLayout";
@@ -16,18 +17,19 @@ const NAV = [
 ];
 
 export default function App() {
+  const [menuOpen, setMenuOpen] = useState(false);
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-40 border-b border-border/70 bg-background/80 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-5">
-          <NavLink to="/" className="flex items-center gap-2 font-semibold">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-5">
+          <NavLink to="/" className="flex items-center gap-2 font-semibold" onClick={() => setMenuOpen(false)}>
             <Radar className="h-5 w-5 text-primary" />
             <span>Delivery Radar</span>
             <span className="ml-1 hidden rounded border border-border px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground sm:inline">
               IIAC
             </span>
           </NavLink>
-          <nav className="flex items-center gap-1">
+          <nav className="hidden items-center gap-1 sm:flex">
             {NAV.map((n) => (
               <NavLink
                 key={n.to}
@@ -49,16 +51,55 @@ export default function App() {
               href="https://github.com/fang-lin/GlobalHack-DeliveryRadar"
               target="_blank"
               rel="noopener noreferrer"
-              className="ml-1 rounded-lg p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              className="ml-1 inline-flex rounded-lg p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
               aria-label="GitHub repository"
             >
               <Github className="h-4 w-4" />
             </a>
           </nav>
+          <button
+            type="button"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label="Menu"
+            className="rounded-lg p-2 text-muted-foreground hover:bg-accent hover:text-foreground sm:hidden"
+          >
+            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
+
+        {menuOpen && (
+          <nav className="border-t border-border bg-background px-4 py-2 sm:hidden">
+            {NAV.map((n) => (
+              <NavLink
+                key={n.to}
+                to={n.to}
+                end={n.end}
+                onClick={() => setMenuOpen(false)}
+                className={({ isActive }) =>
+                  cn(
+                    "block rounded-lg px-3 py-2 text-sm transition-colors",
+                    isActive
+                      ? "bg-primary/15 text-primary"
+                      : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                  )
+                }
+              >
+                {n.label}
+              </NavLink>
+            ))}
+            <a
+              href="https://github.com/fang-lin/GlobalHack-DeliveryRadar"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+            >
+              GitHub ↗
+            </a>
+          </nav>
+        )}
       </header>
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-8">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-5">
         <Routes>
           <Route path="/" element={<Overview />} />
           <Route path="/dashboard" element={<DashboardLayout />}>

@@ -212,8 +212,8 @@ export default function Overview() {
         <h2 className="mb-4 text-center text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           Why this is new
         </h2>
-        <div className="overflow-hidden rounded-xl border border-border">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto rounded-xl border border-border">
+          <table className="w-full min-w-[30rem] text-sm">
             <thead className="bg-card/60 text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
                 <th className="px-4 py-2.5 text-left font-medium">layer</th>

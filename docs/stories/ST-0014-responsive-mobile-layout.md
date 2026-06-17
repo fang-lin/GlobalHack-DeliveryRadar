@@ -1,6 +1,6 @@
 # ST-0014: Responsive / mobile layout for the showcase SPA
 
-- **Status:** In progress
+- **Status:** In review — built & deployed 2026-06-17; **pending verification on a real device** (not signed off)
 - **Type:** showcase / frontend
 - **Implements:** ADR-0001 (the SPA)
 
@@ -10,11 +10,13 @@ As a judge or visitor opening the showcase on a phone, I want every page readabl
 
 ## Acceptance criteria
 
-- [ ] No horizontal overflow / clipping at ~390px on every route: Overview, Dashboard (shop-demo + Backstage), Evidence (measured + worked example).
-- [ ] Tables **scroll** (`overflow-x-auto`), not clip; the IIAC Loop SVG is legible or horizontally scrollable.
-- [ ] Header nav usable on narrow screens (no overflow / wrap mess).
-- [ ] Desktop deck behaviour unchanged (scroll-snap is intentionally desktop-only).
+- [x] No horizontal overflow at ~390px on every route (verified via headless-Chrome screenshots).
+- [x] Tables now **scroll** (`overflow-x-auto` + `min-w-…`) instead of clipping (the eval table no longer cuts off the `ungrounded` column); the IIAC Loop SVG gets `min-width:520px` so it stays legible and scrolls horizontally on phones instead of shrinking to nothing.
+- [x] Header nav: a **hamburger menu** on mobile (`sm:hidden` button → dropdown), inline nav on `sm+`. This is robust to font width (the old inline nav overflowed at 390 and pushed "Evidence" off-screen).
+- [x] Desktop deck behaviour unchanged (scroll-snap stays desktop-only).
 
 ## Notes
 
 Diagnose with a 390px headless-Chrome screenshot per route, fix, re-verify.
+
+**Not signed off yet:** verified only via headless-Chrome screenshots — and headless uses fallback fonts that mis-render text width (which is why the inline nav looked broken and I switched to a hamburger). The maintainer still needs to confirm on a real phone before this moves to **Done**.

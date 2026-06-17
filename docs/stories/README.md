@@ -21,4 +21,4 @@ Work-unit records for Delivery Radar's **own** development — we dogfood our ow
 | ST-0011 | Migrate radar Python → TypeScript | Done | ADR-0003 |
 | ST-0012 | Replay/precision eval harness (Backstage) | Done | — |
 | ST-0013 | GitHub Action — auto-run on PR events | Todo · backlog | — |
-| ST-0014 | Responsive / mobile layout for the showcase SPA | In progress | ADR-0001 |
+| ST-0014 | Responsive / mobile layout for the showcase SPA | In review | ADR-0001 |
