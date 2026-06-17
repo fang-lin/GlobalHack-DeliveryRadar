@@ -58,6 +58,10 @@
     padding-top: 2rem;
     padding-bottom: 2rem;
   }
+  /* The global footer lives outside the snap sections. Without its own snap point,
+     `mandatory` snap traps scrolling at the last section and the footer can never be
+     reached. Give it an end-aligned snap target so the deck can scroll down to it. */
+  html.deck footer { scroll-snap-align: end; }
 }
 
 /* rendered markdown (the worked-example reviews) */
