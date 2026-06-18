@@ -20,3 +20,38 @@ Reasons: (1) one language across the radar core and the showcase SPA (also TS); 
 - The Round-1 demo video shows the **Python** version (noted in the demo-day spec); the repo is now TS.
 - `extract` + `check --replay` verified byte-identical to the Python output; 7/7 vitest pass.
 - `node_modules/` and `dist/` are gitignored.
+
+## Machine-checkable constraints
+
+`radar extract` reads the block below; `radar check` evaluates PR diffs against it (advisory, never blocks).
+
+```constraints
+- id: ADR-0003-C1
+  adr: ADR-0003
+  title: Model verdicts via typed structured outputs only
+  rule: >
+    The radar's Anthropic model calls must obtain results through the SDK's
+    typed structured outputs (messages.parse + zodOutputFormat with a Zod
+    schema). They must not hand-parse free text or JSON out of the model's
+    message.content (no JSON.parse / regex extraction of verdict fields).
+  polarity: requirement
+  driver: ADR-0003 — typed, validated verdicts are the product's reliability guarantee
+  scope:
+    paths: ["src/**"]
+    layers: ["radar-core", "llm"]
+  check:
+    type: semantic
+    matcher: null
+    examples:
+      compliant:
+        - "client.messages.parse with zodOutputFormat(Schema)"
+        - "a Zod-validated Verdict returned by checkConstraint"
+      violating:
+        - "JSON.parse(resp.content[0].text)"
+        - "regex-extracting result/confidence from the model's text reply"
+        - "messages.create then manually reading message.content for a verdict"
+  enforce: advisory
+  severity: high
+  status: active
+  superseded_by: null
+```

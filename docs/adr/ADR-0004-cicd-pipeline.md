@@ -75,4 +75,56 @@ We dogfood this ADR: `radar extract` reads the block below; `radar check` evalua
   severity: high
   status: active
   superseded_by: null
+- id: ADR-0004-C2
+  adr: ADR-0004
+  title: Pages deploys from the main repo via official actions
+  rule: >
+    The showcase must deploy to GitHub Pages from THIS repo using the official
+    actions/upload-pages-artifact + actions/deploy-pages (Pages source = GitHub
+    Actions). It must not deploy via a stored cross-repo deploy key / PAT, nor
+    by pushing build output to a separate repo.
+  polarity: requirement
+  driver: ADR-0004 — no secrets, single source, retire the -pages repo
+  scope:
+    paths: [".github/workflows/**"]
+    layers: ["ci", "deploy"]
+  check:
+    type: semantic
+    matcher: null
+    examples:
+      compliant:
+        - "actions/deploy-pages + actions/upload-pages-artifact from main"
+      violating:
+        - "peaceiris/actions-gh-pages with external_repository + a deploy key"
+        - "git push to GlobalHack-DeliveryRadar-pages using a PAT secret"
+  enforce: advisory
+  severity: medium
+  status: active
+  superseded_by: null
+- id: ADR-0004-C3
+  adr: ADR-0004
+  title: Releases stay GitHub-only (no npm publish)
+  rule: >
+    semantic-release must remain GitHub-only — tags + CHANGELOG + GitHub
+    Release. @semantic-release/npm must keep npmPublish:false; no npm registry
+    publish and no NPM_TOKEN. The radar is not distributed via npm.
+  polarity: prohibition
+  driver: ADR-0004 — Q2 decision, GitHub-only releases, no registry
+  scope:
+    paths: [".releaserc.json", ".github/workflows/release.yml"]
+    layers: ["ci", "release"]
+  check:
+    type: semantic
+    matcher: null
+    examples:
+      compliant:
+        - "@semantic-release/npm with npmPublish false"
+      violating:
+        - "npmPublish set to true"
+        - "adding NPM_TOKEN to release.yml"
+        - "a publish step to the npm registry"
+  enforce: advisory
+  severity: low
+  status: active
+  superseded_by: null
 ```
