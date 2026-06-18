@@ -29,3 +29,4 @@ Work-unit records for Delivery Radar's **own** development — we dogfood our ow
 | ST-0017 | Bump CI/CD actions to current (Node 24) majors — clear Node 20 deprecation | Done | ADR-0004 |
 | ST-0018 | Homepage deck — slide-scroll on mobile, not just desktop | Done | ADR-0001 |
 | ST-0019 | Trigger radar from the PR — `/radar` comment + `radar` label | In progress | FR-INT-6 |
+| ST-0020 | Add stable ids to significant UI elements (ADR-0005-C1) | In progress | ADR-0005 |

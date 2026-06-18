@@ -20,9 +20,9 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-40 border-b border-border/70 bg-background/80 backdrop-blur">
+      <header id="site-header" className="sticky top-0 z-40 border-b border-border/70 bg-background/80 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-5">
-          <NavLink to="/" className="flex items-center gap-2 font-semibold" onClick={() => setMenuOpen(false)}>
+          <NavLink to="/" id="nav-logo" className="flex items-center gap-2 font-semibold" onClick={() => setMenuOpen(false)}>
             <Radar className="h-5 w-5 text-primary" />
             <span>Delivery Radar</span>
             <span className="ml-1 hidden rounded border border-border px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground sm:inline">
@@ -33,6 +33,7 @@ export default function App() {
             {NAV.map((n) => (
               <NavLink
                 key={n.to}
+                id={`nav-${n.label.toLowerCase()}`}
                 to={n.to}
                 end={n.end}
                 className={({ isActive }) =>
@@ -48,6 +49,7 @@ export default function App() {
               </NavLink>
             ))}
             <a
+              id="nav-github"
               href="https://github.com/fang-lin/GlobalHack-DeliveryRadar"
               target="_blank"
               rel="noopener noreferrer"
@@ -68,7 +70,7 @@ export default function App() {
         </div>
 
         {menuOpen && (
-          <nav className="border-t border-border bg-background px-4 py-2 sm:hidden">
+          <nav id="mobile-nav" className="border-t border-border bg-background px-4 py-2 sm:hidden">
             {NAV.map((n) => (
               <NavLink
                 key={n.to}
@@ -113,7 +115,7 @@ export default function App() {
         </Routes>
       </main>
 
-      <footer className="mt-12 border-t border-border/70">
+      <footer id="site-footer" className="mt-12 border-t border-border/70">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-6 text-xs text-muted-foreground">
           <span>Delivery Radar — Intent–Implementation Alignment &amp; Convergence · advisory, never blocks</span>
           <span className="flex items-center gap-1.5">

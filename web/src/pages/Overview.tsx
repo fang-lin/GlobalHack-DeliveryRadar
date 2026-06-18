@@ -147,7 +147,7 @@ export default function Overview() {
   return (
     <div className="deck-main">
       {/* hero */}
-      <section className="pt-4 text-center">
+      <section id="hero" className="pt-4 text-center">
         <Eyebrow>intent → implementation → alignment → convergence</Eyebrow>
         <h1 className="mx-auto mt-3 max-w-3xl text-3xl font-bold leading-tight sm:text-4xl">
           Does this change still match what the team <span className="text-primary">decided</span>?
@@ -160,12 +160,14 @@ export default function Overview() {
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <Link
+            id="cta-see-it-run"
             to="/dashboard"
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             <LayoutDashboard className="h-4 w-4" /> See it run
           </Link>
           <Link
+            id="cta-see-it-measured"
             to="/evidence"
             className="inline-flex items-center gap-2 rounded-lg border border-border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-accent"
           >
@@ -175,7 +177,7 @@ export default function Overview() {
       </section>
 
       {/* crux */}
-      <section>
+      <section id="crux">
         <Card className="border-primary/40 bg-primary/[0.04]">
           <CardContent className="p-6 text-center">
             <p className="text-lg font-medium">
@@ -191,7 +193,7 @@ export default function Overview() {
       </section>
 
       {/* the IIAC loop */}
-      <section>
+      <section id="iiac-loop">
         <Eyebrow>intent → implementation → alignment → convergence · IIAC</Eyebrow>
         <h2 className="mt-2 text-center text-2xl font-bold">The IIAC Loop</h2>
         <p className="mt-1 text-center text-sm text-muted-foreground">
@@ -208,7 +210,7 @@ export default function Overview() {
       </section>
 
       {/* why this is new */}
-      <section>
+      <section id="why-new">
         <h2 className="mb-4 text-center text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           Why this is new
         </h2>
@@ -237,7 +239,7 @@ export default function Overview() {
       </section>
 
       {/* the full system — one slice */}
-      <section>
+      <section id="system-map">
         <Eyebrow>the specified system</Eyebrow>
         <h2 className="mt-2 text-center text-2xl font-bold">What runs today is one slice</h2>
         <div className="mt-3 flex flex-wrap items-center justify-center gap-3 font-mono text-[11px]">
@@ -268,7 +270,7 @@ export default function Overview() {
       </section>
 
       {/* two paths → autonomy */}
-      <section>
+      <section id="paths">
         <Eyebrow>why this matters</Eyebrow>
         <h2 className="mt-2 text-center text-2xl font-bold">From writing, to steering, to autonomy</h2>
         <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -301,7 +303,7 @@ export default function Overview() {
       </section>
 
       {/* roadmap */}
-      <section>
+      <section id="roadmap">
         <Eyebrow>where this goes</Eyebrow>
         <h2 className="mt-2 text-center text-2xl font-bold">Roadmap</h2>
         <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -327,7 +329,7 @@ export default function Overview() {
       </section>
 
       {/* explore the showcases */}
-      <section>
+      <section id="explore">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
@@ -372,7 +374,7 @@ export default function Overview() {
       </section>
 
       {/* closing */}
-      <section className="pb-4 text-center">
+      <section id="closing" className="pb-4 text-center">
         <div className="text-2xl font-bold">🛰️ Delivery Radar</div>
         <div className="mt-2 font-mono text-primary">
           keep the <span className="italic">why</span> alive
