@@ -102,15 +102,18 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: node dist/cli.js check --adr-dir docs/adr --diff pr.diff --save verdicts.json
 
-      # Success: edit the SAME 'started' review in place with the full verdict.
-      # Uses the built CLI (dist/ exists — we got past build + check).
+      # Success: render the verdict with the CLI (pure — stdout only), then the
+      # workflow edits the SAME 'started' review in place via gh api. All platform
+      # I/O lives here, never in the CLI.
       - name: Update the sticky review with the verdict
         env:
           GH_TOKEN: ${{ github.token }}
-        run: >
-          node dist/cli.js comment --adr-dir docs/adr --verdicts verdicts.json
-          --repo ${{ github.repository }} --pr ${{ steps.pr.outputs.num }}
-          --update ${{ steps.start.outputs.review_id }} --all
+          PR: ${{ steps.pr.outputs.num }}
+          REPO: ${{ github.repository }}
+          RID: ${{ steps.start.outputs.review_id }}
+        run: |
+          BODY=$(node dist/cli.js comment --adr-dir docs/adr --verdicts verdicts.json --all)
+          gh api -X PUT "repos/${REPO}/pulls/${PR}/reviews/${RID}" -f body="$BODY"
 
       # Failure/cancel: resolve the same review so it never stays stuck at "running".
       # Inline gh api — the CLI may not be built if we failed at install/build/check.

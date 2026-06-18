@@ -466,6 +466,13 @@ path/ownership mapping first; semantic similarity is a secondary signal only.
 - `NFR-SEC-1` Least-privilege tokens. The system reads code and writes review
   comments / draft PRs / draft issues only. It MUST NOT modify access controls,
   branch protection, or repository settings.
+- `NFR-PORT-1` **Core / platform decoupling.** The radar core (`src/`) is
+  platform-agnostic: it only reads inputs (ADRs, the diff, verdicts) and emits
+  outputs (constraints, verdicts, rendered markdown) to stdout/files; it MUST NOT
+  call git / GitHub / `gh` or any host / VCS / CI API. All platform I/O (fetching
+  the diff, posting/editing a review, labels, status) lives in the **integration
+  layer** (the workflow or an adapter), which drives the core and publishes its
+  output. See `ADR-0006`.
 - `NFR-EXPLAIN-1` Every `violated` verdict MUST carry evidence (ADR clause ↔ code
   hunk) and a short explanation. No unexplained blocks.
 - `NFR-CONFIG-1` Thresholds (confidence cutoffs, drift schedule, ungraduated-note
