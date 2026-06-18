@@ -1,6 +1,6 @@
 # ST-0018: Homepage deck — slide-scroll on mobile, not just desktop
 
-- **Status:** In progress
+- **Status:** Done (2026-06-18) — merged (PR #3), radar-checked 🟢 aligned, deployed; maintainer confirmed the slide-scroll on mobile.
 - **Type:** showcase / frontend
 - **Implements / Relates:** ADR-0001 (the SPA deck) · governed by **ADR-0001-C2** (mobile-first / responsive) · revises the ST-0014 "deck desktop-only" decision.
 
@@ -14,18 +14,18 @@ ST-0014 gated the deck (scroll-snap + full-screen centred sections) to `@media (
 
 ## Acceptance criteria
 
-- [ ] On mobile, the homepage scrolls **one full-screen section at a time** (scroll-snap), like the desktop deck.
-- [ ] **Tall sections are not clipped** — content stays reachable (e.g. `justify-content: safe center`, `min-height: 100svh`).
-- [ ] Inner multi-column content (system map, roadmap, why-new table) **stacks/scrolls responsively** on a phone — no cramped fixed grids, no horizontal overflow.
-- [ ] Desktop deck behaviour unchanged.
+- [x] On mobile, the homepage scrolls **one full-screen section at a time** (scroll-snap), like the desktop deck.
+- [x] **Tall sections are not clipped** — content stays reachable (e.g. `justify-content: safe center`, `min-height: 100svh`).
+- [x] Inner multi-column content (system map, roadmap, why-new table) **stacks/scrolls responsively** on a phone — no cramped fixed grids, no horizontal overflow.
+- [x] Desktop deck behaviour unchanged.
 
 ## Verification / QA
 
 | gate | how | result |
 |---|---|---|
-| Automated | `ci.yml` (lint/typecheck/build) green | ⬜ |
-| Live / web behaviour | local real-Chrome at ~390px — slide-scroll works, nothing clipped/overflowing | ⬜ |
-| Maintainer sign-off | maintainer confirms on a real phone | ⬜ pending |
+| Automated | `ci.yml` green on PR #3; radar check 🟢 aligned (C1/C2/C3) | ✅ |
+| Live / web behaviour | verified locally in Chrome @390px (mandatory snap, 788px sections, tall section top-aligned, no clip); deployed | ✅ |
+| Maintainer sign-off | maintainer confirmed slide-scroll on mobile | ✅ 2026-06-18 |
 
 ## Notes
 
