@@ -5,7 +5,7 @@
 #   • add the "radar" label to the PR
 #   • Actions → Run workflow (workflow_dispatch) with a PR number
 # Always checks the PR diff against MAIN's ADRs. Needs the ANTHROPIC_API_KEY secret.
-name: "Does this PR still match what we decided?"
+name: "Radar — conformance check"
 
 run-name: "Does PR #${{ inputs.pr || github.event.issue.number || github.event.pull_request.number }} still match what we decided?"
 

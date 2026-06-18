@@ -12,7 +12,7 @@ As the maintainer, I want to run the radar on a chosen PR with one click and hav
 
 - **Repo:** this repo (Delivery Radar) — **dogfood**, the radar checks its own PRs. Ties to ST-0008.
 - **Trigger (this story): `workflow_dispatch`** — the Actions "Run workflow" button + a `pr` input. No auto-on-every-PR → zero API until you trigger (NFR-COST-1). Always checks the PR diff against **main's** ADRs (checkout `ref: main`). The **PR-native triggers** (`/radar` comment + `radar` label) are split into **[ST-0019](ST-0019-radar-pr-triggers.md)** — same `radar.yml`, added as a follow-up increment.
-- **Name:** workflow `name: "Does this PR still match what we decided?"`; `run-name` appends the PR number. This is what shows in Actions / PR checks — the product's pitch line, aimed at the judges' pain point.
+- **Name:** workflow `name: "Radar — conformance check"` (functional — clear sidebar identifier, coheres with the `/radar` command + CLI `radar check`); **`run-name: "Does PR #N still match what we decided?"`** keeps the pitch line as each run's title (what a judge sees per run). Split so the identifier is clear while runs still read as the pitch.
 - **What it does:** checkout → `pnpm build` → `gh pr diff <pr>` → `radar extract` (free) → `radar check --diff` (LLM, `claude-sonnet-4-6`) → `radar comment --post --all` → advisory review via the Reviews API `COMMENT` event (**never blocks**).
 - **Secret:** needs `ANTHROPIC_API_KEY` as a repo Actions secret (the **maintainer adds it**; the assistant never handles the key). The built-in `GITHUB_TOKEN` posts the review (`pull-requests: write`).
 - `--all` posts the full review (aligned + violated) — demo-friendly; drop it for violated-only in real use.
