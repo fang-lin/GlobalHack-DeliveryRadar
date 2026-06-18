@@ -422,11 +422,14 @@ path/ownership mapping first; semantic similarity is a secondary signal only.
   configurable destination for remediation issues and behavioral Decision Notes.
 - `FR-INT-5` Deterministic checks SHOULD integrate an existing engine
   (e.g. semgrep) rather than reimplement matching.
-- `FR-INT-6` The CI run of `radar check` MAY be **manually gated** (a GitHub
-  Action `workflow_dispatch`, taking the PR number as input) or label-triggered,
-  to control LLM cost; either way it stays **advisory** — posted via the Reviews
-  API as a `COMMENT` event, never blocking the merge. First landing: checking
-  this repo's own PRs (dogfood — see `ST-0013` / `ST-0008`).
+- `FR-INT-6` The CI run of `radar check` is **user-initiated**, to control LLM
+  cost (`NFR-COST-1`); it triggers from the PR itself or from Actions in three
+  ways: a **`/radar` PR comment command**, a **`radar` label** on the PR, or
+  **`workflow_dispatch`** (the Actions "Run workflow" button + a PR number). The
+  comment trigger SHOULD verify the commenter has write access. Either way it
+  stays **advisory** — posted via the Reviews API as a `COMMENT` event, never
+  blocking the merge. First landing: checking this repo's own PRs (dogfood — see
+  `ST-0013` / `ST-0008`).
 
 ---
 

@@ -1,10 +1,13 @@
-# Dogfood: run the radar on one of this repo's own PRs, on demand (manual button).
-# Advisory only — posts a review COMMENT, never blocks. LLM cost is gated to manual
-# runs (FR-INT-6 / NFR-COST-1). Needs the ANTHROPIC_API_KEY repo secret.
+# Dogfood: run the radar on a PR against recorded intent. Advisory only — posts a
+# review COMMENT, never blocks. Cost-gated: it runs only when YOU trigger it
+# (FR-INT-6 / NFR-COST-1), one of three user-initiated ways:
+#   • comment "/radar" on the PR (ChatOps; commenter must have write access)
+#   • add the "radar" label to the PR
+#   • Actions → Run workflow (workflow_dispatch) with a PR number
+# Always checks the PR diff against MAIN's ADRs. Needs the ANTHROPIC_API_KEY secret.
 name: "Does this PR still match what we decided?"
 
-# Quoted: the "#" in "PR #42" would otherwise start a YAML comment.
-run-name: "Does PR #${{ inputs.pr }} still match what we decided?"
+run-name: "Does PR #${{ inputs.pr || github.event.issue.number || github.event.pull_request.number }} still match what we decided?"
 
 on:
   workflow_dispatch:
@@ -13,21 +16,46 @@ on:
         description: "PR number to check against recorded intent (the ADRs)"
         required: true
         type: number
+  issue_comment:
+    types: [created]
+  pull_request:
+    types: [labeled]
 
 permissions:
   contents: read
   pull-requests: write # post the advisory review via the Reviews API
 
 concurrency:
-  group: radar-pr-${{ inputs.pr }}
+  group: radar-pr-${{ inputs.pr || github.event.issue.number || github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
   radar:
     name: radar check — advisory, never blocks
+    # Only on an explicit, authorised trigger: the manual button, a "/radar" PR
+    # comment from a write-access user, or the "radar" label being added.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issue_comment' &&
+        github.event.issue.pull_request != null &&
+        startsWith(github.event.comment.body, '/radar') &&
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)) ||
+      (github.event_name == 'pull_request' && github.event.label.name == 'radar')
     runs-on: ubuntu-latest
     steps:
+      - name: Resolve the PR number from whichever event fired
+        id: pr
+        run: |
+          case "${{ github.event_name }}" in
+            workflow_dispatch) echo "num=${{ inputs.pr }}" >> "$GITHUB_OUTPUT" ;;
+            issue_comment)     echo "num=${{ github.event.issue.number }}" >> "$GITHUB_OUTPUT" ;;
+            pull_request)      echo "num=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT" ;;
+          esac
+
+      # Always use MAIN's ADRs + radar (the recorded baseline intent), regardless of trigger.
       - uses: actions/checkout@v6
+        with:
+          ref: main
 
       - uses: pnpm/action-setup@v6
 
@@ -45,7 +73,7 @@ jobs:
       - name: Fetch the PR diff
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh pr diff ${{ inputs.pr }} --repo ${{ github.repository }} > pr.diff
+        run: gh pr diff ${{ steps.pr.outputs.num }} --repo ${{ github.repository }} > pr.diff
 
       - name: Extract constraints (deterministic, free)
         run: node dist/cli.js extract --adr-dir docs/adr
@@ -60,4 +88,4 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: >
           node dist/cli.js comment --adr-dir docs/adr --verdicts verdicts.json
-          --repo ${{ github.repository }} --pr ${{ inputs.pr }} --post --all
+          --repo ${{ github.repository }} --pr ${{ steps.pr.outputs.num }} --post --all

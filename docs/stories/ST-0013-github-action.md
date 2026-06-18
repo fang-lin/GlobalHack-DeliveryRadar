@@ -11,7 +11,7 @@ As the maintainer, I want to run the radar on a chosen PR with one click and hav
 ## Design (decisions locked 2026-06-17)
 
 - **Repo:** this repo (Delivery Radar) — **dogfood**, the radar checks its own PRs. Ties to ST-0008.
-- **Trigger:** **`workflow_dispatch` only** (manual). GitHub renders a "Run workflow" button in the Actions tab; an input `pr` (PR number) is the form field. No auto-on-PR → **zero API cost until clicked** (NFR-COST-1).
+- **Triggers — all user-initiated, cost-gated (NFR-COST-1):** a **`/radar` PR comment** (commenter must have write access), the **`radar` label** on a PR, or **`workflow_dispatch`** (Actions "Run workflow" + a `pr` input). No auto-on-every-PR → zero API until you trigger. Always checks the PR diff against **main's** ADRs (checkout `ref: main`). *Caveat: `/radar` + dispatch use main's workflow → work on any PR (incl. existing ones); the `radar` **label** only fires for PRs whose branch already contains this workflow (GitHub runs `pull_request` workflows from the PR head).*
 - **Name:** workflow `name: "Does this PR still match what we decided?"`; `run-name` appends the PR number. This is what shows in Actions / PR checks — the product's pitch line, aimed at the judges' pain point.
 - **What it does:** checkout → `pnpm build` → `gh pr diff <pr>` → `radar extract` (free) → `radar check --diff` (LLM, `claude-sonnet-4-6`) → `radar comment --post --all` → advisory review via the Reviews API `COMMENT` event (**never blocks**).
 - **Secret:** needs `ANTHROPIC_API_KEY` as a repo Actions secret (the **maintainer adds it**; the assistant never handles the key). The built-in `GITHUB_TOKEN` posts the review (`pull-requests: write`).

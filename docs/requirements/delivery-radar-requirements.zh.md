@@ -320,7 +320,7 @@ fix_locality: structural        # local | structural | none  (drives review proj
 - `FR-INT-3` 按仓库引擎以计划任务（cron）外加 ADR 变更钩子的形式运行。
 - `FR-INT-4` `[Phase 2]` issue 跟踪器（GitHub Issues 或 Linear）作为整改 issue 和行为类 Decision Note 的可配置目的地。
 - `FR-INT-5` 确定性检查 SHOULD 集成现有引擎（如 semgrep），而非重新实现匹配。
-- `FR-INT-6` `radar check` 在 CI 中的运行 MAY 由 **GitHub Action 手动触发**（`workflow_dispatch`，以待检查的 PR 号为输入）或按标签门控，以控制 LLM 调用成本；无论触发方式如何，保持 **advisory**——经 Reviews API 以 `COMMENT` 事件发布，绝不阻塞 merge。首个落地形态：对本仓库自身的 PR 做检查（dogfood，见 `ST-0013` / `ST-0008`）。
+- `FR-INT-6` `radar check` 在 CI 中的运行由**用户发起**，以控制 LLM 成本（`NFR-COST-1`）；触发方式有三种、都在 PR 现场或 Actions 里：**PR 评论命令 `/radar`**、给 PR 打 **`radar` 标签**、或 **`workflow_dispatch`**（Actions 的 "Run workflow" 按钮 + PR 号）。评论触发 SHOULD 校验评论者具备写权限。无论触发方式如何，保持 **advisory**——经 Reviews API 以 `COMMENT` 事件发布，绝不阻塞 merge。首个落地形态：对本仓库自身的 PR 做检查（dogfood，见 `ST-0013` / `ST-0008`）。
 
 ---
 
