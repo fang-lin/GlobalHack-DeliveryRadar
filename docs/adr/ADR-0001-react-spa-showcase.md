@@ -82,4 +82,31 @@ Build the showcase as a **Vite + React + TypeScript + Tailwind + shadcn-style SP
   severity: medium
   status: active
   superseded_by: null
+- id: ADR-0001-C3
+  adr: ADR-0001
+  title: Homepage presents as a slide deck on all viewports
+  rule: >
+    The homepage must present as a slide deck — full-screen sections that scroll
+    one screen at a time (scroll-snap) — at ALL viewport widths, mobile included.
+    The deck's full-screen + scroll-snap behaviour must not be gated to desktop
+    only (no @media min-width that disables it on phones); on a phone the page
+    must not collapse into cramped continuous stacking.
+  polarity: requirement
+  driver: ST-0018 — the showcase must read like slides on every device, not just desktop
+  scope:
+    paths: ["web/src/index.css", "web/src/pages/Overview.tsx"]
+    layers: ["web", "layout", "deck"]
+  check:
+    type: semantic
+    matcher: null
+    examples:
+      compliant:
+        - "html.deck scroll-snap-type: y mandatory at all widths; sections min-height 100svh + scroll-snap-align: start"
+      violating:
+        - "wrapping the deck scroll-snap / full-screen sections in @media (min-width: 1024px) so mobile loses them"
+        - "deck sections with no min-height or scroll-snap on phones (continuous cramped stacking)"
+  enforce: advisory
+  severity: medium
+  status: active
+  superseded_by: null
 ```
