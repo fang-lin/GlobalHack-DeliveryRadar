@@ -10,8 +10,8 @@ As someone discussing the UI or writing tests, I want the showcase's significant
 
 ## Scope (first pass — global chrome + homepage, the most-referenced surface)
 
-- **Global (`App.tsx`):** `#site-header`, `#site-footer`, desktop nav links (`#nav-overview` / `#nav-dashboard` / `#nav-evidence`), `#nav-logo`, `#nav-github`, `#mobile-nav`.
-- **Homepage (`Overview.tsx`):** each deck section — `#hero`, `#crux`, `#iiac-loop`, `#why-new`, `#system-map`, `#paths`, `#roadmap`, `#explore`, `#closing` — and the two hero CTAs (`#cta-see-it-run`, `#cta-see-it-measured`).
+- **Global (`App.tsx`):** `#site-header`, `#site-footer`, desktop nav links (`#nav-overview` / `#nav-dashboard` / `#nav-evidence`), `#nav-logo`, `#nav-github`, `#mobile-nav` **and its items** (`#mobile-nav-overview` / `#mobile-nav-dashboard` / `#mobile-nav-evidence`, `#mobile-nav-github`).
+- **Homepage (`Overview.tsx`):** each deck section — `#hero`, `#crux`, `#iiac-loop`, `#why-new`, `#system-map`, `#paths`, `#roadmap`, `#explore`, `#closing` — the two hero CTAs (`#cta-see-it-run`, `#cta-see-it-measured`), and the two explore-card links (`#explore-dashboard-link`, `#explore-evidence-link`).
 
 **Out of scope** (incremental per ADR-0005, "as touched"): Dashboard + Evidence sub-pages — id those when next edited.
 
@@ -27,8 +27,14 @@ As someone discussing the UI or writing tests, I want the showcase's significant
 |---|---|---|
 | Automated | `ci.yml` (lint/typecheck/build) green | ⬜ |
 | Live / web behaviour | browser / `qa-engineer`: `#iiac-loop`, `#nav-evidence` etc. resolve and are unique | ⬜ |
-| radar (ADR-0005-C1) | optional `/radar` on the PR — should read aligned | ⬜ |
+| radar (ADR-0005-C1) | `/radar` on the PR | 🟢 caught a real deviation → converged (see below); re-run to confirm ⬜ |
 | Maintainer sign-off | maintainer reviews + merges | ⬜ pending |
+
+## Convergence (radar dogfood — the loop working on our own PR)
+
+First pass shipped section + desktop-nav + CTA ids but **missed the interactive controls in the touched chrome**. `/radar` on PR #4 flagged it (🔴 ADR-0005-C1, confidence 0.82, evidence `App.tsx L70–L80`): the desktop nav items got ids but the **mobile-drawer NavLinks did not** — "duplicating the nav into a mobile drawer doesn't exempt the items inside it." Accurate catch.
+
+Converged by completing the **same category the PR established (interactive controls)**: added ids to the mobile-drawer nav items + the mobile GitHub link (`App.tsx`) and the two explore-card links (`Overview.tsx`) I'd previously left bare. Content cards (`<Card>`) stay out of scope this pass — they carry no ids anywhere yet, so the PR is internally consistent; card ids are a separate "as touched" pass per ADR-0005. Re-run `/radar` to confirm aligned.
 
 ## Notes
 

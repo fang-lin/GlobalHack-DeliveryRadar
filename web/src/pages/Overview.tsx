@@ -345,7 +345,7 @@ export default function Overview() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link to="/dashboard" className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
+            <Link id="explore-dashboard-link" to="/dashboard" className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
               Open dashboard <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </CardContent>
@@ -365,7 +365,7 @@ export default function Overview() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link to="/evidence" className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
+            <Link id="explore-evidence-link" to="/evidence" className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
               Open evidence <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </CardContent>

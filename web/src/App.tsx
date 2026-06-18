@@ -74,6 +74,7 @@ export default function App() {
             {NAV.map((n) => (
               <NavLink
                 key={n.to}
+                id={`mobile-nav-${n.label.toLowerCase()}`}
                 to={n.to}
                 end={n.end}
                 onClick={() => setMenuOpen(false)}
@@ -90,6 +91,7 @@ export default function App() {
               </NavLink>
             ))}
             <a
+              id="mobile-nav-github"
               href="https://github.com/fang-lin/GlobalHack-DeliveryRadar"
               target="_blank"
               rel="noopener noreferrer"
