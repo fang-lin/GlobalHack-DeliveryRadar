@@ -11,7 +11,9 @@ We constantly need to point at a specific element — when discussing the UI in 
 
 ## Decision
 
-**Significant UI elements carry a stable, descriptive `id`** (or `data-testid`): page sections, navigation items, interactive controls (button / link / input), and major named content blocks. Ids are **kebab-case and meaningful** (`id="hero"`, `id="iiac-loop"`, `id="nav-dashboard"`), not auto-generated or index-based. This is **not** "every `<div>`/`<span>`" — it is every element a human or a test would reasonably need to target.
+**Every user-visible element with independent semantic meaning carries a stable, descriptive `id`** (or `data-testid`) — page sections, every nav item, every interactive control (button / link / input), and every distinct content unit a user perceives as a thing (a card, a metric/stat, a verdict row, a labelled value, a CTA, a heading that names something). Ids are **kebab-case and meaningful** (`id="hero"`, `id="nav-dashboard"`); data-driven elements derive a **stable** id from the data's own identity (e.g. `adr-001-c1` from the row), **never** an index or auto-generated value. **The only exemption is a pure layout/wrapper element** (a flex/grid container, a spacer) that carries no independent meaning of its own — exempt because it has no semantics, not because it's "minor".
+
+*(Strengthened 2026-06-18: the first wording — "only elements a human/test would reasonably target", "not every div" — was too soft and let the implementer rationalise skipping real controls. The bar is now "independent semantic meaning", with pure layout the only exemption.)*
 
 ## Consequences
 
@@ -26,12 +28,14 @@ We constantly need to point at a specific element — when discussing the UI in 
   adr: ADR-0005
   title: Significant UI elements carry stable, descriptive ids
   rule: >
-    Significant UI elements — page sections, navigation items, interactive
-    controls (button/link/input), and major named content blocks — must carry a
-    stable, descriptive id (or data-testid), kebab-case and meaningful, so they
-    can be located for discussion and tests. Adding such an element with no id
-    (only utility classes) is a violation. This does NOT mean every div/span —
-    only elements a human or a test would reasonably target.
+    Every user-visible element with INDEPENDENT SEMANTIC MEANING must carry a
+    stable, descriptive id (or data-testid): page sections, every nav item,
+    every interactive control (button/link/input), and every distinct content
+    unit (card, metric/stat, verdict row, labelled value, CTA, naming heading).
+    Adding OR changing such an element without a stable id is a violation.
+    Data-driven elements use a stable, data-derived id (not an index). The ONLY
+    exemption is a pure layout/wrapper element (flex/grid container, spacer)
+    with no independent meaning of its own.
   polarity: requirement
   driver: ADR-0005 — locatability for discussion + stable test selectors
   scope:
@@ -42,12 +46,12 @@ We constantly need to point at a specific element — when discussing the UI in 
     matcher: null
     examples:
       compliant:
-        - '<section id="iiac-loop"> ... </section>'
-        - '<NavLink id="nav-dashboard" ...>'
-        - '<button id="run-eval" ...>'
+        - '<section id="iiac-loop">, <NavLink id="nav-dashboard">, <button id="run-eval">'
+        - "data-driven element: a stable id derived from the data (e.g. adr-001-c1), not an index"
+        - "pure layout wrapper (flex/grid container) with no id — exempt, no independent meaning"
       violating:
-        - "a new section / nav item / button with only className and no id or data-testid"
-        - "unstable auto-generated or index-based ids for a key control"
+        - "any new user-visible semantic element (card, metric, verdict row, link, button, labelled value) with only className and no id"
+        - "index- or auto-generated ids (row-0, row-1) for a semantic element"
   enforce: advisory
   severity: medium
   status: active
