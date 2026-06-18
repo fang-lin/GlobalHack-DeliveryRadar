@@ -422,6 +422,11 @@ path/ownership mapping first; semantic similarity is a secondary signal only.
   configurable destination for remediation issues and behavioral Decision Notes.
 - `FR-INT-5` Deterministic checks SHOULD integrate an existing engine
   (e.g. semgrep) rather than reimplement matching.
+- `FR-INT-6` The CI run of `radar check` MAY be **manually gated** (a GitHub
+  Action `workflow_dispatch`, taking the PR number as input) or label-triggered,
+  to control LLM cost; either way it stays **advisory** — posted via the Reviews
+  API as a `COMMENT` event, never blocking the merge. First landing: checking
+  this repo's own PRs (dogfood — see `ST-0013` / `ST-0008`).
 
 ---
 
@@ -442,6 +447,9 @@ path/ownership mapping first; semantic similarity is a secondary signal only.
   on past PRs before any constraint is promoted to `gate`.
 - `NFR-PERF-1` The per-diff engine MUST complete within typical CI time budgets;
   bound LLM calls by scoping (`NFR-RETRIEVAL-1`) and prefer batching.
+- `NFR-COST-1` **LLM cost is gatable.** Any integration that triggers
+  `radar check` in CI (each call costs API) MUST support gating (manual dispatch
+  / label by default); it must not unconditionally spend API on every PR.
 - `NFR-SEC-1` Least-privilege tokens. The system reads code and writes review
   comments / draft PRs / draft issues only. It MUST NOT modify access controls,
   branch protection, or repository settings.

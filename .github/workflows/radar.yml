@@ -1,0 +1,63 @@
+# Dogfood: run the radar on one of this repo's own PRs, on demand (manual button).
+# Advisory only — posts a review COMMENT, never blocks. LLM cost is gated to manual
+# runs (FR-INT-6 / NFR-COST-1). Needs the ANTHROPIC_API_KEY repo secret.
+name: "Does this PR still match what we decided?"
+
+# Quoted: the "#" in "PR #42" would otherwise start a YAML comment.
+run-name: "Does PR #${{ inputs.pr }} still match what we decided?"
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: "PR number to check against recorded intent (the ADRs)"
+        required: true
+        type: number
+
+permissions:
+  contents: read
+  pull-requests: write # post the advisory review via the Reviews API
+
+concurrency:
+  group: radar-pr-${{ inputs.pr }}
+  cancel-in-progress: true
+
+jobs:
+  radar:
+    name: radar check — advisory, never blocks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Build radar
+        run: pnpm build
+
+      - name: Fetch the PR diff
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr diff ${{ inputs.pr }} --repo ${{ github.repository }} > pr.diff
+
+      - name: Extract constraints (deterministic, free)
+        run: node dist/cli.js extract --adr-dir docs/adr
+
+      - name: "Radar check — does the diff still match the ADRs? (LLM, advisory)"
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node dist/cli.js check --adr-dir docs/adr --diff pr.diff --save verdicts.json
+
+      - name: Post the advisory review on the PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          node dist/cli.js comment --adr-dir docs/adr --verdicts verdicts.json
+          --repo ${{ github.repository }} --pr ${{ inputs.pr }} --post --all

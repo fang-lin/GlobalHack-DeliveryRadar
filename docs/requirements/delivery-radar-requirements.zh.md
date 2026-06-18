@@ -320,6 +320,7 @@ fix_locality: structural        # local | structural | none  (drives review proj
 - `FR-INT-3` 按仓库引擎以计划任务（cron）外加 ADR 变更钩子的形式运行。
 - `FR-INT-4` `[Phase 2]` issue 跟踪器（GitHub Issues 或 Linear）作为整改 issue 和行为类 Decision Note 的可配置目的地。
 - `FR-INT-5` 确定性检查 SHOULD 集成现有引擎（如 semgrep），而非重新实现匹配。
+- `FR-INT-6` `radar check` 在 CI 中的运行 MAY 由 **GitHub Action 手动触发**（`workflow_dispatch`，以待检查的 PR 号为输入）或按标签门控，以控制 LLM 调用成本；无论触发方式如何，保持 **advisory**——经 Reviews API 以 `COMMENT` 事件发布，绝不阻塞 merge。首个落地形态：对本仓库自身的 PR 做检查（dogfood，见 `ST-0013` / `ST-0008`）。
 
 ---
 
@@ -330,6 +331,7 @@ fix_locality: structural        # local | structural | none  (drives review proj
 - `NFR-RETRIEVAL-1` 作用域优先的检索（见 §6.2）。过度检索是缺陷。
 - `NFR-EVAL-1` **可度量性。** 持久化每个裁定及其人类信号。提供历史回放评测台（`§14`），使任何约束在被提升为 `gate` 之前都能在历史 PR 上度量 precision/recall。
 - `NFR-PERF-1` 按 diff 引擎 MUST 在典型 CI 时间预算内完成；通过作用域限定（`NFR-RETRIEVAL-1`）控制 LLM 调用量并优先批处理。
+- `NFR-COST-1` **LLM 成本可门控。** 任何在 CI 中触发 `radar check`（每次调用都产生 API 成本）的集成 MUST 支持门控（默认手动触发 / 标签），不得对每个 PR 无条件消耗 API。
 - `NFR-SEC-1` 最小权限令牌。系统只读取代码、只写评审评论/草稿 PR/草稿 issue。它 MUST NOT 修改访问控制、分支保护或仓库设置。
 - `NFR-EXPLAIN-1` 每个 `violated` 裁定 MUST 携带证据（ADR 条款 ↔ 代码 hunk）和简短解释。不允许无解释的阻断。
 - `NFR-CONFIG-1` 各类阈值（置信度截断、drift 排程、未毕业笔记时间窗、按约束的 gate 开关）属于配置，而非代码。

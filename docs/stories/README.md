@@ -22,7 +22,7 @@ Work-unit records for Delivery Radar's **own** development — we dogfood our ow
 | ST-0010 | radar as investigative agent + pre-PR self-check | Todo · backlog | — |
 | ST-0011 | Migrate radar Python → TypeScript | Done | ADR-0003 |
 | ST-0012 | Replay/precision eval harness (Backstage) | Done | — |
-| ST-0013 | GitHub Action — auto-run on PR events | Todo · backlog | — |
+| ST-0013 | GitHub Action — radar-check a PR against recorded intent (manual, advisory) | In progress | FR-INT-6 |
 | ST-0014 | Responsive / mobile layout for the showcase SPA | Done | ADR-0001 |
 | ST-0015 | CI/CD pipeline (GitHub Actions) — lint · unit tests · typecheck/build · semantic-release · deploy Pages | Done | ADR-0004 |
 | ST-0016 | Redirect pre-migration `-pages` showcase links to the new Pages site | Done | ADR-0004 |
