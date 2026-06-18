@@ -113,3 +113,20 @@ export function postReview(repo: string, pr: number, body: string): void {
     input: payload,
   });
 }
+
+/**
+ * Edit an existing review's body in place (FR-INT-7) — stays a COMMENT event.
+ * A COMMENT review is editable after submission (verified: PUT edits a
+ * *submitted* review's body), which is what makes the sticky started→verdict
+ * lifecycle possible. Used by the success path, after the CLI is built; the
+ * "started" placeholder and failure note are posted by the workflow via gh api
+ * (those steps run when dist/ may not exist yet).
+ */
+export function updateReview(repo: string, pr: number, reviewId: number, body: string): void {
+  const payload = JSON.stringify({ body });
+  execFileSync(
+    "gh",
+    ["api", "-X", "PUT", `repos/${repo}/pulls/${pr}/reviews/${reviewId}`, "--input", "-"],
+    { input: payload },
+  );
+}

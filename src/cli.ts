@@ -15,7 +15,7 @@ import {
   loadVerdicts,
   DEFAULT_MODEL,
 } from "./checker.js";
-import { reviewMarkdown, postReview } from "./comment.js";
+import { reviewMarkdown, postReview, updateReview } from "./comment.js";
 
 function fail(msg: string): never {
   console.error(`error: ${msg}`);
@@ -90,22 +90,33 @@ async function cmdComment(argv: string[]): Promise<number> {
       pr: { type: "string" },
       post: { type: "boolean", default: false },
       all: { type: "boolean", default: false },
+      // sticky progress review (FR-INT-7): edit an existing review in place
+      update: { type: "string" },
     },
   });
+
+  // verdict body — post a new review (--post), edit an existing one (--update), or print
   if (!values.verdicts) fail("comment requires --verdicts");
-  if (values.post && (!values.repo || !values.pr)) fail("--post requires --repo and --pr");
+  if ((values.post || values.update) && (!values.repo || !values.pr)) {
+    fail("--post / --update requires --repo and --pr");
+  }
   const adrDir = values["adr-dir"]!;
   const constraints = extractFromDir(adrDir);
   let verdicts = loadVerdicts(values.verdicts);
   if (!values.all) verdicts = verdicts.filter((v) => v.result === "violated");
-  if (verdicts.length === 0) {
+  // In --update mode we fall through even when empty: reviewMarkdown([]) renders a
+  // header + advisory note, resolving the sticky placeholder instead of leaving it "running".
+  if (verdicts.length === 0 && !values.update) {
     console.log("nothing to post (no violated verdicts; use --all to include others)");
     return 0;
   }
   const driverContexts: Record<string, string> = {};
   for (const c of constraints) driverContexts[c.adr] = adrSection(adrDir, c.adr, "Context");
   const body = reviewMarkdown(verdicts, constraints, driverContexts);
-  if (values.post) {
+  if (values.update) {
+    updateReview(values.repo!, Number(values.pr), Number(values.update), body);
+    console.error(`updated review #${values.update} on ${values.repo}#${values.pr}`);
+  } else if (values.post) {
     postReview(values.repo!, Number(values.pr), body);
     console.error(`posted advisory review on ${values.repo}#${values.pr}`);
   } else {
