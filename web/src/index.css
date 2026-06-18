@@ -42,27 +42,25 @@
 ::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 
-/* homepage "deck": each section is one full screen, content centered, and scrolling
-   snaps page-by-page (same technique as the original slide deck: mandatory snap +
-   100vh sections + flex-centered content). Desktop only — on small screens content
-   stacks tall, so we keep normal scrolling. */
-.deck-main > section { scroll-margin-top: 3.5rem; }
-@media (min-width: 1024px) {
-  html.deck { scroll-snap-type: y mandatory; }
-  .deck-main > section {
-    min-height: calc(100vh - 3.5rem);
-    scroll-snap-align: start;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-  }
-  /* The global footer lives outside the snap sections. Without its own snap point,
-     `mandatory` snap traps scrolling at the last section and the footer can never be
-     reached. Give it an end-aligned snap target so the deck can scroll down to it. */
-  html.deck footer { scroll-snap-align: end; }
+/* homepage "deck": each section is one full screen; scrolling snaps page-by-page
+   (mandatory snap + full-height sections + flex-centered content). Applies at ALL
+   widths — the showcase reads like slides on mobile too (ADR-0001-C3 / ST-0018).
+   `safe center` centers when content fits and top-aligns (no clipping) when a
+   section is taller than the viewport; `svh` avoids the mobile address-bar jump. */
+html.deck { scroll-snap-type: y mandatory; }
+.deck-main > section {
+  min-height: calc(100svh - 3.5rem);
+  scroll-snap-align: start;
+  scroll-margin-top: 3.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: safe center;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
 }
+/* The global footer lives outside the snap sections; give it an end-aligned snap
+   point so mandatory snap can scroll down to it instead of trapping at the last one. */
+html.deck footer { scroll-snap-align: end; }
 
 /* rendered markdown (the worked-example reviews) */
 .md { font-size: 13px; line-height: 1.55; color: hsl(var(--muted-foreground)); margin-top: 0.75rem; }

@@ -145,7 +145,7 @@ export default function Overview() {
   }, []);
 
   return (
-    <div className="deck-main space-y-16 lg:space-y-0">
+    <div className="deck-main">
       {/* hero */}
       <section className="pt-4 text-center">
         <Eyebrow>intent → implementation → alignment → convergence</Eyebrow>
