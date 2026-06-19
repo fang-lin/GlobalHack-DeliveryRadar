@@ -5,6 +5,8 @@
 #   • add the "radar" label to the PR
 #   • Actions → Run workflow (workflow_dispatch) with a PR number
 # Always checks the PR diff against MAIN's ADRs. Needs the ANTHROPIC_API_KEY secret.
+# Sticky progress (FR-INT-7): posts a "started" review immediately, then edits THAT
+# SAME review in place with the verdict — or a failure note if the run dies early.
 name: "Radar — conformance check"
 
 run-name: "Does PR #${{ inputs.pr || github.event.issue.number || github.event.pull_request.number }} still match what we decided?"
@@ -52,6 +54,23 @@ jobs:
             pull_request)      echo "num=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT" ;;
           esac
 
+      # Sticky progress (FR-INT-7): post a "started" review NOW — before the ~1-min
+      # build — so the PR immediately shows the check is running. Capture its id; the
+      # finalize step edits this same review in place. Inline gh api (not the CLI),
+      # because dist/ isn't built yet at this point.
+      - name: Post the 'started' review (sticky placeholder)
+        id: start
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ steps.pr.outputs.num }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          BODY=$(printf '## 🛰️ Delivery Radar — Architecture Conformance\n\n⏳ **Check started** — reading the recorded intent (the ADRs) and checking PR #%s against it…\n\n_Edits itself in place with the verdict when the run finishes (~1-2 min). Advisory — never blocks your merge._\n\n[Live log →](%s)' "$PR" "$RUN_URL")
+          RID=$(gh api "repos/${REPO}/pulls/${PR}/reviews" -f event=COMMENT -f body="$BODY" --jq .id)
+          echo "review_id=$RID" >> "$GITHUB_OUTPUT"
+          echo "posted started review #$RID"
+
       # Always use MAIN's ADRs + radar (the recorded baseline intent), regardless of trigger.
       - uses: actions/checkout@v6
         with:
@@ -83,9 +102,29 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: node dist/cli.js check --adr-dir docs/adr --diff pr.diff --save verdicts.json
 
-      - name: Post the advisory review on the PR
+      # Success: render the verdict with the CLI (pure — stdout only), then the
+      # workflow edits the SAME 'started' review in place via gh api. All platform
+      # I/O lives here, never in the CLI.
+      - name: Update the sticky review with the verdict
         env:
           GH_TOKEN: ${{ github.token }}
-        run: >
-          node dist/cli.js comment --adr-dir docs/adr --verdicts verdicts.json
-          --repo ${{ github.repository }} --pr ${{ steps.pr.outputs.num }} --post --all
+          PR: ${{ steps.pr.outputs.num }}
+          REPO: ${{ github.repository }}
+          RID: ${{ steps.start.outputs.review_id }}
+        run: |
+          BODY=$(node dist/cli.js comment --adr-dir docs/adr --verdicts verdicts.json --all)
+          gh api -X PUT "repos/${REPO}/pulls/${PR}/reviews/${RID}" -f body="$BODY"
+
+      # Failure/cancel: resolve the same review so it never stays stuck at "running".
+      # Inline gh api — the CLI may not be built if we failed at install/build/check.
+      - name: On failure, resolve the sticky review
+        if: (failure() || cancelled()) && steps.start.outputs.review_id != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ steps.pr.outputs.num }}
+          REPO: ${{ github.repository }}
+          RID: ${{ steps.start.outputs.review_id }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          BODY=$(printf '## 🛰️ Delivery Radar — Architecture Conformance\n\n🟠 **Check did not finish** — the run ended before producing a verdict. The recorded intent is unchanged, and nothing here blocks your merge.\n\n[See the run log →](%s) — fix the cause and re-trigger /radar to retry.' "$RUN_URL")
+          gh api -X PUT "repos/${REPO}/pulls/${PR}/reviews/${RID}" -f body="$BODY"

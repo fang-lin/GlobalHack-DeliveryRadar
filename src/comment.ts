@@ -1,12 +1,16 @@
 /**
  * Review projection (FR-CONF-7 — structural type, NFR-EXPLAIN-1).
  *
+ * Pure rendering: verdicts + constraints -> the review markdown. This module is
+ * platform-agnostic by design — it NEVER talks to git / GitHub / gh. Posting or
+ * editing the review is the integration layer's job (the workflow), so the radar
+ * core stays a check/render tool that any platform adapter can drive.
+ *
  * Every violated verdict carries evidence (ADR clause <-> code lines) and a
- * short explanation; the comment cites the direction of the required change and
- * stays advisory (review event COMMENT, never Request changes — NFR-GATE-1 for
- * this slice where all constraints are semantic/advisory).
+ * short explanation; the body cites the direction of the required change and
+ * stays advisory (rendered as a COMMENT review, never Request changes — NFR-GATE-1
+ * for this slice where all constraints are semantic/advisory).
  */
-import { execFileSync } from "node:child_process";
 import type { Constraint, Verdict } from "./models.js";
 
 const HEADER = "## 🛰️ Delivery Radar — Architecture Conformance";
@@ -101,15 +105,4 @@ export function reviewMarkdown(
       "checks can be calibrated._",
   );
   return blocks.join("\n");
-}
-
-/**
- * Post an advisory review via gh api (FR-INT-1, Reviews API).
- * Review state is COMMENT — non-blocking by default (FR-CONF-9).
- */
-export function postReview(repo: string, pr: number, body: string): void {
-  const payload = JSON.stringify({ event: "COMMENT", body });
-  execFileSync("gh", ["api", `repos/${repo}/pulls/${pr}/reviews`, "--input", "-"], {
-    input: payload,
-  });
 }

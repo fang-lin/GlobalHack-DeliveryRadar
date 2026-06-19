@@ -321,6 +321,7 @@ fix_locality: structural        # local | structural | none  (drives review proj
 - `FR-INT-4` `[Phase 2]` issue 跟踪器（GitHub Issues 或 Linear）作为整改 issue 和行为类 Decision Note 的可配置目的地。
 - `FR-INT-5` 确定性检查 SHOULD 集成现有引擎（如 semgrep），而非重新实现匹配。
 - `FR-INT-6` `radar check` 在 CI 中的运行由**用户发起**，以控制 LLM 成本（`NFR-COST-1`）；触发方式有三种、都在 PR 现场或 Actions 里：**PR 评论命令 `/radar`**、给 PR 打 **`radar` 标签**、或 **`workflow_dispatch`**（Actions 的 "Run workflow" 按钮 + PR 号）。评论触发 SHOULD 校验评论者具备写权限。无论触发方式如何，保持 **advisory**——经 Reviews API 以 `COMMENT` 事件发布，绝不阻塞 merge。首个落地形态：对本仓库自身的 PR 做检查（dogfood，见 `ST-0013` / `ST-0008`）。
+- `FR-INT-7` **进度可见（sticky 进度评审）。** 一次 `radar check` 被触发后（`FR-INT-6`），系统 SHOULD **立即**在该 PR 上发布一条可见的 advisory 评审（Reviews API，`COMMENT` 事件），内容为"检查已开始"占位 + 指向本次运行实时日志的链接；运行结束后**就地编辑同一条评审**为最终裁定投影（`FR-CONF-7`），若运行失败则就地编辑为失败说明 + 日志链接。目的：PR 上始终反映检查的当前状态（开始 / 完成 / 失败），绝不残留"正在运行"的僵尸状态；一次运行只占用一条评审，跨多次运行各自新建（每次检查是一条可审计记录，`NFR-EVAL-1`）。状态始终为 `COMMENT`（不阻断，`FR-CONF-9`）。
 
 ---
 
@@ -333,6 +334,7 @@ fix_locality: structural        # local | structural | none  (drives review proj
 - `NFR-PERF-1` 按 diff 引擎 MUST 在典型 CI 时间预算内完成；通过作用域限定（`NFR-RETRIEVAL-1`）控制 LLM 调用量并优先批处理。
 - `NFR-COST-1` **LLM 成本可门控。** 任何在 CI 中触发 `radar check`（每次调用都产生 API 成本）的集成 MUST 支持门控（默认手动触发 / 标签），不得对每个 PR 无条件消耗 API。
 - `NFR-SEC-1` 最小权限令牌。系统只读取代码、只写评审评论/草稿 PR/草稿 issue。它 MUST NOT 修改访问控制、分支保护或仓库设置。
+- `NFR-PORT-1` **核心与平台解耦。** radar 核心(`src/`)是平台无关的:只读输入(ADR、diff、verdicts)、把输出(约束、裁定、渲染好的 markdown)写到 stdout/文件;它 MUST NOT 调用 git / GitHub / `gh` 或任何宿主 / VCS / CI API。所有平台 I/O(取 diff、发/改 review、打标签、status)属于**集成层**(workflow 或适配器),由其驱动核心并发布产物。见 `ADR-0006`。
 - `NFR-EXPLAIN-1` 每个 `violated` 裁定 MUST 携带证据（ADR 条款 ↔ 代码 hunk）和简短解释。不允许无解释的阻断。
 - `NFR-CONFIG-1` 各类阈值（置信度截断、drift 排程、未毕业笔记时间窗、按约束的 gate 开关）属于配置，而非代码。
 

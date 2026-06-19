@@ -430,6 +430,16 @@ path/ownership mapping first; semantic similarity is a secondary signal only.
   stays **advisory** — posted via the Reviews API as a `COMMENT` event, never
   blocking the merge. First landing: checking this repo's own PRs (dogfood — see
   `ST-0013` / `ST-0008`).
+- `FR-INT-7` **Visible progress (sticky progress review).** Once a `radar check`
+  is triggered (`FR-INT-6`), the system SHOULD **immediately** post a visible
+  advisory review on the PR (Reviews API, `COMMENT` event) — a "check started"
+  placeholder plus a link to this run's live log — then, on completion, **edit
+  that same review in place** into the final verdict projection (`FR-CONF-7`),
+  or, if the run fails, into a failure note plus the log link. Goal: the PR
+  always reflects the check's current state (started / done / failed) and never
+  leaves a stuck "running" zombie; one run occupies one review, and separate
+  runs each create their own (each check is an auditable record, `NFR-EVAL-1`).
+  State stays `COMMENT` (non-blocking, `FR-CONF-9`).
 
 ---
 
@@ -456,6 +466,13 @@ path/ownership mapping first; semantic similarity is a secondary signal only.
 - `NFR-SEC-1` Least-privilege tokens. The system reads code and writes review
   comments / draft PRs / draft issues only. It MUST NOT modify access controls,
   branch protection, or repository settings.
+- `NFR-PORT-1` **Core / platform decoupling.** The radar core (`src/`) is
+  platform-agnostic: it only reads inputs (ADRs, the diff, verdicts) and emits
+  outputs (constraints, verdicts, rendered markdown) to stdout/files; it MUST NOT
+  call git / GitHub / `gh` or any host / VCS / CI API. All platform I/O (fetching
+  the diff, posting/editing a review, labels, status) lives in the **integration
+  layer** (the workflow or an adapter), which drives the core and publishes its
+  output. See `ADR-0006`.
 - `NFR-EXPLAIN-1` Every `violated` verdict MUST carry evidence (ADR clause ↔ code
   hunk) and a short explanation. No unexplained blocks.
 - `NFR-CONFIG-1` Thresholds (confidence cutoffs, drift schedule, ungraduated-note

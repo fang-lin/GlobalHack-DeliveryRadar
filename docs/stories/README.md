@@ -30,3 +30,5 @@ Work-unit records for Delivery Radar's **own** development — we dogfood our ow
 | ST-0018 | Homepage deck — slide-scroll on mobile, not just desktop | Done | ADR-0001 |
 | ST-0019 | Trigger radar from the PR — `/radar` comment + `radar` label | In progress | FR-INT-6 |
 | ST-0020 | Add stable ids to significant UI elements (ADR-0005-C1) | In progress | ADR-0005 |
+| ST-0021 | Sticky progress review — post "started", then edit it into the verdict | In progress | FR-INT-7 |
+| ST-0022 | Review & restructure the radar CLI architecture (layered core / ports & adapters) | In progress | ADR-0006 |
