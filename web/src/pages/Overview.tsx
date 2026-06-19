@@ -4,6 +4,7 @@ import { ArrowRight, FlaskConical, LayoutDashboard, Search } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { IiacLoopDiagram } from "@/components/IiacLoopDiagram";
+import { slug } from "@/lib/utils";
 
 const WHY = [
   { who: "Tests", checks: "does it work?", misses: "whether it still matches intent" },
@@ -128,9 +129,6 @@ const ROADMAP = [
     ],
   },
 ];
-
-// stable, data-derived id slug (ADR-0005-C1 — never an index)
-const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
