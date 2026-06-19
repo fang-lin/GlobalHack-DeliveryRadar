@@ -129,6 +129,9 @@ const ROADMAP = [
   },
 ];
 
+// stable, data-derived id slug (ADR-0005-C1 — never an index)
+const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
     <div className="text-center font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
@@ -178,7 +181,7 @@ export default function Overview() {
 
       {/* crux */}
       <section id="crux">
-        <Card className="border-primary/40 bg-primary/[0.04]">
+        <Card id="crux-card" className="border-primary/40 bg-primary/[0.04]">
           <CardContent className="p-6 text-center">
             <p className="text-lg font-medium">
               The staleness wasn't a bug — <span className="text-primary">the team chose it.</span>
@@ -215,7 +218,7 @@ export default function Overview() {
           Why this is new
         </h2>
         <div className="overflow-x-auto rounded-xl border border-border">
-          <table className="w-full min-w-[30rem] text-sm">
+          <table id="why-table" className="w-full min-w-[30rem] text-sm">
             <thead className="bg-card/60 text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
                 <th className="px-4 py-2.5 text-left font-medium">layer</th>
@@ -225,7 +228,7 @@ export default function Overview() {
             </thead>
             <tbody>
               {WHY.map((r) => (
-                <tr key={r.who} className={`border-t border-border ${r.us ? "bg-primary/[0.06]" : ""}`}>
+                <tr key={r.who} id={`why-row-${slug(r.who)}`} className={`border-t border-border ${r.us ? "bg-primary/[0.06]" : ""}`}>
                   <td className="px-4 py-3 font-medium">
                     {r.us ? <span className="text-primary">{r.who}</span> : r.who}
                   </td>
@@ -243,18 +246,18 @@ export default function Overview() {
         <Eyebrow>the specified system</Eyebrow>
         <h2 className="mt-2 text-center text-2xl font-bold">What runs today is one slice</h2>
         <div className="mt-3 flex flex-wrap items-center justify-center gap-3 font-mono text-[11px]">
-          <span className="rounded border border-primary/40 bg-primary/15 px-2 py-0.5 text-primary">■ LIVE TODAY</span>
-          <span className="rounded border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-amber-400">■ PHASE 2</span>
-          <span className="rounded border border-slate-500/30 bg-slate-500/10 px-2 py-0.5 text-slate-400">■ PHASE 3</span>
+          <span id="system-legend-live" className="rounded border border-primary/40 bg-primary/15 px-2 py-0.5 text-primary">■ LIVE TODAY</span>
+          <span id="system-legend-p2" className="rounded border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-amber-400">■ PHASE 2</span>
+          <span id="system-legend-p3" className="rounded border border-slate-500/30 bg-slate-500/10 px-2 py-0.5 text-slate-400">■ PHASE 3</span>
         </div>
         <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {SYSTEM.map((col) => (
-            <div key={col.head} className="space-y-3">
+            <div key={col.head} id={`system-col-${slug(col.head)}`} className="space-y-3">
               <div className="text-center text-[10px] uppercase tracking-widest text-muted-foreground">
                 {col.head}
               </div>
               {col.items.map((it) => (
-                <div key={it.t} className={`rounded-xl border bg-card/70 p-3 ${PHASE_CARD[it.phase]}`}>
+                <div key={it.t} id={`system-item-${slug(it.t)}`} className={`rounded-xl border bg-card/70 p-3 ${PHASE_CARD[it.phase]}`}>
                   <div className={`text-sm font-semibold ${PHASE_TITLE[it.phase]}`}>{it.t}</div>
                   <div className="mt-1 text-xs text-muted-foreground">{it.d}</div>
                 </div>
@@ -275,7 +278,7 @@ export default function Overview() {
         <h2 className="mt-2 text-center text-2xl font-bold">From writing, to steering, to autonomy</h2>
         <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
           {PATHS.map((p) => (
-            <Card key={p.tag} className={p.accent ? "border-primary/60 shadow-[0_0_40px_rgba(55,232,194,.1)]" : ""}>
+            <Card key={p.tag} id={`path-${slug(p.tag)}`} className={p.accent ? "border-primary/60 shadow-[0_0_40px_rgba(55,232,194,.1)]" : ""}>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="text-3xl">{p.icon}</div>
@@ -287,7 +290,7 @@ export default function Overview() {
             </Card>
           ))}
         </div>
-        <Card className="mt-5 border-violet-500/40">
+        <Card id="paths-auditable" className="mt-5 border-violet-500/40">
           <CardContent className="flex flex-col items-center gap-4 p-6 sm:flex-row">
             <div className="text-2xl">🔍</div>
             <div>
@@ -308,7 +311,7 @@ export default function Overview() {
         <h2 className="mt-2 text-center text-2xl font-bold">Roadmap</h2>
         <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
           {ROADMAP.map((r) => (
-            <Card key={r.phase} className={r.accent ? "border-primary/60 shadow-[0_0_40px_rgba(55,232,194,.1)]" : ""}>
+            <Card key={r.phase} id={`roadmap-${slug(r.phase)}`} className={r.accent ? "border-primary/60 shadow-[0_0_40px_rgba(55,232,194,.1)]" : ""}>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className={`text-lg font-bold ${r.head}`}>{r.phase}</div>
