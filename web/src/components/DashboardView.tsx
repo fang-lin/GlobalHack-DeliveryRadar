@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { slug } from "@/lib/utils";
 import type { DashboardData, Verdict } from "@/data/dashboards";
 
 const RESULT: Record<Verdict["result"], { variant: "violated" | "aligned" | "unknown"; Icon: typeof XCircle; label: string }> = {
@@ -33,7 +34,7 @@ function Sparkline({ points }: { points: number[] }) {
 
 function Kpi({ label, value, hint, warn }: { label: string; value: string | number; hint?: string; warn?: boolean }) {
   return (
-    <Card>
+    <Card id={`kpi-${slug(label)}`}>
       <CardContent className="p-4">
         <div className={`text-3xl font-bold ${warn ? "text-amber-400" : "text-primary"}`}>{value}</div>
         <div className="mt-1 text-xs text-muted-foreground">{label}</div>
@@ -57,7 +58,7 @@ export function DashboardView({ data }: { data: DashboardData }) {
   return (
     <div className="space-y-6">
       {/* header */}
-      <div className="flex flex-wrap items-end justify-between gap-2 border-b border-border pb-4">
+      <div id="dashboard-header" className="flex flex-wrap items-end justify-between gap-2 border-b border-border pb-4">
         <div className="flex items-center gap-3">
           <span className="text-2xl">🛰️</span>
           <div>
@@ -66,7 +67,7 @@ export function DashboardView({ data }: { data: DashboardData }) {
           </div>
         </div>
         <div className="sm:text-right">
-          <a href={data.repoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-mono text-sm text-primary hover:underline">
+          <a id="dashboard-repo-link" href={data.repoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-mono text-sm text-primary hover:underline">
             {data.repo} <ExternalLink className="h-3 w-3" />
           </a>
           <div className="text-xs text-muted-foreground">last scan {new Date(data.generated_at).toLocaleString("en-GB")}</div>
@@ -86,11 +87,11 @@ export function DashboardView({ data }: { data: DashboardData }) {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
         {/* conformance feed */}
-        <section className="lg:col-span-3">
+        <section id="conformance-feed" className="lg:col-span-3">
           <SectionTitle icon={GitPullRequest}>Conformance — PR checks (advisory)</SectionTitle>
           <div className="space-y-3">
             {data.conformance_feed.map((pr) => (
-              <Card key={pr.pr} className={pr.live ? "border-primary/50 shadow-[0_0_24px_rgba(55,232,194,.08)]" : ""}>
+              <Card key={pr.pr} id={`pr-${pr.pr}`} className={pr.live ? "border-primary/50 shadow-[0_0_24px_rgba(55,232,194,.08)]" : ""}>
                 <CardContent className="p-4">
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                     <span className="font-mono text-xs text-muted-foreground">#{pr.pr}</span>
@@ -102,7 +103,7 @@ export function DashboardView({ data }: { data: DashboardData }) {
                   {pr.verdicts.map((v, i) => {
                     const m = RESULT[v.result];
                     return (
-                      <div key={i} className="mt-3 border-t border-border pt-3">
+                      <div key={i} id={`pr-${pr.pr}-${slug(v.constraint_id)}`} className="mt-3 border-t border-border pt-3">
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                           <Badge variant={m.variant} className="gap-1">
                             <m.Icon className="h-3 w-3" />
@@ -128,11 +129,11 @@ export function DashboardView({ data }: { data: DashboardData }) {
 
         {/* drift + capture */}
         <section className="space-y-6 lg:col-span-2">
-          <div>
+          <div id="drift-section">
             <SectionTitle icon={TrendingDown} tag="PHASE 2 · SEEDED">Drift — standing codebase</SectionTitle>
             <div className="space-y-2">
               {data.drift.adrs.map((a) => (
-                <Card key={a.adr}>
+                <Card key={a.adr} id={`drift-${slug(a.adr)}`}>
                   <CardContent className="flex items-center gap-3 p-3">
                     <div className="min-w-0 flex-1">
                       <div className="font-mono text-xs text-muted-foreground">{a.adr}</div>
@@ -147,7 +148,7 @@ export function DashboardView({ data }: { data: DashboardData }) {
                 </Card>
               ))}
             </div>
-            <Card className="mt-3 border-rose-500/40">
+            <Card id="drift-at-risk" className="mt-3 border-rose-500/40">
               <CardContent className="p-4">
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                   <Badge variant="violated">AT RISK</Badge>
@@ -160,10 +161,10 @@ export function DashboardView({ data }: { data: DashboardData }) {
                 </div>
                 <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                   {ar.options.map((o) => (
-                    <div key={o.kind} className="rounded-lg border border-border p-3 transition-colors hover:border-primary/50">
+                    <div key={o.kind} id={`at-risk-${o.kind}`} className="rounded-lg border border-border p-3 transition-colors hover:border-primary/50">
                       <div className={`text-xs font-semibold ${o.kind === "remediation" ? "text-emerald-400" : "text-violet-400"}`}>{o.label}</div>
                       <div className="mt-1 text-[11px] leading-snug text-muted-foreground">{o.summary}</div>
-                      <button className="mt-2 w-full rounded border border-border py-1 font-mono text-[11px] text-muted-foreground hover:bg-accent">
+                      <button id={`at-risk-${o.kind}-confirm`} className="mt-2 w-full rounded border border-border py-1 font-mono text-[11px] text-muted-foreground hover:bg-accent">
                         review draft → confirm
                       </button>
                     </div>
@@ -174,11 +175,11 @@ export function DashboardView({ data }: { data: DashboardData }) {
             </Card>
           </div>
 
-          <div>
+          <div id="capture-section">
             <SectionTitle icon={Inbox} tag="PHASE 2 · SEEDED">Capture — Decision Notes</SectionTitle>
             <div className="space-y-2">
               {data.capture_queue.map((n) => (
-                <Card key={n.id}>
+                <Card key={n.id} id={`note-${slug(n.id)}`}>
                   <CardContent className="p-4">
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-xs text-primary">{n.id}</span>
@@ -188,9 +189,9 @@ export function DashboardView({ data }: { data: DashboardData }) {
                     <div className="mt-2 text-sm">{n.detected}</div>
                     <div className="mt-1.5 font-mono text-[11px] text-muted-foreground">📍 {n.evidence}</div>
                     <div className="mt-3 flex gap-2">
-                      <button className="flex-1 rounded border border-border py-1 font-mono text-[11px] hover:bg-accent">graduate → ADR</button>
-                      <button className="flex-1 rounded border border-border py-1 font-mono text-[11px] hover:bg-accent">route → story</button>
-                      <button className="flex-1 rounded border border-border py-1 font-mono text-[11px] text-muted-foreground hover:bg-accent">dismiss</button>
+                      <button id={`note-${slug(n.id)}-graduate`} className="flex-1 rounded border border-border py-1 font-mono text-[11px] hover:bg-accent">graduate → ADR</button>
+                      <button id={`note-${slug(n.id)}-route`} className="flex-1 rounded border border-border py-1 font-mono text-[11px] hover:bg-accent">route → story</button>
+                      <button id={`note-${slug(n.id)}-dismiss`} className="flex-1 rounded border border-border py-1 font-mono text-[11px] text-muted-foreground hover:bg-accent">dismiss</button>
                     </div>
                   </CardContent>
                 </Card>

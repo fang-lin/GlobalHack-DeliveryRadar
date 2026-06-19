@@ -1,6 +1,7 @@
 import { Boxes, Check, ExternalLink, FlaskConical, Lightbulb, Target, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { slug } from "@/lib/utils";
 import raw from "@/data/evidence.json";
 
 type Arm = { result: string; confidence: number | null; explanation: string | null };
@@ -49,7 +50,7 @@ function correctness(arm: "grounded" | "ungrounded", row: Row): boolean | null {
 
 function MetricCard({ tag, accent, m, note }: { tag: string; accent: boolean; m: Metric; note: string }) {
   return (
-    <Card className={accent ? "border-primary/50 bg-primary/[0.05]" : ""}>
+    <Card id={`metric-${slug(tag)}`} className={accent ? "border-primary/50 bg-primary/[0.05]" : ""}>
       <CardContent className="p-5">
         <Badge variant={accent ? "default" : "unknown"}>{tag}</Badge>
         <div className="mt-3 flex items-baseline gap-3">
@@ -91,7 +92,7 @@ export default function Evidence() {
   return (
     <div className="space-y-10">
       {/* header / why */}
-      <header>
+      <header id="evidence-header">
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold">Measured evidence</h1>
           <Badge variant="default">not cherry-picked</Badge>
@@ -105,9 +106,9 @@ export default function Evidence() {
       </header>
 
       {/* context: why / why backstage / how */}
-      <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <section id="evidence-context" className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {CONTEXT.map((c) => (
-          <Card key={c.title}>
+          <Card key={c.title} id={`context-${slug(c.title)}`}>
             <CardContent className="p-5">
               <div className="flex items-center gap-2">
                 <c.Icon className="h-4 w-4 text-primary" />
@@ -120,7 +121,7 @@ export default function Evidence() {
       </section>
 
       {/* results */}
-      <section>
+      <section id="evidence-results">
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           Results
         </h2>
@@ -153,7 +154,7 @@ export default function Evidence() {
         </div>
 
         <div className="mt-4 overflow-x-auto rounded-xl border border-border">
-          <table className="w-full min-w-[34rem] text-sm">
+          <table id="evidence-table" className="w-full min-w-[34rem] text-sm">
             <thead className="bg-card/60 text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
                 <th className="px-4 py-2.5 text-left font-medium">case</th>
@@ -164,7 +165,7 @@ export default function Evidence() {
             </thead>
             <tbody className="font-mono text-xs">
               {rows.map((r) => (
-                <tr key={r.id} className="border-t border-border">
+                <tr key={r.id} id={`case-${slug(r.id)}`} className="border-t border-border">
                   <td className="px-4 py-2.5">
                     {r.source ? (
                       <a href={r.source} target="_blank" rel="noopener noreferrer" className="hover:text-primary">
@@ -192,18 +193,18 @@ export default function Evidence() {
 
       {/* killer example */}
       {q && (
-        <section>
+        <section id="evidence-killer-example">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
             The clearest case — why "best practice" isn't enough
           </h2>
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <Card>
+            <Card id="killer-ungrounded">
               <CardContent className="p-5">
                 <Badge variant="unknown">UNGROUNDED → {q.ungrounded.result}</Badge>
                 <p className="mt-3 text-sm italic text-muted-foreground">"{q.ungrounded.explanation}"</p>
               </CardContent>
             </Card>
-            <Card className="border-primary/50">
+            <Card id="killer-grounded" className="border-primary/50">
               <CardContent className="p-5">
                 <Badge variant="default">GROUNDED → {q.grounded.result}</Badge>
                 <p className="mt-3 text-sm italic">"{q.grounded.explanation}"</p>
@@ -220,8 +221,8 @@ export default function Evidence() {
       )}
 
       {/* conclusion */}
-      <section>
-        <Card className="border-primary/40 bg-primary/[0.04]">
+      <section id="evidence-conclusion">
+        <Card id="conclusion-card" className="border-primary/40 bg-primary/[0.04]">
           <CardContent className="p-6">
             <div className="flex items-center gap-2">
               <Lightbulb className="h-4 w-4 text-primary" />
