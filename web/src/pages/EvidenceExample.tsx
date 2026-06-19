@@ -15,7 +15,7 @@ function Md({ children }: { children: string }) {
 export default function EvidenceExample() {
   return (
     <div className="space-y-5">
-      <header>
+      <header id="example-header">
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold">Worked example</h1>
           <Badge variant="default">shop-demo</Badge>
@@ -29,13 +29,13 @@ export default function EvidenceExample() {
         </p>
       </header>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <Card>
+        <Card id="example-ungrounded">
           <CardContent className="p-5">
             <Badge variant="unknown">UNGROUNDED — generic review</Badge>
             <Md>{LEFT_UNGROUNDED}</Md>
           </CardContent>
         </Card>
-        <Card className="border-primary/50 shadow-[0_0_32px_rgba(55,232,194,.07)]">
+        <Card id="example-grounded" className="border-primary/50 shadow-[0_0_32px_rgba(55,232,194,.07)]">
           <CardContent className="p-5">
             <Badge variant="default">GROUNDED — Delivery Radar</Badge>
             <Md>{RIGHT_GROUNDED}</Md>

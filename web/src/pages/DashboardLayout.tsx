@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from "react-router-dom";
-import { cn } from "@/lib/utils";
+import { cn, slug } from "@/lib/utils";
 
 const SUB = [
   { to: "/dashboard", label: "shop-demo", end: true },
@@ -9,11 +9,12 @@ const SUB = [
 export default function DashboardLayout() {
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-2 border-b border-border pb-3">
+      <div id="dashboard-subnav" className="flex flex-wrap items-center gap-2 border-b border-border pb-3">
         <span className="mr-1 font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Dashboard ·</span>
         {SUB.map((s) => (
           <NavLink
             key={s.to}
+            id={`dashboard-tab-${slug(s.label)}`}
             to={s.to}
             end={s.end}
             className={({ isActive }) =>
