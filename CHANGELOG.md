@@ -1,3 +1,18 @@
+# [1.1.0](https://github.com/fang-lin/GlobalHack-DeliveryRadar/compare/v1.0.0...v1.1.0) (2026-06-19)
+
+
+### Bug Fixes
+
+* **web:** homepage deck — slide-scroll on mobile, not just desktop (ST-0018) ([3ffe7f0](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/3ffe7f06a947b23f13ecaef5f0df00786b81feb0))
+* **web:** id mobile-nav items + explore links — radar caught ADR-0005-C1 gap on PR [#4](https://github.com/fang-lin/GlobalHack-DeliveryRadar/issues/4) (ST-0020) ([bf8fa66](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/bf8fa66b4ac5af90081a89d657a048c2ab307c0a))
+
+
+### Features
+
+* **radar:** sticky progress review — post 'started', then edit it into the verdict (ST-0021) ([51189ab](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/51189abd839beafd99b1023e1ab92aea8c928ef2))
+* **web:** complete homepage id pass — crux card, why-table + rows, system-map legend/columns/items, paths & roadmap cards (ST-0020, ADR-0005-C1) ([b38829d](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/b38829db18d5114cc07767544107a8d41a3ad6de))
+* **web:** stable ids on significant UI elements — nav, header, footer, homepage sections, hero CTAs (ST-0020 / ADR-0005-C1) ([fe833d4](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/fe833d4b812b2001cb271d4f647cec0ce2278ec9)), closes [#site-header](https://github.com/fang-lin/GlobalHack-DeliveryRadar/issues/site-header) [#nav-logo](https://github.com/fang-lin/GlobalHack-DeliveryRadar/issues/nav-logo) [#nav-github](https://github.com/fang-lin/GlobalHack-DeliveryRadar/issues/nav-github) [#mobile-nav](https://github.com/fang-lin/GlobalHack-DeliveryRadar/issues/mobile-nav) [#site-footer](https://github.com/fang-lin/GlobalHack-DeliveryRadar/issues/site-footer)
+
 # 1.0.0 (2026-06-17)
 
 
