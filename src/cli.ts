@@ -8,13 +8,8 @@ import {
 } from "./extract.js";
 import { loadDiff } from "./diff.js";
 import { retrieve } from "./retrieve.js";
-import {
-  makeClient,
-  checkConstraint,
-  saveVerdicts,
-  loadVerdicts,
-  DEFAULT_MODEL,
-} from "./checker.js";
+import { checkConstraint, saveVerdicts, loadVerdicts } from "./checker.js";
+import { AnthropicAdapter, DEFAULT_MODEL } from "./llm.js";
 import { reviewMarkdown } from "./comment.js";
 
 function fail(msg: string): never {
@@ -61,11 +56,11 @@ async function cmdCheck(argv: string[]): Promise<number> {
   if (values.replay) {
     verdicts = loadVerdicts(values.replay);
   } else {
-    const client = makeClient();
+    const client = new AnthropicAdapter({ model: values.model });
     verdicts = [];
     for (const [constraint, diffs] of inScope) {
       const context = adrSection(adrDir, constraint.adr, "Context");
-      verdicts.push(await checkConstraint(client, constraint, diffs, context, values.model));
+      verdicts.push(await checkConstraint(client, constraint, diffs, context));
     }
   }
 
