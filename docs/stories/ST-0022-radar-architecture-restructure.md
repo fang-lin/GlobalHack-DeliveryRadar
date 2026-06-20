@@ -2,13 +2,13 @@
 
 - **Status:** In progress
 - **Type:** radar / architecture / refactor
-- **Related:** ADR-0003 (TS rewrite) · **ADR-0006 (platform-agnostic core — _parked_; this story finalizes it)**
+- **Related:** ADR-0003 (TS rewrite) · ADR-0006 (platform-agnostic core) · **ADR-0007 (pluggable model layer — the concrete realization of adjustment A)** · design spec `docs/specs/2026-06-21-radar-model-layer-design.zh.md`
 
 ## Story
 
 As a maintainer planning the radar's evolution (drift, capture, multi-host, multi-LLM, earned gating, the pre-PR agent), I want a clear, honest picture of the **current** CLI design and then a deliberate **target** layering — so future capabilities slot in by adding adapters / ops, not by reworking the core.
 
-> ⚠️ ADR-0006 ("the CLI must be platform-agnostic") is **parked** until this story settles the design. It will be finalized/strengthened as an *output* of this story, not before.
+> ✅ Design settled (brainstormed + user-approved 2026-06-21). ADR-0006's "model adapter" idea is now realized by **ADR-0007** — a `ModelClient` port + native Anthropic & universal OpenAI-compatible adapters, gateway-aware (OpenRouter / Vercel AI Gateway presets). **Adjustment A (model port) is being implemented** per the design spec; ADR-0006 stays as the principle.
 
 ## Plan (the order we agreed)
 
