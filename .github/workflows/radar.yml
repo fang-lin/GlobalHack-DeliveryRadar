@@ -4,7 +4,8 @@
 #   • comment "/radar" on the PR (ChatOps; commenter must have write access)
 #   • add the "radar" label to the PR
 #   • Actions → Run workflow (workflow_dispatch) with a PR number
-# Always checks the PR diff against MAIN's ADRs. Needs the ANTHROPIC_API_KEY secret.
+# Always checks the PR diff against MAIN's ADRs. Needs the AI_GATEWAY_API_KEY secret
+# (Vercel AI Gateway → DeepSeek V4 Pro).
 # Sticky progress (FR-INT-7): posts a "started" review immediately, then edits THAT
 # SAME review in place with the verdict — or a failure note if the run dies early.
 name: "Radar — conformance check"
@@ -98,7 +99,13 @@ jobs:
 
       - name: "Radar check — does the diff still match the ADRs? (LLM, advisory)"
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # DeepSeek V4 Pro via Vercel AI Gateway (ADR-0007 pluggable model layer).
+          # V4 Pro rejects response_format json_object, so use json_schema (verified
+          # live). Provider/model/mode are plain config; only the key is a secret.
+          RADAR_PROVIDER: vercel
+          RADAR_MODEL: deepseek/deepseek-v4-pro
+          RADAR_JSON_MODE: json_schema
+          AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
         run: pnpm exec tsx src/cli/main.ts check --adr-dir docs/adr --diff pr.diff --save verdicts.json
 
       # Success: render the verdict with the CLI (pure — stdout only), then the
