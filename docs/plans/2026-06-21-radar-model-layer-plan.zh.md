@@ -1,6 +1,6 @@
 # Radar 模型层实现计划
 
-> **权威: 中文（本文件） · 翻译: 英文（`2026-06-21-radar-model-layer-plan.en.md`） · 最后同步: 2026-06-21 · 两版冲突以中文为准 · 翻译待更新 / translation pending**
+> **权威: 中文（本文件） · 翻译: 英文（`2026-06-21-radar-model-layer-plan.en.md`） · 最后同步: 2026-06-21 · 两版冲突以中文为准**
 
 > **给执行者:** 本计划实现 ADR-0007 / `docs/specs/2026-06-21-radar-model-layer-design.zh.md`。分支 `ST-0022-model-layer`(设计文档已提交)。TDD、每任务一提交。代码块/路径/标识符逐字一致(`doc-management` §6)。
 
