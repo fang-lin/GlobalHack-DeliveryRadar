@@ -1,11 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { loadDiff } from "../src/io/diff.js";
-import { extractFromDir } from "../src/io/extract.js";
-import { globToRegex, retrieve } from "../src/core/retrieve.js";
+import { loadDiff } from "../../src/io/diff.js";
+import { extractFromDir } from "../../src/io/extract.js";
+import { globToRegex, retrieve } from "../../src/core/retrieve.js";
 
-const FIXTURES = join(dirname(fileURLToPath(import.meta.url)), "fixtures");
+const FIXTURES = join(dirname(fileURLToPath(import.meta.url)), "..", "fixtures");
 
 describe("scope-first retrieval (NFR-RETRIEVAL-1)", () => {
   it("parses changed files from the diff", () => {
