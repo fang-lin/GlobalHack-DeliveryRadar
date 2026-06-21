@@ -422,14 +422,16 @@ path/ownership mapping first; semantic similarity is a secondary signal only.
   configurable destination for remediation issues and behavioral Decision Notes.
 - `FR-INT-5` Deterministic checks SHOULD integrate an existing engine
   (e.g. semgrep) rather than reimplement matching.
-- `FR-INT-6` The CI run of `radar check` is **user-initiated**, to control LLM
-  cost (`NFR-COST-1`); it triggers from the PR itself or from Actions in three
-  ways: a **`/radar` PR comment command**, a **`radar` label** on the PR, or
-  **`workflow_dispatch`** (the Actions "Run workflow" button + a PR number). The
-  comment trigger SHOULD verify the commenter has write access. Either way it
-  stays **advisory** — posted via the Reviews API as a `COMMENT` event, never
-  blocking the merge. First landing: checking this repo's own PRs (dogfood — see
-  `ST-0013` / `ST-0008`).
+- `FR-INT-6` The CI run of `radar check` **runs automatically on every PR** (on
+  open / update); cost is controlled by **scope-first retrieval**
+  (`NFR-RETRIEVAL-1` — only in-scope constraints call the LLM) + a **configurable
+  low-cost provider** (ADR-0007, e.g. DeepSeek) + advisory non-blocking, not by
+  manual gating (`NFR-COST-1`, revised 2026-06-21; previously user-initiated). It
+  can still be **re-run manually**: a **`/radar` PR comment** (SHOULD verify the
+  commenter has write access) or **`workflow_dispatch`** (the Actions "Run
+  workflow" button + a PR number). Either way it stays **advisory** — posted via
+  the Reviews API as a `COMMENT` event, never blocking the merge. First landing:
+  checking this repo's own PRs (dogfood — see `ST-0013` / `ST-0008`).
 - `FR-INT-7` **Visible progress (sticky progress review).** Once a `radar check`
   is triggered (`FR-INT-6`), the system SHOULD **immediately** post a visible
   advisory review on the PR (Reviews API, `COMMENT` event) — a "check started"
@@ -460,9 +462,13 @@ path/ownership mapping first; semantic similarity is a secondary signal only.
   on past PRs before any constraint is promoted to `gate`.
 - `NFR-PERF-1` The per-diff engine MUST complete within typical CI time budgets;
   bound LLM calls by scoping (`NFR-RETRIEVAL-1`) and prefer batching.
-- `NFR-COST-1` **LLM cost is gatable.** Any integration that triggers
-  `radar check` in CI (each call costs API) MUST support gating (manual dispatch
-  / label by default); it must not unconditionally spend API on every PR.
+- `NFR-COST-1` **LLM cost is controlled.** `radar check` in CI keeps cost down by
+  three design choices: **scope-first retrieval** (`NFR-RETRIEVAL-1` — only
+  in-scope constraints call the LLM), a **configurable low-cost provider/model**
+  (ADR-0007; e.g. DeepSeek), and advisory non-blocking. Under these, **running
+  automatically on every PR is acceptable** (revised 2026-06-21: previously this
+  defaulted to manual gating). Gating remains available (swap the provider /
+  revert to manual triggers) but is no longer the default.
 - `NFR-SEC-1` Least-privilege tokens. The system reads code and writes review
   comments / draft PRs / draft issues only. It MUST NOT modify access controls,
   branch protection, or repository settings.

@@ -1,8 +1,9 @@
 # Dogfood: run the radar on a PR against recorded intent. Advisory only — posts a
-# review COMMENT, never blocks. Cost-gated: it runs only when YOU trigger it
-# (FR-INT-6 / NFR-COST-1), one of three user-initiated ways:
+# review COMMENT, never blocks. Runs AUTOMATICALLY on every PR (opened / updated);
+# cost is controlled by scope-first retrieval (only in-scope constraints call the
+# LLM) + a low-cost provider (DeepSeek) + advisory non-blocking, not by manual
+# gating (FR-INT-6 / NFR-COST-1, revised 2026-06-21). Can also be re-run manually:
 #   • comment "/radar" on the PR (ChatOps; commenter must have write access)
-#   • add the "radar" label to the PR
 #   • Actions → Run workflow (workflow_dispatch) with a PR number
 # Always checks the PR diff against MAIN's ADRs. Needs the AI_GATEWAY_API_KEY secret
 # (Vercel AI Gateway → DeepSeek V4 Pro).
@@ -13,6 +14,8 @@ name: "Radar — conformance check"
 run-name: "Does PR #${{ inputs.pr || github.event.issue.number || github.event.pull_request.number }} still match what we decided?"
 
 on:
+  pull_request:
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
     inputs:
       pr:
@@ -21,8 +24,6 @@ on:
         type: number
   issue_comment:
     types: [created]
-  pull_request:
-    types: [labeled]
 
 permissions:
   contents: read
@@ -35,15 +36,15 @@ concurrency:
 jobs:
   radar:
     name: radar check — advisory, never blocks
-    # Only on an explicit, authorised trigger: the manual button, a "/radar" PR
-    # comment from a write-access user, or the "radar" label being added.
+    # Auto on every PR (opened / updated); also re-runnable manually via the Actions
+    # button or a "/radar" comment from a write-access user.
     if: >-
+      github.event_name == 'pull_request' ||
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'issue_comment' &&
         github.event.issue.pull_request != null &&
         startsWith(github.event.comment.body, '/radar') &&
-        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)) ||
-      (github.event_name == 'pull_request' && github.event.label.name == 'radar')
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association))
     runs-on: ubuntu-latest
     steps:
       - name: Resolve the PR number from whichever event fired
