@@ -216,7 +216,7 @@ and evidence
 ## ⚡ Quickstart
 
 ```bash
-pnpm install && pnpm build        # TypeScript → dist/; `radar` bin = dist/cli.js
+pnpm install && pnpm build        # TypeScript → dist/; `radar` bin = dist/cli/main.js
 echo "ANTHROPIC_API_KEY=sk-ant-..." > .envrc   # gitignored
 
 # extract constraints from a repo's ADRs
@@ -232,7 +232,7 @@ radar comment --adr-dir ../GlobalHack-shop-demo/docs/adr --verdicts verdicts.jso
 ```
 
 `radar` resolves via the `bin` entry once built (or `pnpm link` / a symlink to
-`dist/cli.js`); during development use `pnpm radar -- <args>` (tsx). Tests: `pnpm test` (vitest).
+`dist/cli/main.js`); during development use `pnpm radar -- <args>` (tsx). Tests: `pnpm test` (vitest).
 
 > **Monorepo (pnpm workspaces):** the repo root is the radar; `web/` is the showcase SPA. One `pnpm install` at the root installs both; `corepack` provisions pnpm (no global install). **CI/CD (GitHub Actions):** `ci.yml` lints, typechecks, tests and builds on every PR; `release.yml` runs `semantic-release` (version + CHANGELOG + GitHub Release from Conventional Commits, GitHub-only) and auto-deploys the showcase to Pages on `main` — no manual build/cp. See ADR-0004.
 
@@ -240,13 +240,15 @@ radar comment --adr-dir ../GlobalHack-shop-demo/docs/adr --verdicts verdicts.jso
 
 TypeScript (Node 22) · `@anthropic-ai/sdk` with Zod-typed structured outputs
 (`messages.parse` + `zodOutputFormat`) · `js-yaml` for ADR constraint blocks ·
-`vitest` for tests. Semantic checks run on `claude-sonnet-4-6` with adaptive
-thinking. Deterministic checks (Phase 2) will shell out to semgrep.
+`vitest` for tests. Semantic checks run on Claude native (`messages.parse`) **or
+any OpenAI-compatible provider / gateway** — OpenRouter, Vercel AI Gateway,
+DeepSeek — via the pluggable model layer (ADR-0007), selected by env (see
+`.env.example`). Deterministic checks (Phase 2) will shell out to semgrep.
 
 ## 🗂️ Repository layout
 
 ```
-src/              CLI + core (TypeScript): cli · extract · retrieve · diff · checker · comment · models(zod)
+src/              radar engine (TypeScript, layered): core/ (pure domain: models · retrieve · checker · comment) · io/ (fs edges: diff · extract · verdicts) · llm/ (ModelClient port + adapters, ADR-0007) · cli/ (main + commands) · index.ts (experimental library API)
 tests/            vitest tests + fixtures (ADR parsing, scope retrieval)
 scripts/          eval (replay/precision harness) · baseline-review · make-contrast (tsx)
 eval/             benchmark on real Backstage ADRs: cases.yaml · adr/ · cases/ · report.md · results.json
