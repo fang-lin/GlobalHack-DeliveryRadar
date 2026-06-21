@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/fang-lin/GlobalHack-DeliveryRadar/compare/v1.2.0...v1.3.0) (2026-06-21)
+
+
+### Features
+
+* **radar:** empty conformance review says "Nothing flagged" (ST-0026) ([bf671ff](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/bf671ff5c6eef393bcedcbf9382e878e750fff8d)), closes [#10](https://github.com/fang-lin/GlobalHack-DeliveryRadar/issues/10)
+
 # [1.2.0](https://github.com/fang-lin/GlobalHack-DeliveryRadar/compare/v1.1.0...v1.2.0) (2026-06-21)
 
 
