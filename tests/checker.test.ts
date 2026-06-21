@@ -1,23 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { checkConstraint } from "../src/checker.js";
 import type { ModelClient } from "../src/llm.js";
-import type { Constraint } from "../src/models.js";
 import type { FileDiff } from "../src/diff.js";
+import { makeConstraint } from "./fixtures/factories.js";
 
-const constraint = {
-  id: "ADR-001-C1",
-  adr: "ADR-001",
-  title: "Inventory reads tolerate eventual consistency",
-  rule: "Reads must tolerate stale data.",
-  polarity: "requirement",
-  driver: null,
-  scope: { paths: ["**"], layers: null },
-  check: { type: "semantic", matcher: null, examples: null },
-  enforce: "advisory",
-  severity: "high",
-  status: "active",
-  superseded_by: null,
-} as unknown as Constraint;
+const constraint = makeConstraint();
 
 const diffs: FileDiff[] = [{ path: "a.ts", text: "+ some change" }];
 

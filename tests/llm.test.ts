@@ -3,10 +3,13 @@ import * as z from "zod/v4";
 
 // Mock the OpenAI SDK: every `new OpenAI(...)` gets a client whose
 // chat.completions.create is this controllable spy.
-const { create } = vi.hoisted(() => ({ create: vi.fn() }));
+const { create, ctor } = vi.hoisted(() => ({ create: vi.fn(), ctor: vi.fn() }));
 vi.mock("openai", () => ({
   default: class {
     chat = { completions: { create } };
+    constructor(opts: unknown) {
+      ctor(opts);
+    }
   },
 }));
 
@@ -15,7 +18,10 @@ const { OpenAICompatAdapter, AnthropicAdapter, makeModelClient } = await import(
 const schema = z.object({ result: z.string(), n: z.number() });
 const reply = (content: string | null) => ({ choices: [{ message: { content } }] });
 
-beforeEach(() => create.mockReset());
+beforeEach(() => {
+  create.mockReset();
+  ctor.mockReset();
+});
 
 describe("OpenAICompatAdapter (ADR-0007)", () => {
   it("json_object: retries past empty + bad JSON, then returns the validated object", async () => {
@@ -53,6 +59,15 @@ describe("OpenAICompatAdapter (ADR-0007)", () => {
     expect(out).toEqual({ result: "aligned", n: 7 });
     expect(create.mock.calls[0][0].response_format.type).toBe("json_schema");
   });
+
+  it("json_schema mode strips the top-level $schema key (strict mode rejects it)", async () => {
+    create.mockResolvedValueOnce(reply(JSON.stringify({ result: "aligned", n: 1 })));
+    const a = new OpenAICompatAdapter({ model: "m", baseURL: "https://x/v1", apiKey: "k", mode: "json_schema" });
+    await a.complete({ system: "s", user: "u", schema });
+    const sent = create.mock.calls[0][0].response_format.json_schema.schema;
+    expect(sent.$schema).toBeUndefined();
+    expect(sent.type).toBe("object");
+  });
 });
 
 describe("makeModelClient factory (ADR-0007)", () => {
@@ -82,5 +97,32 @@ describe("makeModelClient factory (ADR-0007)", () => {
   });
   it("rejects an unknown provider", () => {
     expect(() => makeModelClient({ RADAR_PROVIDER: "nope" })).toThrow(/unknown RADAR_PROVIDER/);
+  });
+  it("falls back to RADAR_API_KEY when the provider's native key var is unset", () => {
+    const c = makeModelClient({ RADAR_PROVIDER: "openrouter", RADAR_API_KEY: "uni", RADAR_MODEL: "m" });
+    expect(c).toBeInstanceOf(OpenAICompatAdapter);
+    expect(ctor.mock.calls[0][0].apiKey).toBe("uni");
+  });
+  it("RADAR_BASE_URL overrides a preset's endpoint", () => {
+    makeModelClient({
+      RADAR_PROVIDER: "vercel",
+      AI_GATEWAY_API_KEY: "k",
+      RADAR_MODEL: "m",
+      RADAR_BASE_URL: "https://proxy.example/v1",
+    });
+    expect(ctor.mock.calls[0][0].baseURL).toBe("https://proxy.example/v1");
+  });
+  it("an empty native key falls back to RADAR_API_KEY (not blocked by ??)", () => {
+    makeModelClient({ RADAR_PROVIDER: "openrouter", OPENROUTER_API_KEY: "", RADAR_API_KEY: "uni", RADAR_MODEL: "m" });
+    expect(ctor.mock.calls[0][0].apiKey).toBe("uni");
+  });
+  it("resolves a key from process.env even when the passed env object lacks it", () => {
+    process.env.OPENROUTER_API_KEY = "from-process-env";
+    try {
+      makeModelClient({ RADAR_PROVIDER: "openrouter", RADAR_MODEL: "m" });
+      expect(ctor.mock.calls[0][0].apiKey).toBe("from-process-env");
+    } finally {
+      delete process.env.OPENROUTER_API_KEY;
+    }
   });
 });

@@ -1,6 +1,6 @@
 # Delivery Radar — eval report (grounded vs ungrounded)
 
-Corpus: 7 human-labelled cases on **real Backstage ADRs**. Model: `claude-sonnet-4-6`. Ground truth is hand-labelled in `eval/cases.yaml` — the harness never asks the model for the gold label.
+Corpus: 7 human-labelled cases on **real Backstage ADRs**. Model: `anthropic/claude-sonnet-4-6`. Ground truth is hand-labelled in `eval/cases.yaml` — the harness never asks the model for the gold label.
 
 | case | gold | grounded | ungrounded | source |
 |---|---|---|---|---|

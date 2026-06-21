@@ -56,8 +56,9 @@ async function cmdCheck(argv: string[]): Promise<number> {
   if (values.replay) {
     verdicts = loadVerdicts(values.replay);
   } else {
-    if (values.model) process.env.RADAR_MODEL = values.model;
-    const client = makeModelClient();
+    const client = makeModelClient(
+      values.model ? { ...process.env, RADAR_MODEL: values.model } : process.env,
+    );
     verdicts = [];
     for (const [constraint, diffs] of inScope) {
       const context = adrSection(adrDir, constraint.adr, "Context");

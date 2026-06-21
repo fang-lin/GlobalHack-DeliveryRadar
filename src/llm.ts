@@ -34,8 +34,8 @@ export interface ModelClient {
  * environment. No third-party dependency. Config/infra, lives in the model layer
  * (not the core), and is invoked by the adapters/factory at the edge.
  */
-export function loadDotenv(key: string, start?: string): void {
-  if (process.env[key]) return;
+export function loadDotenv(key: string, start?: string): string | undefined {
+  if (process.env[key]) return process.env[key];
   let dir = start ?? process.cwd();
   const root = parsePath(dir).root;
   for (;;) {
@@ -45,13 +45,14 @@ export function loadDotenv(key: string, start?: string): void {
         const line = raw.trim();
         if (line.startsWith(`${key}=`)) {
           process.env[key] = line.slice(key.length + 1).trim().replace(/^"|"$/g, "");
-          return;
+          return process.env[key];
         }
       }
     }
     if (dir === root) break;
     dir = parsePath(dir).dir;
   }
+  return process.env[key];
 }
 
 /**
@@ -62,9 +63,12 @@ export function loadDotenv(key: string, start?: string): void {
 export class AnthropicAdapter implements ModelClient {
   private client: Anthropic;
   private model: string;
-  constructor(opts: { model?: string } = {}) {
+  constructor(opts: { model?: string; apiKey?: string; baseURL?: string } = {}) {
     loadDotenv("ANTHROPIC_API_KEY");
-    this.client = new Anthropic();
+    this.client = new Anthropic({
+      ...(opts.apiKey ? { apiKey: opts.apiKey } : {}),
+      ...(opts.baseURL ? { baseURL: opts.baseURL } : {}),
+    });
     this.model = opts.model ?? DEFAULT_MODEL;
   }
   async complete<T>(o: { system: string; user: string; schema: z.ZodType<T>; maxTokens?: number }): Promise<T> {
@@ -110,15 +114,21 @@ export class OpenAICompatAdapter implements ModelClient {
   }
   async complete<T>(o: { system: string; user: string; schema: z.ZodType<T>; maxTokens?: number }): Promise<T> {
     const jsonSchema = z.toJSONSchema(o.schema) as Record<string, unknown>;
+    // z.toJSONSchema emits a top-level "$schema" key that OpenAI/Vercel strict
+    // json_schema mode rejects as an unknown root property — drop it.
+    delete jsonSchema.$schema;
     const response_format =
       this.mode === "json_schema"
         ? ({ type: "json_schema", json_schema: { name: "verdict", schema: jsonSchema, strict: true } } as const)
         : ({ type: "json_object" } as const);
-    // Show the schema in the system prompt so the model knows the shape in BOTH modes
-    // (required for json_object; harmless and helpful for json_schema).
+    // In json_object mode there is no schema channel, so the schema must ride in
+    // the prompt. In json_schema mode response_format already carries it — don't
+    // double-send (wasted tokens).
     const baseSystem =
-      `${o.system}\n\nReturn ONLY a JSON object matching this JSON Schema ` +
-      `(no prose, no markdown):\n${JSON.stringify(jsonSchema)}`;
+      this.mode === "json_schema"
+        ? o.system
+        : `${o.system}\n\nReturn ONLY a JSON object matching this JSON Schema ` +
+          `(no prose, no markdown):\n${JSON.stringify(jsonSchema)}`;
     let lastErr: unknown;
     for (let attempt = 0; attempt < this.maxRetries; attempt++) {
       const res = await this.client.chat.completions.create({
@@ -160,56 +170,61 @@ function jsonMode(env: NodeJS.ProcessEnv): "json_schema" | "json_object" {
   return env.RADAR_JSON_MODE === "json_schema" ? "json_schema" : "json_object";
 }
 
+// OpenAI-compatible presets: a known base_url + the provider's native key var
+// (+ optional headers). RADAR_BASE_URL overrides the base_url for any of them.
+const COMPAT_PRESETS: Record<string, { baseURL: string; nativeKey: string; headers?: Record<string, string> }> = {
+  openrouter: {
+    baseURL: "https://openrouter.ai/api/v1",
+    nativeKey: "OPENROUTER_API_KEY",
+    headers: { "HTTP-Referer": "https://github.com/fang-lin/GlobalHack-DeliveryRadar", "X-Title": "Delivery Radar" },
+  },
+  vercel: { baseURL: "https://ai-gateway.vercel.sh/v1", nativeKey: "AI_GATEWAY_API_KEY" },
+  "openai-compat": { baseURL: "", nativeKey: "RADAR_API_KEY" },
+};
+
 /**
- * Build the ModelClient from config at the edge (ADR-0006/0007). Presets:
- *   RADAR_PROVIDER = anthropic (default) | openrouter | vercel | openai-compat
- * with RADAR_MODEL, RADAR_BASE_URL, RADAR_JSON_MODE and per-provider key env vars.
- * Any other OpenAI-compatible gateway works via the `openai-compat` + RADAR_BASE_URL
- * escape hatch. Keys come from env (.env supported); never hard-coded.
+ * Resolve a provider key: the native var first, then the universal RADAR_API_KEY
+ * fallback, consulting .env for either. `||` (not `??`) so an empty-string var is
+ * treated as unset and does not block the fallback. `loadDotenv` returns the value
+ * AND populates process.env, so this works whether `env` is process.env or a
+ * caller-supplied copy (e.g. the CLI's `--model` merged env).
+ */
+function resolveKey(env: NodeJS.ProcessEnv, nativeKey: string): string | undefined {
+  return env[nativeKey] || env.RADAR_API_KEY || loadDotenv(nativeKey) || loadDotenv("RADAR_API_KEY") || undefined;
+}
+
+/**
+ * Build the ModelClient from env config at the edge (ADR-0006/0007):
+ *   RADAR_PROVIDER  = anthropic (default) | openrouter | vercel | openai-compat
+ *   RADAR_MODEL     = model string (required for gateways; format is provider-specific)
+ *   RADAR_BASE_URL  = override the endpoint (required for openai-compat; optional for any preset)
+ *   RADAR_JSON_MODE = json_schema | json_object (default json_object)
+ * Key resolution: the provider's native var (ANTHROPIC_API_KEY / OPENROUTER_API_KEY /
+ * AI_GATEWAY_API_KEY) is preferred, with RADAR_API_KEY as the universal fallback.
+ * Keys come from env (.env supported); never hard-coded.
  */
 export function makeModelClient(env: NodeJS.ProcessEnv = process.env): ModelClient {
   const provider = env.RADAR_PROVIDER ?? "anthropic";
   const model = env.RADAR_MODEL;
-  switch (provider) {
-    case "anthropic":
-      return new AnthropicAdapter({ model: model ?? DEFAULT_MODEL });
-    case "openrouter": {
-      loadDotenv("OPENROUTER_API_KEY");
-      if (!env.OPENROUTER_API_KEY) throw new Error("RADAR_PROVIDER=openrouter requires OPENROUTER_API_KEY");
-      if (!model) throw new Error("RADAR_PROVIDER=openrouter requires RADAR_MODEL (e.g. anthropic/claude-sonnet-4-6)");
-      return new OpenAICompatAdapter({
-        baseURL: "https://openrouter.ai/api/v1",
-        apiKey: env.OPENROUTER_API_KEY,
-        model,
-        headers: { "HTTP-Referer": "https://github.com/fang-lin/GlobalHack-DeliveryRadar", "X-Title": "Delivery Radar" },
-        mode: jsonMode(env),
-      });
-    }
-    case "vercel": {
-      loadDotenv("AI_GATEWAY_API_KEY");
-      if (!env.AI_GATEWAY_API_KEY) throw new Error("RADAR_PROVIDER=vercel requires AI_GATEWAY_API_KEY");
-      if (!model) throw new Error("RADAR_PROVIDER=vercel requires RADAR_MODEL (e.g. anthropic/claude-opus-4.7)");
-      return new OpenAICompatAdapter({
-        baseURL: "https://ai-gateway.vercel.sh/v1",
-        apiKey: env.AI_GATEWAY_API_KEY,
-        model,
-        mode: jsonMode(env),
-      });
-    }
-    case "openai-compat": {
-      loadDotenv("RADAR_API_KEY");
-      if (!env.RADAR_BASE_URL) throw new Error("RADAR_PROVIDER=openai-compat requires RADAR_BASE_URL");
-      if (!model) throw new Error("RADAR_PROVIDER=openai-compat requires RADAR_MODEL");
-      return new OpenAICompatAdapter({
-        baseURL: env.RADAR_BASE_URL,
-        apiKey: env.RADAR_API_KEY,
-        model,
-        mode: jsonMode(env),
-      });
-    }
-    default:
-      throw new Error(
-        `unknown RADAR_PROVIDER '${provider}' (expected: anthropic | openrouter | vercel | openai-compat)`,
-      );
+
+  if (provider === "anthropic") {
+    return new AnthropicAdapter({
+      model: model ?? DEFAULT_MODEL,
+      apiKey: resolveKey(env, "ANTHROPIC_API_KEY"),
+      baseURL: env.RADAR_BASE_URL,
+    });
   }
+
+  const preset = COMPAT_PRESETS[provider];
+  if (!preset) {
+    throw new Error(
+      `unknown RADAR_PROVIDER '${provider}' (expected: anthropic | openrouter | vercel | openai-compat)`,
+    );
+  }
+  const baseURL = env.RADAR_BASE_URL || preset.baseURL;
+  const apiKey = resolveKey(env, preset.nativeKey);
+  if (!baseURL) throw new Error(`RADAR_PROVIDER=${provider} requires RADAR_BASE_URL`);
+  if (!apiKey) throw new Error(`RADAR_PROVIDER=${provider} requires ${preset.nativeKey} or RADAR_API_KEY`);
+  if (!model) throw new Error(`RADAR_PROVIDER=${provider} requires RADAR_MODEL`);
+  return new OpenAICompatAdapter({ baseURL, apiKey, model, headers: preset.headers, mode: jsonMode(env) });
 }

@@ -27,7 +27,7 @@ So the LLM dependency must become **pluggable**, without losing the proven Anthr
 
 3. **Gateways are configuration, not code.** Any OpenAI-compatible gateway works via `base_url + model + key`. Shipped presets: **`anthropic`** (native), **`openrouter`**, **`vercel`**, plus a generic **`openai-compat`**; anything else via a `RADAR_BASE_URL` escape hatch.
 
-4. **Selection/construction happens at the edge** (ADR-0006): a `makeModelClient(env)` factory reads config (`RADAR_PROVIDER` / `RADAR_MODEL` / `RADAR_BASE_URL` + per-provider key env vars) at the CLI boundary and injects a `ModelClient` into the core. Keys live in env, never committed.
+4. **Selection/construction happens at the edge** (ADR-0006): a `makeModelClient(env)` factory reads config (`RADAR_PROVIDER` / `RADAR_MODEL` / `RADAR_BASE_URL` / `RADAR_JSON_MODE` + keys) at the CLI boundary and injects a `ModelClient` into the core. `RADAR_BASE_URL` can override any preset's endpoint. Key resolution is `nativeKey ?? RADAR_API_KEY` — the provider's native var (`ANTHROPIC_API_KEY` / `OPENROUTER_API_KEY` / `AI_GATEWAY_API_KEY`) is preferred, with `RADAR_API_KEY` as the universal fallback. Keys live in env (template `.env.example`), never committed.
 
 5. **Cross-provider quality is measured, not assumed.** The eval harness (`scripts/eval.ts`) gains a provider/model knob so the same Backstage benchmark is run across providers and compared on F1 / precision / recall — this is how we pick a default and answer "does quality degrade".
 

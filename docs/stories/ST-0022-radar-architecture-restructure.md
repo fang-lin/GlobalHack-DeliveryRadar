@@ -69,14 +69,51 @@ What's already healthy (don't disturb): one shared contract (`models.ts`, not fo
 - [x] Maintainer reviewed the current design (brainstormed + approved 2026-06-21).
 - [x] Target layering + now/defer adjustments agreed (hybrid: do **A** now; **B/C/D** deferred).
 - [x] ADR-0006 un-parked — realized concretely by **ADR-0007** (the model layer).
-- [x] **Adjustment A (model layer) implemented**; lint + typecheck + build + tests green (18 tests). B/C/D remain deferred (separate future passes).
+- [x] **Adjustment A (model layer) implemented**; lint + typecheck + build + tests green (34 tests). B/C/D remain deferred (separate future passes).
+- [x] **Config made coherent** (env-driven: provider/model/base_url/json-mode + `RADAR_API_KEY` universal fallback; `.env.example`) — see ADR-0007 §4 / spec §4.
+- [x] **Self-reviewed** via `/code-review` (xhigh / recall): 15 findings, 12 fixed, 4 recorded — see "Code review" below.
 
 ## Verification / QA
 
 | gate | how | result |
 |---|---|---|
-| Automated | `ci.yml` green for any code change | ⬜ |
+| Automated | `pnpm lint` + `build` + `test` | ✅ 34 tests; scripts `tsc --noEmit` ✅; `eval --replay` ✅ |
+| Self-review | `/code-review` xhigh / recall (see below) | ✅ 15 found, 12 fixed, 4 recorded |
 | Maintainer sign-off | maintainer agrees the design + reviews changes | ⬜ pending |
+
+## Code review (self-review, 2026-06-21)
+
+`/code-review` (xhigh / recall) over this branch (PR #9 + working tree): 10 independent finder angles → verify → sweep → **15 findings**. **Fixed 12 (#1–#10, #14, and #15's double-send); 4 recorded as low / deferred.** They surfaced *after* lint/build/test were green — evidence that design-first still needs a review gate.
+
+> **绿 ≠ 对**:`tsc` 只编 `src/`(漏 `scripts/`);`--replay`、`--model`+`.env`、`json_schema` 真校验都没被测试覆盖(单测把 key 塞进 env、把 SDK mock 掉)。
+
+| # | 严重度 | 位置 | 摘要 | 状态 |
+|---|---|---|---|---|
+| 1 | 🔴 | `scripts/baseline-review.ts:11` | import 了重构删除的 `makeClient`/`DEFAULT_MODEL` → 运行即崩 | ✅ 已修 |
+| 2 | 🔴 | `src/llm.ts` 工厂 + `src/cli.ts` | `loadDotenv` 写 `process.env`、工厂读传入的 `env` 副本;`--model` 路径下 `.env` 里的 key 读不到 | ✅ 已修 |
+| 3 | 🔴 | `scripts/eval.ts` cache key | key 加了 `${model}` 段,旧缓存仍是 `grounded:<id>` → `--replay`(免 key 路径)全空 | ✅ 已修 |
+| 4 | 🔴 | `src/llm.ts` OpenAICompat | `z.toJSONSchema` 带顶层 `$schema`,被严格 `json_schema` 400 退回,retry 接不住 | ✅ 已修 |
+| 5 | 🔴 | `src/llm.ts` 工厂 key 解析 | 空串原生 key 被 `??` 保留 → 跳过 `RADAR_API_KEY` 兜底 → `!apiKey` 抛错 | ✅ 已修 |
+| 6 | 🟠 | `scripts/eval.ts` cache 守卫 | `cache[gKey] && (replay \|\| true)` 恒真,误导且与 #3 纠缠 | ✅ 已修 |
+| 7 | 🟠 | `src/llm.ts` + ADR-0007 §4 / spec §4 | `AnthropicAdapter` 不接 `baseURL`,但文档(本次自己加的)称"覆盖任意 preset" | ✅ 已修 |
+| 8 | 🟠 | spec §3.2(zh/en) | 中英镜像互相矛盾、且都与代码不符;"未知目标自动降级"未实现 | ✅ 已修 |
+| 9 | 🟡 | checker/comment 测试 | `Constraint` fixture 重复手写(`as unknown as` 掩盖 schema 漂移) | ✅ 已修 |
+| 10 | 🟡 | `scripts/eval.ts` | 自造 `argValue`、每旗标调两次、`--provider --model x` 误解析 | ✅ 已修 |
+| 11 | 🟡 | `src/llm.ts` `max_tokens` | 新 OpenAI 推理模型要 `max_completion_tokens`(经网关通常被转译,看目标) | ⏭️ 记录 |
+| 12 | 🟡 | `src/llm.ts` `jsonMode` | json 模式全局而非按 preset 能力;属早前"最稳默认"决策 | ⏭️ 记录 |
+| 13 | 🟡 | `src/llm.ts` | `AnthropicAdapter` 无 retry、`OpenAICompatAdapter` 有 → 失败处理不对称 | ⏭️ 记录 |
+| 14 | 🟡 | `scripts/eval.ts` cache key | key 不含 `RADAR_JSON_MODE` → 仅 json 模式不同的两次跑共用缓存 | ✅ 已修 |
+| 15 | 🟡 | `src/llm.ts` | 冗余 `loadDotenv`;json_schema 模式 schema 双发(prompt + `response_format`) | 🟡 部分(双发已修;冗余记录) |
+
+### 修复记录
+
+- `src/llm.ts`:`loadDotenv` 返回值;新增 `resolveKey()`(`原生 || RADAR_API_KEY || loadDotenv(原生) || loadDotenv(RADAR_API_KEY)`,空串视未设)→ #2/#5;anthropic 分支 + `AnthropicAdapter` 接 `baseURL` → #7;`json_schema` 模式 `delete jsonSchema.$schema` 且不再把 schema 塞进 prompt → #4/#15。
+- `scripts/baseline-review.ts`:改用 `Anthropic` SDK + `llm.js` 的 `loadDotenv`/`DEFAULT_MODEL` → #1。
+- `scripts/eval.ts`:`argValue` 绑一次 + 守卫下一 token → #10;cache key 加 json 模式段 → #14;miss 回退查旧 key、去 `(replay\|\|true)` → #3/#6。
+- 文档:spec §3.2 zh/en 对齐真实实现(`z.toJSONSchema` 手搓 + zod-v4 原因、删 `$schema`、去掉未实现的自动降级)→ #8。
+- 测试:抽 `tests/fixtures/factories.ts` 共享 `makeConstraint`/`makeVerdict` → #9;新增 llm 单测 3 个(`$schema` 剥离、空 key 兜底、从 `process.env` 解析 key)。
+- **验证**:`lint`/`build`/`test` ✅ 34 passed;`scripts/*.ts` tsc ✅;`eval --replay` 恢复(GROUNDED F1=1.00 / UNGROUNDED F1=0.40)。
+- **暂不改(理由)**:#11(网关多会转译 `max_tokens`,改了反伤常见路径)、#12(全局默认 json_object 为有意决策)、#13(原生路径更稳;retry 可后续提端口层)、#15 余项(冗余 `loadDotenv` 已早返回,开销极小)。
 
 ## Notes
 

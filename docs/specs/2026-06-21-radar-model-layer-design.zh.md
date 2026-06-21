@@ -47,27 +47,35 @@ export interface ModelClient {
 `messages.parse({ model, system, messages, output_config: zodOutputFormat(schema) })` → `parsed_output`(schema 强约束,已校验)。即现有 `checker.ts` 逻辑迁过来。
 
 ### 3.2 OpenAICompatAdapter(通用·新增)
-`new OpenAI({ baseURL, apiKey, defaultHeaders })`。结构化输出两条路径(均对照官方文档核实于 2026-06,Chat Completions 仍是当前受支持的标准面,Responses API 并存但未取代):
+`new OpenAI({ baseURL, apiKey, defaultHeaders })`。结构化输出两条路径,由 `RADAR_JSON_MODE` 选择(默认 `json_object`,兼容面最广;目标支持时设 `json_schema`);均对照官方文档核实于 2026-06(Chat Completions 仍是当前受支持的标准面,Responses API 并存但未取代):
 
-- **首选 —— 支持 json_schema 的目标(OpenAI / Vercel AI Gateway / OpenRouter 中支持的模型)**:用 OpenAI SDK 的 **`zodResponseFormat(schema, "verdict")` + `chat.completions.parse(...)`** —— schema 强约束 + 自动解析,**与 AnthropicAdapter 对称**(两边都是 "zod 助手 + parse")。底层 `response_format` 形态:`{ type:"json_schema", json_schema:{ name, schema, strict:true } }`。
-- **兜底 —— 只支持 json_object 的目标(如 DeepSeek)**:`response_format:{ type:"json_object" }` + 在 prompt 里附 schema 与示例(DeepSeek 要求 prompt 含 "json")→ `JSON.parse` → **zod 校验** → 解析/校验失败或空返回 → **重试(默认上限 3 次)**,重试追加"只返回符合该 schema 的 JSON"提示;超限抛错(由 radar workflow 失败路径接住,不崩)。
+- **`json_schema` —— 支持的目标(OpenAI / Vercel AI Gateway / OpenRouter 中支持的模型)**:`response_format:{ type:"json_schema", json_schema:{ name:"verdict", schema, strict:true } }`,其中 `schema` 由 `z.toJSONSchema(schema)` 生成(**须删掉顶层 `$schema` 键**——严格模式拒绝未知顶层键)→ `JSON.parse` → **zod 校验**。注:不用 OpenAI SDK 的 `zodResponseFormat` / `chat.completions.parse` 助手——它们面向 zod v3,本项目用 zod/v4,故手搓 schema + 解析。
+- **`json_object` —— 只支持它的目标(如 DeepSeek)**:`response_format:{ type:"json_object" }` + 在 prompt 里附 schema(DeepSeek 要求 prompt 含 "json")→ `JSON.parse` → **zod 校验**。
 
-适配器按 provider 能力选路径(预设里标注;未知目标默认先试 json_schema、失败再降级到 json_object 兜底)。各网关对 json_schema 的精确支持以实现时核实为准(OpenRouter 透传 `response_format`)。
+两路共用一个**重试循环**(默认上限 3 次):空返回或 `JSON.parse` / zod 校验失败即重试,追加"只返回符合该 schema 的 JSON"提示;超限抛错(由 radar workflow 失败路径接住,不崩)。各网关对 json_schema 的精确支持以实现时核实为准(OpenRouter 透传 `response_format`)。
 
 ## 4. 配置与选择(env 驱动:预设 + 逃生口)
 
-工厂 `makeModelClient(env)` 在 **CLI 边缘**执行(IO 在边缘,ADR-0006)。`.env` 加载也从 `checker.ts` 挪到这里。
+工厂 `makeModelClient(env)` 在 **CLI 边缘**执行(IO 在边缘,ADR-0006)。`.env` 加载也从 `checker.ts` 挪到这里。**全部配置走环境变量**;模板见仓库根 `.env.example`。
 
-| `RADAR_PROVIDER` | 适配器 | base_url | key env | model 串示例 | 备注 |
+**后端选择(数据驱动预设)**
+
+| `RADAR_PROVIDER` | 适配器 | base_url(默认) | 原生 key env | model 串示例 | 备注 |
 |---|---|---|---|---|---|
-| `anthropic`(默认) | Anthropic 原生 | — | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6` | 最稳 |
-| `openrouter` | OpenAI 兼容 | `https://openrouter.ai/api/v1` | `OPENROUTER_API_KEY` | `anthropic/claude-…`、`deepseek/…` | 可选头 `HTTP-Referer`/`X-Title` |
-| `vercel` | OpenAI 兼容 | `https://ai-gateway.vercel.sh/v1` | `AI_GATEWAY_API_KEY` | `provider/model`(如 `anthropic/claude-opus-4.7`) | 统一入口/预算;支持 json_schema 结构化输出 |
-| `openai-compat` | OpenAI 兼容 | `RADAR_BASE_URL`(逃生口) | `RADAR_API_KEY` | 任意 | 任何其它兼容网关/provider(含直连 DeepSeek `https://api.deepseek.com` + `deepseek-v4-flash`) |
+| `anthropic`(默认) | Anthropic 原生 | — | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6` | 最稳;schema 强约束 |
+| `openrouter` | OpenAI 兼容 | `https://openrouter.ai/api/v1` | `OPENROUTER_API_KEY` | `anthropic/claude-…`、`deepseek/…` | 自动带头 `HTTP-Referer`/`X-Title` |
+| `vercel` | OpenAI 兼容 | `https://ai-gateway.vercel.sh/v1` | `AI_GATEWAY_API_KEY` | `provider/model`(如 `anthropic/claude-sonnet-4-6`) | 统一入口/预算;支持 json_schema |
+| `openai-compat` | OpenAI 兼容 | 无(必须 `RADAR_BASE_URL`) | `RADAR_API_KEY` | 任意 | 逃生口:任何其它兼容网关/provider(含直连 DeepSeek `https://api.deepseek.com` + `deepseek-v4-flash`) |
 
-- `RADAR_MODEL` 覆盖默认 model 串。
-- key 一律 env,**绝不进 git**(沿用 `.env` + `.gitignore`)。
-- 选 `anthropic` → AnthropicAdapter;其余三个 → OpenAICompatAdapter(只是 base_url/key/headers 不同)。
+**通用配置项**
+
+- `RADAR_MODEL` —— model 串(网关必填;`anthropic` 缺省 `claude-sonnet-4-6`)。CLI `check --model` 可临时覆盖(不改 `process.env`,传合并后的 env)。
+- `RADAR_BASE_URL` —— 覆盖端点。`openai-compat` **必填**;其余预设**可选覆盖**(指向自建/代理网关)。
+- `RADAR_JSON_MODE` —— `json_schema` | `json_object`,默认 `json_object`(兼容面最广,含 DeepSeek);目标支持 json_schema 时再开。
+- **key 解析(自洽规则)**:每个后端用 `原生KEY ?? RADAR_API_KEY` —— `RADAR_API_KEY` 是**通用兜底键**,各家原生名(`ANTHROPIC_API_KEY` / `OPENROUTER_API_KEY` / `AI_GATEWAY_API_KEY`)只是便利、优先生效。
+
+- key 一律 env,**绝不进 git**(`.env` + `.gitignore`;模板 `.env.example` 入库)。
+- 选 `anthropic` → AnthropicAdapter;其余三个 → OpenAICompatAdapter(数据驱动预设,仅 base_url/key/headers 不同)。
 
 ## 5. 代码改动清单(= ST-0022 调整A + 多 provider)
 
@@ -84,7 +92,7 @@ export interface ModelClient {
 
 ## 7. 测试
 
-端口可 mock:用一个返回固定 `Verdict` 的假 `ModelClient` 给 `checkConstraint` 写纯单测(无网络、无 key)——补上 ADR-0006 说的核心可测性。适配器层的结构化输出/重试逻辑单独测(喂构造的"空返回/坏 JSON"输入)。
+端口可 mock:用一个返回固定 `Verdict` 的假 `ModelClient` 给 `checkConstraint` 写纯单测(无网络、无 key)——补上 ADR-0006 说的核心可测性。适配器层的结构化输出/重试逻辑单独测(喂构造的"空返回/坏 JSON"输入)。工厂另测预设/缺 key/缺 model/未知 provider,以及 **`RADAR_API_KEY` 兜底**与 **`RADAR_BASE_URL` 覆盖**。纯模块 `diff`(解析:多文件切段、删除文件保留旧路径、去尾换行)与 `comment`(渲染:排序、空路径、徽章/证据)各有单测。
 
 ## 8. 范围 / 非目标
 

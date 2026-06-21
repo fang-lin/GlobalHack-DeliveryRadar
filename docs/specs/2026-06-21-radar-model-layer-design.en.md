@@ -47,27 +47,35 @@ export interface ModelClient {
 `messages.parse({ model, system, messages, output_config: zodOutputFormat(schema) })` → `parsed_output` (schema-enforced, already validated). I.e. the current `checker.ts` logic moved here.
 
 ### 3.2 OpenAICompatAdapter (universal, new)
-`new OpenAI({ baseURL, apiKey, defaultHeaders })`. Two structured-output paths (both verified against the vendors' docs on 2026-06; Chat Completions is still the supported standard surface, the Responses API coexists but has not replaced it):
+`new OpenAI({ baseURL, apiKey, defaultHeaders })`. Two structured-output paths, chosen by `RADAR_JSON_MODE` (default `json_object`, the widest-compatible; set `json_schema` where the target supports it); both verified against the vendors' docs on 2026-06 (Chat Completions is still the supported standard surface, the Responses API coexists but has not replaced it):
 
-- **Preferred — targets that support json_schema (OpenAI / Vercel AI Gateway / capable OpenRouter models):** request `response_format` `{ type:"json_schema", json_schema:{ name, schema, strict:true } }` with the schema from `z.toJSONSchema(schema)`, then JSON.parse + zod-validate. (Symmetric with AnthropicAdapter — both are "a zod helper + parse".)
-- **Fallback — targets that only support json_object (e.g. DeepSeek):** `response_format:{ type:"json_object" }` + the schema shown in the prompt (DeepSeek requires the word "json" in the prompt) → JSON.parse → **zod-validate** → on parse/validation failure or empty content → **retry (default cap 3)**, appending "reply with ONLY the JSON object"; throw after the cap (caught by the radar workflow's failure path, never crashes).
+- **`json_schema` — supported targets (OpenAI / Vercel AI Gateway / capable OpenRouter models):** `response_format:{ type:"json_schema", json_schema:{ name:"verdict", schema, strict:true } }`, where `schema` comes from `z.toJSONSchema(schema)` (**the top-level `$schema` key must be dropped** — strict mode rejects unknown root keys) → `JSON.parse` → **zod-validate**. Note: we do NOT use the OpenAI SDK's `zodResponseFormat` / `chat.completions.parse` helpers — they target zod v3, but this project uses zod/v4, so the schema and parsing are hand-rolled.
+- **`json_object` — targets that only support it (e.g. DeepSeek):** `response_format:{ type:"json_object" }` + the schema shown in the prompt (DeepSeek requires the word "json") → `JSON.parse` → **zod-validate**.
 
-The adapter picks the path by the target's capability (set in the preset). Each gateway's exact json_schema support is to be confirmed at implementation (OpenRouter passes `response_format` through).
+Both paths share one **retry loop** (default cap 3): empty content or a `JSON.parse`/zod-validation failure triggers a retry that appends "reply with ONLY the JSON object"; throw after the cap (caught by the radar workflow's failure path, never crashes). Each gateway's exact json_schema support is to be confirmed at implementation (OpenRouter passes `response_format` through).
 
 ## 4. Selection & config (env-driven: presets + escape hatch)
 
-The factory `makeModelClient(env)` runs at the **CLI edge** (I/O at the edge, ADR-0006). The `.env` loader also moves here from `checker.ts`.
+The factory `makeModelClient(env)` runs at the **CLI edge** (I/O at the edge, ADR-0006). The `.env` loader also moves here from `checker.ts`. **All config is env vars**; see `.env.example` at the repo root for the template.
 
-| `RADAR_PROVIDER` | adapter | base_url | key env | model string example | notes |
+**Backend selection (data-driven presets)**
+
+| `RADAR_PROVIDER` | adapter | base_url (default) | native key env | model string example | notes |
 |---|---|---|---|---|---|
-| `anthropic` (default) | Anthropic native | — | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6` | most reliable |
-| `openrouter` | OpenAI-compat | `https://openrouter.ai/api/v1` | `OPENROUTER_API_KEY` | `anthropic/claude-…`, `deepseek/…` | optional `HTTP-Referer`/`X-Title` headers |
-| `vercel` | OpenAI-compat | `https://ai-gateway.vercel.sh/v1` | `AI_GATEWAY_API_KEY` | `provider/model` (e.g. `anthropic/claude-opus-4.7`) | unified entry / budgets; supports json_schema |
-| `openai-compat` | OpenAI-compat | `RADAR_BASE_URL` (escape hatch) | `RADAR_API_KEY` | any | any other compatible gateway/provider (incl. direct DeepSeek `https://api.deepseek.com` + `deepseek-v4-flash`) |
+| `anthropic` (default) | Anthropic native | — | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6` | most reliable; schema-enforced |
+| `openrouter` | OpenAI-compat | `https://openrouter.ai/api/v1` | `OPENROUTER_API_KEY` | `anthropic/claude-…`, `deepseek/…` | auto-sends `HTTP-Referer`/`X-Title` headers |
+| `vercel` | OpenAI-compat | `https://ai-gateway.vercel.sh/v1` | `AI_GATEWAY_API_KEY` | `provider/model` (e.g. `anthropic/claude-sonnet-4-6`) | unified entry / budgets; supports json_schema |
+| `openai-compat` | OpenAI-compat | none (requires `RADAR_BASE_URL`) | `RADAR_API_KEY` | any | escape hatch: any other compatible gateway/provider (incl. direct DeepSeek `https://api.deepseek.com` + `deepseek-v4-flash`) |
 
-- `RADAR_MODEL` overrides the default model string.
-- keys always via env, **never committed** (`.env` + `.gitignore`).
-- `anthropic` → AnthropicAdapter; the other three → OpenAICompatAdapter (only base_url/key/headers differ).
+**Common config**
+
+- `RADAR_MODEL` — model string (required for gateways; `anthropic` defaults to `claude-sonnet-4-6`). The CLI `check --model` flag overrides it transiently (passes a merged env, never mutates `process.env`).
+- `RADAR_BASE_URL` — override the endpoint. **Required** for `openai-compat`; **optional override** for the other presets (point at a self-hosted/proxy gateway).
+- `RADAR_JSON_MODE` — `json_schema` | `json_object`, default `json_object` (widest support, incl. DeepSeek); opt into json_schema where the target supports it.
+- **Key resolution (the coherent rule):** each backend uses `nativeKey ?? RADAR_API_KEY` — `RADAR_API_KEY` is the **universal fallback** key; the native vars (`ANTHROPIC_API_KEY` / `OPENROUTER_API_KEY` / `AI_GATEWAY_API_KEY`) are conveniences that take precedence.
+
+- keys always via env, **never committed** (`.env` + `.gitignore`; the `.env.example` template is checked in).
+- `anthropic` → AnthropicAdapter; the other three → OpenAICompatAdapter (data-driven presets; only base_url/key/headers differ).
 
 ## 5. Code change list (= ST-0022 adjustment A + multi-provider)
 
@@ -84,7 +92,7 @@ Run the same Backstage eval (grounded vs ungrounded) on `anthropic` (Sonnet), `o
 
 ## 7. Testing
 
-The port is mockable: a fake `ModelClient` returning a fixed `Verdict` gives `checkConstraint` pure unit tests (no network, no key) — fulfilling the core testability ADR-0006 called for. The adapter's structured-output/retry logic is tested separately (fed constructed "empty/bad JSON" inputs).
+The port is mockable: a fake `ModelClient` returning a fixed `Verdict` gives `checkConstraint` pure unit tests (no network, no key) — fulfilling the core testability ADR-0006 called for. The adapter's structured-output/retry logic is tested separately (fed constructed "empty/bad JSON" inputs). The factory also tests presets / missing key / missing model / unknown provider, plus **`RADAR_API_KEY` fallback** and **`RADAR_BASE_URL` override**. The pure modules `diff` (parsing: multi-file segmentation, deleted-file path retention, trailing-newline trim) and `comment` (rendering: ordering, empty path, badges/evidence) each have unit tests.
 
 ## 8. Scope / non-goals
 

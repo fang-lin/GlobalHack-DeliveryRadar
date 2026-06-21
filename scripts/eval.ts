@@ -92,15 +92,22 @@ interface Row { cs: Case; grounded: ArmResult; ungrounded: ArmResult; }
 
 const argValue = (flag: string): string | undefined => {
   const i = process.argv.indexOf(flag);
-  return i >= 0 ? process.argv[i + 1] : undefined;
+  if (i < 0) return undefined;
+  const v = process.argv[i + 1];
+  return v && !v.startsWith("--") ? v : undefined; // guard: next token must be a value, not another flag
 };
 
 async function main(): Promise<void> {
   const replay = process.argv.includes("--replay");
   // Provider/model are selectable so the SAME benchmark runs across providers (ADR-0007).
-  if (argValue("--provider")) process.env.RADAR_PROVIDER = argValue("--provider");
-  if (argValue("--model")) process.env.RADAR_MODEL = argValue("--model");
+  const providerArg = argValue("--provider");
+  const modelArg = argValue("--model");
+  if (providerArg) process.env.RADAR_PROVIDER = providerArg;
+  if (modelArg) process.env.RADAR_MODEL = modelArg;
   const model = `${process.env.RADAR_PROVIDER ?? "anthropic"}/${process.env.RADAR_MODEL ?? DEFAULT_MODEL}`;
+  // json mode changes how the model is prompted, so it is part of the cache identity.
+  const jsonMode = process.env.RADAR_JSON_MODE === "json_schema" ? "json_schema" : "json_object";
+  const tag = `${model}:${jsonMode}`;
   const cases = yaml.load(readFileSync(CASES, "utf8")) as Case[];
   const constraints = extractFromDir(ADR_DIR);
 
@@ -117,13 +124,14 @@ async function main(): Promise<void> {
 
     // ---- GROUNDED arm ----
     let grounded: ArmResult;
-    const gKey = `grounded:${model}:${cs.id}`;
+    const gKey = `grounded:${tag}:${cs.id}`;
+    const cachedG = cache[gKey] ?? cache[`grounded:${cs.id}`]; // legacy-key fallback for --replay
     if (cs.target_constraint) {
       const pair = pairs.find(([c]) => c.id === cs.target_constraint);
       if (!pair) {
         grounded = { result: "no-fire", note: "target constraint NOT retrieved (scope gap)" };
-      } else if (cache[gKey] && (replay || true)) {
-        grounded = cache[gKey];
+      } else if (cachedG) {
+        grounded = cachedG;
       } else if (replay) {
         grounded = { result: "?", note: "no cached verdict — run live first" };
       } else {
@@ -144,9 +152,10 @@ async function main(): Promise<void> {
 
     // ---- UNGROUNDED arm ----
     let ungrounded: ArmResult;
-    const uKey = `ungrounded:${model}:${cs.id}`;
-    if (cache[uKey]) {
-      ungrounded = cache[uKey];
+    const uKey = `ungrounded:${tag}:${cs.id}`;
+    const cachedU = cache[uKey] ?? cache[`ungrounded:${cs.id}`]; // legacy-key fallback for --replay
+    if (cachedU) {
+      ungrounded = cachedU;
     } else if (replay) {
       ungrounded = { result: "?", note: "no cached verdict — run live first" };
     } else {

@@ -8,7 +8,8 @@
  * Run:  npx tsx scripts/baseline-review.ts <diff-file>
  */
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
-import { makeClient, DEFAULT_MODEL } from "../src/checker.js";
+import Anthropic from "@anthropic-ai/sdk";
+import { loadDotenv, DEFAULT_MODEL } from "../src/llm.js";
 
 const PR_TITLE = "Fix stale stock count on product page";
 const PR_BODY =
@@ -24,7 +25,8 @@ const SYSTEM =
 
 async function main(): Promise<void> {
   const diff = readFileSync(process.argv[2], "utf8");
-  const client = makeClient();
+  loadDotenv("ANTHROPIC_API_KEY");
+  const client = new Anthropic();
   const response = await client.messages.create({
     model: DEFAULT_MODEL,
     max_tokens: 2000,
