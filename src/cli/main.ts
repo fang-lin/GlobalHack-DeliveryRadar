@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /** radar CLI — entry point. Dispatches to one-file-per-command (cli/commands/). */
-import { cmdExtract } from "./commands/extract.js";
-import { cmdCheck } from "./commands/check.js";
-import { cmdComment } from "./commands/comment.js";
-import { fail } from "./util.js";
+import { cmdExtract } from "./commands/extract.ts";
+import { cmdCheck } from "./commands/check.ts";
+import { cmdComment } from "./commands/comment.ts";
+import { fail } from "./util.ts";
 
 async function main(): Promise<number> {
   const [command, ...rest] = process.argv.slice(2);

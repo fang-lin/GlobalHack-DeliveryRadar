@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { checkConstraint } from "../../src/core/checker.js";
-import type { ModelClient } from "../../src/llm.js";
-import type { FileDiff } from "../../src/io/diff.js";
-import { makeConstraint } from "../fixtures/factories.js";
+import { checkConstraint } from "../../src/core/checker.ts";
+import type { ModelClient } from "../../src/llm.ts";
+import type { FileDiff } from "../../src/io/diff.ts";
+import { makeConstraint } from "../fixtures/factories.ts";
 
 const constraint = makeConstraint();
 

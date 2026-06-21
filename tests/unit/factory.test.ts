@@ -12,7 +12,7 @@ vi.mock("openai", () => ({
   },
 }));
 
-const { OpenAICompatAdapter, AnthropicAdapter, makeModelClient } = await import("../../src/llm.js");
+const { OpenAICompatAdapter, AnthropicAdapter, makeModelClient } = await import("../../src/llm.ts");
 
 beforeEach(() => {
   create.mockReset();

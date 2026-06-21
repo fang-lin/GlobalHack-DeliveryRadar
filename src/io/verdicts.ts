@@ -3,7 +3,7 @@
  * `core/checker.ts` has no filesystem dependency (ADR-0006 layering).
  */
 import { readFileSync, writeFileSync } from "node:fs";
-import { VerdictSchema, type Verdict } from "../core/models.js";
+import { VerdictSchema, type Verdict } from "../core/models.ts";
 
 export function saveVerdicts(verdicts: Verdict[], path: string): void {
   writeFileSync(path, JSON.stringify(verdicts, null, 2));

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { extractFromDir, extractFromText, adrSection } from "../../src/io/extract.js";
+import { extractFromDir, extractFromText, adrSection } from "../../src/io/extract.ts";
 
 const FIXTURES = join(dirname(fileURLToPath(import.meta.url)), "..", "fixtures");
 

@@ -7,7 +7,7 @@
  */
 import OpenAI from "openai";
 import * as z from "zod/v4";
-import { debug, type ModelClient } from "./port.js";
+import { debug, type ModelClient } from "./port.ts";
 
 export class OpenAICompatAdapter implements ModelClient {
   private client: OpenAI;

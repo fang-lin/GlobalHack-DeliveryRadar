@@ -11,7 +11,7 @@
  * stays advisory (rendered as a COMMENT review, never Request changes — NFR-GATE-1
  * for this slice where all constraints are semantic/advisory).
  */
-import type { Constraint, Verdict } from "./models.js";
+import type { Constraint, Verdict } from "./models.ts";
 
 const HEADER = "## 🛰️ Delivery Radar — Architecture Conformance";
 

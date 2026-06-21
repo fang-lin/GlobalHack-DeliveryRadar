@@ -13,9 +13,9 @@
  * All config + keys come from the environment (process.env) only — the CLI never
  * reads a .env file (platform-agnostic, ADR-0006-C2); never hard-coded.
  */
-import { DEFAULT_MODEL, debug, type ModelClient } from "./port.js";
-import { AnthropicAdapter } from "./anthropic-adapter.js";
-import { OpenAICompatAdapter } from "./openai-compat-adapter.js";
+import { DEFAULT_MODEL, debug, type ModelClient } from "./port.ts";
+import { AnthropicAdapter } from "./anthropic-adapter.ts";
+import { OpenAICompatAdapter } from "./openai-compat-adapter.ts";
 
 function jsonMode(env: NodeJS.ProcessEnv): "json_schema" | "json_object" {
   // json_object is the safe default (works on the widest set incl. DeepSeek);

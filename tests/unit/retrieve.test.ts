@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { loadDiff } from "../../src/io/diff.js";
-import { extractFromDir } from "../../src/io/extract.js";
-import { globToRegex, retrieve } from "../../src/core/retrieve.js";
+import { loadDiff } from "../../src/io/diff.ts";
+import { extractFromDir } from "../../src/io/extract.ts";
+import { globToRegex, retrieve } from "../../src/core/retrieve.ts";
 
 const FIXTURES = join(dirname(fileURLToPath(import.meta.url)), "..", "fixtures");
 

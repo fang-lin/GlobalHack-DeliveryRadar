@@ -1,13 +1,13 @@
 import { describe, it, expect } from "vitest";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { extractFromDir } from "../../src/io/extract.js";
-import { loadDiff } from "../../src/io/diff.js";
-import { retrieve } from "../../src/core/retrieve.js";
-import { checkConstraint } from "../../src/core/checker.js";
-import { reviewMarkdown } from "../../src/core/comment.js";
-import type { ModelClient } from "../../src/llm.js";
-import type { Verdict } from "../../src/core/models.js";
+import { extractFromDir } from "../../src/io/extract.ts";
+import { loadDiff } from "../../src/io/diff.ts";
+import { retrieve } from "../../src/core/retrieve.ts";
+import { checkConstraint } from "../../src/core/checker.ts";
+import { reviewMarkdown } from "../../src/core/comment.ts";
+import type { ModelClient } from "../../src/llm.ts";
+import type { Verdict } from "../../src/core/models.ts";
 
 const FIXTURES = join(dirname(fileURLToPath(import.meta.url)), "..", "fixtures");
 

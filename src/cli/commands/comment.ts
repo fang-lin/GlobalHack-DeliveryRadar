@@ -4,10 +4,10 @@
  * the caller (workflow / any adapter) publishes the body however it likes.
  */
 import { parseArgs } from "node:util";
-import { extractFromDir, adrSection } from "../../io/extract.js";
-import { loadVerdicts } from "../../io/verdicts.js";
-import { reviewMarkdown } from "../../core/comment.js";
-import { fail } from "../util.js";
+import { extractFromDir, adrSection } from "../../io/extract.ts";
+import { loadVerdicts } from "../../io/verdicts.ts";
+import { reviewMarkdown } from "../../core/comment.ts";
+import { fail } from "../util.ts";
 
 export async function cmdComment(argv: string[]): Promise<number> {
   const { values } = parseArgs({

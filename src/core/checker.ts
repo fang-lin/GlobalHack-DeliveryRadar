@@ -9,9 +9,9 @@
  * The LLM is reached through the `ModelClient` port (ADR-0007) — this module
  * imports no provider SDK (ADR-0007-C1 / ADR-0006).
  */
-import { SemanticCheckOutputSchema, type Constraint, type Verdict } from "./models.js";
-import type { FileDiff } from "../io/diff.js";
-import type { ModelClient } from "../llm.js";
+import { SemanticCheckOutputSchema, type Constraint, type Verdict } from "./models.ts";
+import type { FileDiff } from "../io/diff.ts";
+import type { ModelClient } from "../llm.ts";
 
 const SYSTEM = `You are the conformance checker of Delivery Radar, an \
 intent-implementation governance engine. You evaluate whether a pull-request \

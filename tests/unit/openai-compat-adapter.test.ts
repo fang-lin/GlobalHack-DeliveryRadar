@@ -13,7 +13,7 @@ vi.mock("openai", () => ({
   },
 }));
 
-const { OpenAICompatAdapter } = await import("../../src/llm.js");
+const { OpenAICompatAdapter } = await import("../../src/llm.ts");
 
 const schema = z.object({ result: z.string(), n: z.number() });
 const reply = (content: string | null) => ({ choices: [{ message: { content } }] });

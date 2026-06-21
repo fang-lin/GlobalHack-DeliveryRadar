@@ -18,12 +18,12 @@
  */
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import yaml from "js-yaml";
-import { extractFromDir, adrSection } from "../src/io/extract.js";
-import { loadDiff } from "../src/io/diff.js";
-import { retrieve } from "../src/core/retrieve.js";
-import { checkConstraint } from "../src/core/checker.js";
-import { makeModelClient, DEFAULT_MODEL, type ModelClient } from "../src/llm.js";
-import { SemanticCheckOutputSchema } from "../src/core/models.js";
+import { extractFromDir, adrSection } from "../src/io/extract.ts";
+import { loadDiff } from "../src/io/diff.ts";
+import { retrieve } from "../src/core/retrieve.ts";
+import { checkConstraint } from "../src/core/checker.ts";
+import { makeModelClient, DEFAULT_MODEL, type ModelClient } from "../src/llm.ts";
+import { SemanticCheckOutputSchema } from "../src/core/models.ts";
 
 const ADR_DIR = "eval/adr";
 const CASES = "eval/cases.yaml";

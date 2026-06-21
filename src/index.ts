@@ -7,12 +7,12 @@
  */
 
 // --- model layer (ADR-0007) ---
-export { makeModelClient, DEFAULT_MODEL, type ModelClient } from "./llm.js";
+export { makeModelClient, DEFAULT_MODEL, type ModelClient } from "./llm.ts";
 
 // --- core engine (pure) ---
-export { checkConstraint } from "./core/checker.js";
-export { retrieve } from "./core/retrieve.js";
-export { reviewMarkdown } from "./core/comment.js";
+export { checkConstraint } from "./core/checker.ts";
+export { retrieve } from "./core/retrieve.ts";
+export { reviewMarkdown } from "./core/comment.ts";
 
 // --- domain contracts ---
 export {
@@ -24,9 +24,9 @@ export {
   type Verdict,
   type Evidence,
   type SemanticCheckOutput,
-} from "./core/models.js";
+} from "./core/models.ts";
 
 // --- I/O helpers (read inputs at the edge) ---
-export { extractFromDir, extractFromText, adrSection } from "./io/extract.js";
-export { loadDiff, parseUnifiedDiff, type FileDiff } from "./io/diff.js";
-export { saveVerdicts, loadVerdicts } from "./io/verdicts.js";
+export { extractFromDir, extractFromText, adrSection } from "./io/extract.ts";
+export { loadDiff, parseUnifiedDiff, type FileDiff } from "./io/diff.ts";
+export { saveVerdicts, loadVerdicts } from "./io/verdicts.ts";

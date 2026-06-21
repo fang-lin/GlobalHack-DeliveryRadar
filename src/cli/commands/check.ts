@@ -1,12 +1,12 @@
 /** `radar check` — evaluate a diff against in-scope ADR constraints via the LLM. */
 import { parseArgs } from "node:util";
-import { extractFromDir, adrSection } from "../../io/extract.js";
-import { loadDiff } from "../../io/diff.js";
-import { retrieve } from "../../core/retrieve.js";
-import { checkConstraint } from "../../core/checker.js";
-import { saveVerdicts, loadVerdicts } from "../../io/verdicts.js";
-import { makeModelClient, debug } from "../../llm.js";
-import { fail } from "../util.js";
+import { extractFromDir, adrSection } from "../../io/extract.ts";
+import { loadDiff } from "../../io/diff.ts";
+import { retrieve } from "../../core/retrieve.ts";
+import { checkConstraint } from "../../core/checker.ts";
+import { saveVerdicts, loadVerdicts } from "../../io/verdicts.ts";
+import { makeModelClient, debug } from "../../llm.ts";
+import { fail } from "../util.ts";
 
 export async function cmdCheck(argv: string[]): Promise<number> {
   const { values } = parseArgs({

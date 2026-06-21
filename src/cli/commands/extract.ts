@@ -1,6 +1,6 @@
 /** `radar extract` — parse ADR constraint blocks and list them. */
 import { parseArgs } from "node:util";
-import { extractFromDir, dumpConstraints } from "../../io/extract.js";
+import { extractFromDir, dumpConstraints } from "../../io/extract.ts";
 
 export async function cmdExtract(argv: string[]): Promise<number> {
   const { values } = parseArgs({

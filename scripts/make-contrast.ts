@@ -9,9 +9,9 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { homedir } from "node:os";
-import { loadVerdicts } from "../src/io/verdicts.js";
-import { extractFromDir, adrSection } from "../src/io/extract.js";
-import { reviewMarkdown } from "../src/core/comment.js";
+import { loadVerdicts } from "../src/io/verdicts.ts";
+import { extractFromDir, adrSection } from "../src/io/extract.ts";
+import { reviewMarkdown } from "../src/core/comment.ts";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const ADR_DIR = join(homedir(), "Projects", "shop-demo", "docs", "adr");

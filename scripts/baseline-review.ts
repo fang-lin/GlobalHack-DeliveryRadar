@@ -9,7 +9,7 @@
  */
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import Anthropic from "@anthropic-ai/sdk";
-import { DEFAULT_MODEL } from "../src/llm.js";
+import { DEFAULT_MODEL } from "../src/llm.ts";
 
 const PR_TITLE = "Fix stale stock count on product page";
 const PR_BODY =
