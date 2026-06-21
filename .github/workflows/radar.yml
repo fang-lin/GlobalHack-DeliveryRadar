@@ -73,10 +73,12 @@ jobs:
           echo "review_id=$RID" >> "$GITHUB_OUTPUT"
           echo "posted started review #$RID"
 
-      # Always use MAIN's ADRs + radar (the recorded baseline intent), regardless of trigger.
+      # Check out the PR's code — the radar engine + this workflow must run from the
+      # SAME ref (the restructured src/cli/main.ts lives here, not yet on main). The
+      # ADR baseline still comes from main (FR-INT-6), fetched separately below.
       - uses: actions/checkout@v6
         with:
-          ref: main
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v6
 
@@ -88,6 +90,14 @@ jobs:
       - name: Install (frozen lockfile)
         run: pnpm install --frozen-lockfile
 
+      # MAIN's ADRs are the recorded-intent baseline (FR-INT-6): a PR is judged
+      # against intent already on main, not intent it adds to itself.
+      - name: Fetch main's ADRs (baseline)
+        run: |
+          git fetch --no-tags origin main
+          rm -rf .radar-baseline && mkdir -p .radar-baseline
+          git archive FETCH_HEAD docs/adr | tar -x -C .radar-baseline
+
       # Run the CLI straight from TypeScript with tsx — no build step / no dist path
       # to maintain (the CLI is platform-agnostic; this is just the driving edge).
       - name: Fetch the PR diff
@@ -96,7 +106,7 @@ jobs:
         run: gh pr diff ${{ steps.pr.outputs.num }} --repo ${{ github.repository }} > pr.diff
 
       - name: Extract constraints (deterministic, free)
-        run: pnpm exec tsx src/cli/main.ts extract --adr-dir docs/adr
+        run: pnpm exec tsx src/cli/main.ts extract --adr-dir .radar-baseline/docs/adr
 
       - name: "Radar check — does the diff still match the ADRs? (LLM, advisory)"
         env:
@@ -107,7 +117,7 @@ jobs:
           RADAR_MODEL: deepseek/deepseek-v4-pro
           RADAR_JSON_MODE: json_schema
           AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
-        run: pnpm exec tsx src/cli/main.ts check --adr-dir docs/adr --diff pr.diff --save verdicts.json
+        run: pnpm exec tsx src/cli/main.ts check --adr-dir .radar-baseline/docs/adr --diff pr.diff --save verdicts.json
 
       # Success: render the verdict with the CLI (pure — stdout only), then the
       # workflow edits the SAME 'started' review in place via gh api. All platform
@@ -119,7 +129,7 @@ jobs:
           REPO: ${{ github.repository }}
           RID: ${{ steps.start.outputs.review_id }}
         run: |
-          BODY=$(pnpm exec tsx src/cli/main.ts comment --adr-dir docs/adr --verdicts verdicts.json --all)
+          BODY=$(pnpm exec tsx src/cli/main.ts comment --adr-dir .radar-baseline/docs/adr --verdicts verdicts.json --all)
           gh api -X PUT "repos/${REPO}/pulls/${PR}/reviews/${RID}" -f body="$BODY"
 
       # Failure/cancel: resolve the same review so it never stays stuck at "running".
