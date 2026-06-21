@@ -8,8 +8,12 @@
 
 # Environment / secrets
 .env
+.envrc
 .env.*
 !.env.example
+
+# Claude Code local notes (personal — not committed)
+CLAUDE.local.md
 
 # Python (future runtime candidate)
 __pycache__/

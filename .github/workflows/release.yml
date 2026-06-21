@@ -37,9 +37,14 @@ jobs:
       - name: Install (frozen lockfile)
         run: pnpm install --frozen-lockfile
 
+      # ADR-0008-C2: hand-written exports/types must pass publint + attw before publish.
+      - name: Package check (publint + attw)
+        run: pnpm pack:check
+
       - name: semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: pnpm exec semantic-release
 
   # Publish the showcase SPA to GitHub Pages from this repo (no separate -pages repo, no secret).

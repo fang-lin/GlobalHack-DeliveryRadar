@@ -320,7 +320,7 @@ fix_locality: structural        # local | structural | none  (drives review proj
 - `FR-INT-3` 按仓库引擎以计划任务（cron）外加 ADR 变更钩子的形式运行。
 - `FR-INT-4` `[Phase 2]` issue 跟踪器（GitHub Issues 或 Linear）作为整改 issue 和行为类 Decision Note 的可配置目的地。
 - `FR-INT-5` 确定性检查 SHOULD 集成现有引擎（如 semgrep），而非重新实现匹配。
-- `FR-INT-6` `radar check` 在 CI 中的运行由**用户发起**，以控制 LLM 成本（`NFR-COST-1`）；触发方式有三种、都在 PR 现场或 Actions 里：**PR 评论命令 `/radar`**、给 PR 打 **`radar` 标签**、或 **`workflow_dispatch`**（Actions 的 "Run workflow" 按钮 + PR 号）。评论触发 SHOULD 校验评论者具备写权限。无论触发方式如何，保持 **advisory**——经 Reviews API 以 `COMMENT` 事件发布，绝不阻塞 merge。首个落地形态：对本仓库自身的 PR 做检查（dogfood，见 `ST-0013` / `ST-0008`）。
+- `FR-INT-6` `radar check` 在 CI 中**默认对每个 PR 自动运行**（PR 打开 / 更新时）；成本由**作用域优先检索**（`NFR-RETRIEVAL-1`，只对命中的约束调 LLM）+ **可配置的低成本 provider**（ADR-0007，如 DeepSeek）+ advisory 不阻塞 来控制，而非靠手动门控（`NFR-COST-1`，2026-06-21 修订；此前为用户发起）。仍可**手动重跑**：**PR 评论命令 `/radar`**（SHOULD 校验评论者写权限）或 **`workflow_dispatch`**（Actions 的 "Run workflow" 按钮 + PR 号）。无论触发方式如何，保持 **advisory**——经 Reviews API 以 `COMMENT` 事件发布，绝不阻塞 merge。首个落地形态：对本仓库自身的 PR 做检查（dogfood，见 `ST-0013` / `ST-0008`）。
 - `FR-INT-7` **进度可见（sticky 进度评审）。** 一次 `radar check` 被触发后（`FR-INT-6`），系统 SHOULD **立即**在该 PR 上发布一条可见的 advisory 评审（Reviews API，`COMMENT` 事件），内容为"检查已开始"占位 + 指向本次运行实时日志的链接；运行结束后**就地编辑同一条评审**为最终裁定投影（`FR-CONF-7`），若运行失败则就地编辑为失败说明 + 日志链接。目的：PR 上始终反映检查的当前状态（开始 / 完成 / 失败），绝不残留"正在运行"的僵尸状态；一次运行只占用一条评审，跨多次运行各自新建（每次检查是一条可审计记录，`NFR-EVAL-1`）。状态始终为 `COMMENT`（不阻断，`FR-CONF-9`）。
 
 ---
@@ -332,7 +332,7 @@ fix_locality: structural        # local | structural | none  (drives review proj
 - `NFR-RETRIEVAL-1` 作用域优先的检索（见 §6.2）。过度检索是缺陷。
 - `NFR-EVAL-1` **可度量性。** 持久化每个裁定及其人类信号。提供历史回放评测台（`§14`），使任何约束在被提升为 `gate` 之前都能在历史 PR 上度量 precision/recall。
 - `NFR-PERF-1` 按 diff 引擎 MUST 在典型 CI 时间预算内完成；通过作用域限定（`NFR-RETRIEVAL-1`）控制 LLM 调用量并优先批处理。
-- `NFR-COST-1` **LLM 成本可门控。** 任何在 CI 中触发 `radar check`（每次调用都产生 API 成本）的集成 MUST 支持门控（默认手动触发 / 标签），不得对每个 PR 无条件消耗 API。
+- `NFR-COST-1` **LLM 成本受控。** `radar check` 在 CI 中的成本通过三重设计压低：**作用域优先检索**（`NFR-RETRIEVAL-1`，只对命中的约束调 LLM）、**可配置的低成本 provider/model**（ADR-0007，如 DeepSeek）、以及 advisory 不阻塞。在此前提下**默认对每个 PR 自动运行**可接受（2026-06-21 修订：此前要求默认手动门控）。门控仍然可用（换 provider / 改回手动触发），但不再是默认。
 - `NFR-SEC-1` 最小权限令牌。系统只读取代码、只写评审评论/草稿 PR/草稿 issue。它 MUST NOT 修改访问控制、分支保护或仓库设置。
 - `NFR-PORT-1` **核心与平台解耦。** radar 核心(`src/`)是平台无关的:只读输入(ADR、diff、verdicts)、把输出(约束、裁定、渲染好的 markdown)写到 stdout/文件;它 MUST NOT 调用 git / GitHub / `gh` 或任何宿主 / VCS / CI API。所有平台 I/O(取 diff、发/改 review、打标签、status)属于**集成层**(workflow 或适配器),由其驱动核心并发布产物。见 `ADR-0006`。
 - `NFR-EXPLAIN-1` 每个 `violated` 裁定 MUST 携带证据（ADR 条款 ↔ 代码 hunk）和简短解释。不允许无解释的阻断。

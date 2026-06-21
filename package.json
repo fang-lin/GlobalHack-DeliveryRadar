@@ -5,30 +5,48 @@
   "type": "module",
   "packageManager": "pnpm@9.15.9",
   "bin": {
-    "radar": "./dist/cli.js"
+    "radar": "./dist/cli/main.js"
   },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
   "scripts": {
     "build": "tsc",
-    "radar": "tsx src/cli.ts",
+    "radar": "tsx src/cli/main.ts",
     "eval": "tsx scripts/eval.ts",
     "test": "vitest run",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "pack:check": "pnpm build && publint && attw --pack . --ignore-rules cjs-resolves-to-esm",
+    "prepublishOnly": "pnpm build"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",
     "js-yaml": "^4.1.0",
+    "openai": "^6.44.0",
     "zod": "^3.25.0"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.3",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.0.0",
     "eslint": "^9.39.4",
     "globals": "^17.6.0",
+    "publint": "^0.3.21",
     "semantic-release": "^25.0.5",
     "tsx": "^4.19.0",
-    "typescript": "^5.6.0",
+    "typescript": "^5.9.3",
     "typescript-eslint": "^8.61.1",
     "vitest": "^2.1.0"
   }

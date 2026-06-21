@@ -217,7 +217,7 @@ and evidence
 
 ```bash
 pnpm install && pnpm build        # TypeScript → dist/; `radar` bin = dist/cli.js
-echo "ANTHROPIC_API_KEY=sk-ant-..." > .env   # gitignored
+echo "ANTHROPIC_API_KEY=sk-ant-..." > .envrc   # gitignored
 
 # extract constraints from a repo's ADRs
 radar extract --adr-dir ../GlobalHack-shop-demo/docs/adr

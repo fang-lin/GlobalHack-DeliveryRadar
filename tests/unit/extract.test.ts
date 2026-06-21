@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { extractFromDir, extractFromText, adrSection } from "../src/extract.js";
+import { extractFromDir, extractFromText, adrSection } from "../../src/io/extract.ts";
 
-const FIXTURES = join(dirname(fileURLToPath(import.meta.url)), "fixtures");
+const FIXTURES = join(dirname(fileURLToPath(import.meta.url)), "..", "fixtures");
 
 describe("extraction core (FR-EXT-1, FR-EXT-3)", () => {
   it("extracts a constraint from the fixture ADR", () => {

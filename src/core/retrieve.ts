@@ -6,8 +6,8 @@
  * defect; path matching is primary, semantic similarity would only ever be a
  * secondary signal (not implemented in this slice).
  */
-import type { Constraint } from "./models.js";
-import type { FileDiff } from "./diff.js";
+import type { Constraint } from "./models.ts";
+import type { FileDiff } from "../io/diff.ts";
 
 /**
  * Translate a path glob with ** support into a RegExp.

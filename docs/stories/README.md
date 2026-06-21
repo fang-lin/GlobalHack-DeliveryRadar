@@ -33,3 +33,4 @@ Work-unit records for Delivery Radar's **own** development — we dogfood our ow
 | ST-0021 | Sticky progress review — post "started", then edit it into the verdict | In progress | FR-INT-7 |
 | ST-0022 | Review & restructure the radar CLI architecture (layered core / ports & adapters) | In progress | ADR-0006 |
 | ST-0023 | Footer on mobile — robust fix (visible + clean second-line wrap; recurring ST-0014) | In progress | ADR-0001 |
+| ST-0024 | Strengthen the radar test suite — co-locate units, fill coverage gaps, real integration tests | Todo · backlog | ADR-0007 |

@@ -1,10 +1,12 @@
 # Dogfood: run the radar on a PR against recorded intent. Advisory only — posts a
-# review COMMENT, never blocks. Cost-gated: it runs only when YOU trigger it
-# (FR-INT-6 / NFR-COST-1), one of three user-initiated ways:
+# review COMMENT, never blocks. Runs AUTOMATICALLY on every PR (opened / updated);
+# cost is controlled by scope-first retrieval (only in-scope constraints call the
+# LLM) + a low-cost provider (DeepSeek) + advisory non-blocking, not by manual
+# gating (FR-INT-6 / NFR-COST-1, revised 2026-06-21). Can also be re-run manually:
 #   • comment "/radar" on the PR (ChatOps; commenter must have write access)
-#   • add the "radar" label to the PR
 #   • Actions → Run workflow (workflow_dispatch) with a PR number
-# Always checks the PR diff against MAIN's ADRs. Needs the ANTHROPIC_API_KEY secret.
+# Always checks the PR diff against MAIN's ADRs. Needs the AI_GATEWAY_API_KEY secret
+# (Vercel AI Gateway → DeepSeek V4 Pro).
 # Sticky progress (FR-INT-7): posts a "started" review immediately, then edits THAT
 # SAME review in place with the verdict — or a failure note if the run dies early.
 name: "Radar — conformance check"
@@ -12,6 +14,8 @@ name: "Radar — conformance check"
 run-name: "Does PR #${{ inputs.pr || github.event.issue.number || github.event.pull_request.number }} still match what we decided?"
 
 on:
+  pull_request:
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
     inputs:
       pr:
@@ -20,8 +24,6 @@ on:
         type: number
   issue_comment:
     types: [created]
-  pull_request:
-    types: [labeled]
 
 permissions:
   contents: read
@@ -34,15 +36,15 @@ concurrency:
 jobs:
   radar:
     name: radar check — advisory, never blocks
-    # Only on an explicit, authorised trigger: the manual button, a "/radar" PR
-    # comment from a write-access user, or the "radar" label being added.
+    # Auto on every PR (opened / updated); also re-runnable manually via the Actions
+    # button or a "/radar" comment from a write-access user.
     if: >-
+      github.event_name == 'pull_request' ||
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'issue_comment' &&
         github.event.issue.pull_request != null &&
         startsWith(github.event.comment.body, '/radar') &&
-        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)) ||
-      (github.event_name == 'pull_request' && github.event.label.name == 'radar')
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association))
     runs-on: ubuntu-latest
     steps:
       - name: Resolve the PR number from whichever event fired
@@ -57,7 +59,7 @@ jobs:
       # Sticky progress (FR-INT-7): post a "started" review NOW — before the ~1-min
       # build — so the PR immediately shows the check is running. Capture its id; the
       # finalize step edits this same review in place. Inline gh api (not the CLI),
-      # because dist/ isn't built yet at this point.
+      # which isn't available until after checkout + install.
       - name: Post the 'started' review (sticky placeholder)
         id: start
         env:
@@ -71,10 +73,12 @@ jobs:
           echo "review_id=$RID" >> "$GITHUB_OUTPUT"
           echo "posted started review #$RID"
 
-      # Always use MAIN's ADRs + radar (the recorded baseline intent), regardless of trigger.
+      # Check out the PR's code — the radar engine + this workflow must run from the
+      # SAME ref (the restructured src/cli/main.ts lives here, not yet on main). The
+      # ADR baseline still comes from main (FR-INT-6), fetched separately below.
       - uses: actions/checkout@v6
         with:
-          ref: main
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v6
 
@@ -86,21 +90,34 @@ jobs:
       - name: Install (frozen lockfile)
         run: pnpm install --frozen-lockfile
 
-      - name: Build radar
-        run: pnpm build
+      # MAIN's ADRs are the recorded-intent baseline (FR-INT-6): a PR is judged
+      # against intent already on main, not intent it adds to itself.
+      - name: Fetch main's ADRs (baseline)
+        run: |
+          git fetch --no-tags origin main
+          rm -rf .radar-baseline && mkdir -p .radar-baseline
+          git archive FETCH_HEAD docs/adr | tar -x -C .radar-baseline
 
+      # Run the CLI straight from TypeScript with tsx — no build step / no dist path
+      # to maintain (the CLI is platform-agnostic; this is just the driving edge).
       - name: Fetch the PR diff
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh pr diff ${{ steps.pr.outputs.num }} --repo ${{ github.repository }} > pr.diff
 
       - name: Extract constraints (deterministic, free)
-        run: node dist/cli.js extract --adr-dir docs/adr
+        run: pnpm exec tsx src/cli/main.ts extract --adr-dir .radar-baseline/docs/adr
 
       - name: "Radar check — does the diff still match the ADRs? (LLM, advisory)"
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: node dist/cli.js check --adr-dir docs/adr --diff pr.diff --save verdicts.json
+          # DeepSeek V4 Pro via Vercel AI Gateway (ADR-0007 pluggable model layer).
+          # V4 Pro rejects response_format json_object, so use json_schema (verified
+          # live). Provider/model/mode are plain config; only the key is a secret.
+          RADAR_PROVIDER: vercel
+          RADAR_MODEL: deepseek/deepseek-v4-pro
+          RADAR_JSON_MODE: json_schema
+          AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
+        run: pnpm exec tsx src/cli/main.ts check --adr-dir .radar-baseline/docs/adr --diff pr.diff --save verdicts.json
 
       # Success: render the verdict with the CLI (pure — stdout only), then the
       # workflow edits the SAME 'started' review in place via gh api. All platform
@@ -112,11 +129,11 @@ jobs:
           REPO: ${{ github.repository }}
           RID: ${{ steps.start.outputs.review_id }}
         run: |
-          BODY=$(node dist/cli.js comment --adr-dir docs/adr --verdicts verdicts.json --all)
+          BODY=$(pnpm exec tsx src/cli/main.ts comment --adr-dir .radar-baseline/docs/adr --verdicts verdicts.json --all)
           gh api -X PUT "repos/${REPO}/pulls/${PR}/reviews/${RID}" -f body="$BODY"
 
       # Failure/cancel: resolve the same review so it never stays stuck at "running".
-      # Inline gh api — the CLI may not be built if we failed at install/build/check.
+      # Inline gh api — the CLI may not have run if we failed at install/check.
       - name: On failure, resolve the sticky review
         if: (failure() || cancelled()) && steps.start.outputs.review_id != ''
         env:

@@ -8,7 +8,7 @@
 import { readFileSync, writeFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import yaml from "js-yaml";
-import { validateConstraint, type Constraint } from "./models.js";
+import { validateConstraint, type Constraint } from "../core/models.ts";
 
 const FENCE_RE = /^```constraints\s*$(.*?)^```\s*$/gms;
 const SECTION_RE = /^##\s+(.+?)\s*$/gm;

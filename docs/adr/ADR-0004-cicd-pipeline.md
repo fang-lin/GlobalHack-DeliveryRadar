@@ -1,6 +1,6 @@
 # ADR-0004: CI/CD via GitHub Actions — deploy Pages from the main repo, semantic-release (GitHub-only)
 
-- **Status:** Accepted
+- **Status:** Accepted (constraint **C3 superseded by [ADR-0008](ADR-0008-library-distribution.md)** on 2026-06-21 — the radar is now distributed as an npm package)
 - **Date:** 2026-06-17
 - **Deciders:** Lin Fang
 - **Related:** ST-0015 (the pipeline work); supersedes the manual deploy recipe in [ST-0001]/the deploy memory.
@@ -125,6 +125,6 @@ We dogfood this ADR: `radar extract` reads the block below; `radar check` evalua
         - "a publish step to the npm registry"
   enforce: advisory
   severity: low
-  status: active
-  superseded_by: null
+  status: superseded
+  superseded_by: ADR-0008
 ```
