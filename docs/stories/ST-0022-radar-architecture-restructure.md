@@ -58,7 +58,7 @@ What's already healthy (don't disturb): one shared contract (`models.ts`, not fo
 
 ## 3. Candidate adjustments (TO DISCUSS — not decided)
 
-- **A — Extract a model port + adapter** (e.g. `llm.ts`): the core depends on a small `complete(system, user, schema) → parsed` port; an Anthropic adapter implements it. Fixes **seam 1** and answers "adapt different LLM API schemas". *(Recommended; small.)*
+- **A — Extract a model port + adapter** (`llm.ts`): the core depends on a small `complete({system, user, schema}) → validated` port; native Anthropic + universal OpenAI-compatible adapters implement it. Fixes **seam 1** and adds multi-provider/gateway support. **✅ DONE** — see ADR-0007 + the design spec/plan; the model port also addresses most of seam 2 (config/.env moved out of `checker.ts`).
 - **B — Push fs I/O to the edge** (CLI reads files / passes strings; core stays pure transforms). Fixes **seam 3** — bigger, likely *defer*.
 - **C — Split `checker.ts`** into config / adapter (folds into A) / check-orchestration / persistence. Fixes **seam 2** — medium.
 - **D — Folder layering** (`src/core`, `src/adapters`) to make the split visible. Fixes **seam 4** — optional / cosmetic.
@@ -66,10 +66,10 @@ What's already healthy (don't disturb): one shared contract (`models.ts`, not fo
 ## Acceptance criteria
 
 - [x] All `src/` modules surveyed; current design documented (this story).
-- [ ] Maintainer reviews the current design.
-- [ ] Target layering + now/defer adjustments agreed with the maintainer.
-- [ ] ADR-0006 finalized to match (un-parked).
-- [ ] Agreed adjustments implemented; lint + typecheck + build + tests green.
+- [x] Maintainer reviewed the current design (brainstormed + approved 2026-06-21).
+- [x] Target layering + now/defer adjustments agreed (hybrid: do **A** now; **B/C/D** deferred).
+- [x] ADR-0006 un-parked — realized concretely by **ADR-0007** (the model layer).
+- [x] **Adjustment A (model layer) implemented**; lint + typecheck + build + tests green (18 tests). B/C/D remain deferred (separate future passes).
 
 ## Verification / QA
 
