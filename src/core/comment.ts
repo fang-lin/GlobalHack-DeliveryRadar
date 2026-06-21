@@ -89,6 +89,7 @@ export function reviewMarkdown(
     const bv = b.result !== "violated" ? 1 : 0;
     return av - bv || b.confidence - a.confidence;
   });
+  let rendered = 0;
   for (const v of ordered) {
     const constraint = byId.get(v.constraint_id);
     if (!constraint) continue;
@@ -96,6 +97,16 @@ export function reviewMarkdown(
       verdictMarkdown(v, constraint, driverContexts[constraint.adr] ?? ""),
       "",
       "---",
+      "",
+    );
+    rendered++;
+  }
+  if (rendered === 0) {
+    // No verdicts to show — make "nothing flagged" explicit, rather than leaving a
+    // bare header that reads like the check failed (FR-CONF-7 / NFR-EXPLAIN-1).
+    blocks.push(
+      "✅ **Nothing flagged** — the changed files raise no architecture-conformance " +
+        "issues against the recorded intent.",
       "",
     );
   }
