@@ -9,7 +9,7 @@ import {
 import { loadDiff } from "./diff.js";
 import { retrieve } from "./retrieve.js";
 import { checkConstraint, saveVerdicts, loadVerdicts } from "./checker.js";
-import { AnthropicAdapter, DEFAULT_MODEL } from "./llm.js";
+import { makeModelClient } from "./llm.js";
 import { reviewMarkdown } from "./comment.js";
 
 function fail(msg: string): never {
@@ -37,7 +37,7 @@ async function cmdCheck(argv: string[]): Promise<number> {
     options: {
       "adr-dir": { type: "string", default: "docs/adr" },
       diff: { type: "string" },
-      model: { type: "string", default: DEFAULT_MODEL },
+      model: { type: "string" }, // overrides RADAR_MODEL; provider via RADAR_PROVIDER (env)
       save: { type: "string" },
       replay: { type: "string" },
     },
@@ -56,7 +56,8 @@ async function cmdCheck(argv: string[]): Promise<number> {
   if (values.replay) {
     verdicts = loadVerdicts(values.replay);
   } else {
-    const client = new AnthropicAdapter({ model: values.model });
+    if (values.model) process.env.RADAR_MODEL = values.model;
+    const client = makeModelClient();
     verdicts = [];
     for (const [constraint, diffs] of inScope) {
       const context = adrSection(adrDir, constraint.adr, "Context");
