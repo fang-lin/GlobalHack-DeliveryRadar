@@ -1,3 +1,23 @@
+# [1.2.0](https://github.com/fang-lin/GlobalHack-DeliveryRadar/compare/v1.1.0...v1.2.0) (2026-06-21)
+
+
+### Bug Fixes
+
+* **ci:** radar.yml runs the CLI via tsx (no build); gate npm publish off until ready ([db4587c](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/db4587c1d015c1f86fc00c3768690679290c6c64))
+* **ci:** radar.yml runs the PR's radar engine, ADR baseline from main ([3e12231](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/3e1223143b4f14edbdffabf999fb79420bcec385))
+* **radar:** coherent env config + self-review fixes (ST-0022, ADR-0007) ([8ee4b5e](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/8ee4b5e2f9533bfd6b6c24f576b0b325bfe76043))
+* **web:** footer visible + clean on mobile — robust fix (ST-0023, recurring ST-0014) ([d33d12e](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/d33d12ed6071ec75a9a61c771614e2f0131a769c)), closes [#site-footer](https://github.com/fang-lin/GlobalHack-DeliveryRadar/issues/site-footer)
+
+
+### Features
+
+* **eval:** select provider/model so the Backstage benchmark runs across providers (ST-0022, ADR-0007) ([6259727](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/62597270ce89f23f2decde2113496554755adf45))
+* **radar:** cli check builds the model client from env at the edge (ST-0022, ADR-0007) ([569221a](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/569221a7f5e4d44051f3473fb725149278b9e812))
+* **radar:** distribute as an npm package — CLI now, library API experimental (ADR-0008) ([7628d41](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/7628d41c495e91a1235e2d94c6d2bdd9fdbe1453))
+* **radar:** makeModelClient(env) factory — provider/gateway presets + escape hatch (ST-0022, ADR-0007) ([e9693bf](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/e9693bf7f5a0b174f16a48be1e2a11ff6f9f5ef3))
+* **radar:** OpenAICompatAdapter — json_object/json_schema + zod-validate + retry (ST-0022, ADR-0007) ([c939b45](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/c939b45fa91df445e3d90415601666e0fff1ae72))
+* **web:** id Dashboard + Evidence surfaces — complete the showcase id pass (ST-0020, ADR-0005-C1) ([5eb0e34](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/5eb0e34494a5019216fbb3136e51e0d2d53a6e3e))
+
 # [1.1.0](https://github.com/fang-lin/GlobalHack-DeliveryRadar/compare/v1.0.0...v1.1.0) (2026-06-19)
 
 
