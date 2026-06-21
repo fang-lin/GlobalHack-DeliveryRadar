@@ -10,7 +10,7 @@ vi.mock("openai", () => ({
   },
 }));
 
-const { OpenAICompatAdapter } = await import("../src/llm.js");
+const { OpenAICompatAdapter, AnthropicAdapter, makeModelClient } = await import("../src/llm.js");
 
 const schema = z.object({ result: z.string(), n: z.number() });
 const reply = (content: string | null) => ({ choices: [{ message: { content } }] });
@@ -52,5 +52,35 @@ describe("OpenAICompatAdapter (ADR-0007)", () => {
     const out = await a.complete({ system: "s", user: "u", schema });
     expect(out).toEqual({ result: "aligned", n: 7 });
     expect(create.mock.calls[0][0].response_format.type).toBe("json_schema");
+  });
+});
+
+describe("makeModelClient factory (ADR-0007)", () => {
+  // AnthropicAdapter constructs `new Anthropic()`, which needs a key present in env
+  // (not validated here); openai-backed presets use the mocked OpenAI above.
+  beforeEach(() => {
+    process.env.ANTHROPIC_API_KEY ??= "test-key";
+  });
+
+  it("defaults to the Anthropic native adapter", () => {
+    expect(makeModelClient({})).toBeInstanceOf(AnthropicAdapter);
+  });
+  it("builds an OpenAI-compat adapter for the openrouter preset", () => {
+    const c = makeModelClient({
+      RADAR_PROVIDER: "openrouter",
+      OPENROUTER_API_KEY: "k",
+      RADAR_MODEL: "anthropic/claude-sonnet-4-6",
+    });
+    expect(c).toBeInstanceOf(OpenAICompatAdapter);
+  });
+  it("a gateway preset requires its key and a model", () => {
+    expect(() => makeModelClient({ RADAR_PROVIDER: "openrouter", RADAR_MODEL: "m" })).toThrow(/OPENROUTER_API_KEY/);
+    expect(() => makeModelClient({ RADAR_PROVIDER: "openrouter", OPENROUTER_API_KEY: "k" })).toThrow(/RADAR_MODEL/);
+  });
+  it("the openai-compat escape hatch requires RADAR_BASE_URL", () => {
+    expect(() => makeModelClient({ RADAR_PROVIDER: "openai-compat", RADAR_MODEL: "m" })).toThrow(/RADAR_BASE_URL/);
+  });
+  it("rejects an unknown provider", () => {
+    expect(() => makeModelClient({ RADAR_PROVIDER: "nope" })).toThrow(/unknown RADAR_PROVIDER/);
   });
 });

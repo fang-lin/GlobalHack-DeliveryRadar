@@ -153,3 +153,63 @@ export class OpenAICompatAdapter implements ModelClient {
     );
   }
 }
+
+function jsonMode(env: NodeJS.ProcessEnv): "json_schema" | "json_object" {
+  // json_object is the safe default (works on the widest set incl. DeepSeek);
+  // opt into json_schema per the target's support via RADAR_JSON_MODE.
+  return env.RADAR_JSON_MODE === "json_schema" ? "json_schema" : "json_object";
+}
+
+/**
+ * Build the ModelClient from config at the edge (ADR-0006/0007). Presets:
+ *   RADAR_PROVIDER = anthropic (default) | openrouter | vercel | openai-compat
+ * with RADAR_MODEL, RADAR_BASE_URL, RADAR_JSON_MODE and per-provider key env vars.
+ * Any other OpenAI-compatible gateway works via the `openai-compat` + RADAR_BASE_URL
+ * escape hatch. Keys come from env (.env supported); never hard-coded.
+ */
+export function makeModelClient(env: NodeJS.ProcessEnv = process.env): ModelClient {
+  const provider = env.RADAR_PROVIDER ?? "anthropic";
+  const model = env.RADAR_MODEL;
+  switch (provider) {
+    case "anthropic":
+      return new AnthropicAdapter({ model: model ?? DEFAULT_MODEL });
+    case "openrouter": {
+      loadDotenv("OPENROUTER_API_KEY");
+      if (!env.OPENROUTER_API_KEY) throw new Error("RADAR_PROVIDER=openrouter requires OPENROUTER_API_KEY");
+      if (!model) throw new Error("RADAR_PROVIDER=openrouter requires RADAR_MODEL (e.g. anthropic/claude-sonnet-4-6)");
+      return new OpenAICompatAdapter({
+        baseURL: "https://openrouter.ai/api/v1",
+        apiKey: env.OPENROUTER_API_KEY,
+        model,
+        headers: { "HTTP-Referer": "https://github.com/fang-lin/GlobalHack-DeliveryRadar", "X-Title": "Delivery Radar" },
+        mode: jsonMode(env),
+      });
+    }
+    case "vercel": {
+      loadDotenv("AI_GATEWAY_API_KEY");
+      if (!env.AI_GATEWAY_API_KEY) throw new Error("RADAR_PROVIDER=vercel requires AI_GATEWAY_API_KEY");
+      if (!model) throw new Error("RADAR_PROVIDER=vercel requires RADAR_MODEL (e.g. anthropic/claude-opus-4.7)");
+      return new OpenAICompatAdapter({
+        baseURL: "https://ai-gateway.vercel.sh/v1",
+        apiKey: env.AI_GATEWAY_API_KEY,
+        model,
+        mode: jsonMode(env),
+      });
+    }
+    case "openai-compat": {
+      loadDotenv("RADAR_API_KEY");
+      if (!env.RADAR_BASE_URL) throw new Error("RADAR_PROVIDER=openai-compat requires RADAR_BASE_URL");
+      if (!model) throw new Error("RADAR_PROVIDER=openai-compat requires RADAR_MODEL");
+      return new OpenAICompatAdapter({
+        baseURL: env.RADAR_BASE_URL,
+        apiKey: env.RADAR_API_KEY,
+        model,
+        mode: jsonMode(env),
+      });
+    }
+    default:
+      throw new Error(
+        `unknown RADAR_PROVIDER '${provider}' (expected: anthropic | openrouter | vercel | openai-compat)`,
+      );
+  }
+}
