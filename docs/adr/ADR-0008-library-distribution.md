@@ -44,7 +44,7 @@ The decision was stress-tested by four independent agent perspectives:
 4. **package.json:** `"exports"` `"."` → `{ "types": "./dist/index.d.ts", "default": "./dist/index.js" }` (**types first**) + `"./package.json"`; top-level `"types"`; `"bin": { "radar": "./dist/cli/main.js" }`; `"files": ["dist"]`; `"sideEffects": false`; `"prepublishOnly": "tsc"`.
 5. **Publish is gated by `publint` + `@arethetypeswrong/cli` (`attw`)** in CI — non-negotiable insurance for the hand-written `exports`/types.
 6. **Release** via the existing semantic-release pipeline + `@semantic-release/npm` (needs an `NPM_TOKEN` CI secret the maintainer provisions; never committed).
-7. **`.js` import ergonomics** (if we want to drop the extensions) → TypeScript 5.7 `rewriteRelativeImportExtensions`, **not** a bundler.
+7. **`.js` import ergonomics — ADOPTED (2026-06-21).** Source uses `.ts` import specifiers via TypeScript `rewriteRelativeImportExtensions` (on TS 5.9); `tsc` rewrites them to `.js` on emit (the `.d.ts` keep `.ts`, but `attw` confirms consumer resolution). No bundler.
 
 ## Consequences
 
@@ -53,6 +53,7 @@ The decision was stress-tested by four independent agent perspectives:
 - Adds devDeps `publint` + `@arethetypeswrong/cli` and a publish step; **no bundler dependency** is added — `dist/` is plain `tsc` output.
 - Hand-written `exports`/per-file `.d.ts` is more correctness surface; the `publint`/`attw` gate is what makes that safe.
 - Reverses ADR-0004-C3 (marked superseded).
+- Status (2026-06-21): publishing is fully wired (packaging + `pack:check` gate + `NPM_TOKEN` env) but **`npmPublish` stays `false`** — flip to `true` after an `NPM_TOKEN` secret + a verified npm name exist; keeps releases GitHub-only and merges to main safe meanwhile.
 
 ## Provenance (references & verification, 2026-06-21)
 

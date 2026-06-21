@@ -17,7 +17,9 @@ As a maintainer planning the radar's evolution (drift, capture, multi-host, mult
 3. **Agree the target layering** + which adjustments to do *now* vs *defer*.
 4. **Finalize ADR-0006** to match; implement the agreed adjustments.
 
-## 1 + 2. Current design (survey of all 7 modules, 681 LOC)
+## 1 + 2. Current design (survey of all 7 modules, 681 LOC) — pre-restructure snapshot
+
+> **Note (2026-06-21):** this survey describes the FLAT `src/` before adjustments C/D landed. The code is now layered `core/ · io/ · llm/ · cli/`; the seam line numbers below are historical.
 
 | module | LOC | responsibility | external deps | side effects |
 |---|---|---|---|---|
@@ -56,12 +58,12 @@ Why it matters: the check logic can't be tested without the SDK + fs, and secret
 
 What's already healthy (don't disturb): one shared contract (`models.ts`, not forked per op), a pure `retrieve`, a now-pure `comment`, clean command separation in `cli.ts`.
 
-## 3. Candidate adjustments (TO DISCUSS — not decided)
+## 3. Candidate adjustments (A/C/D done · B deferred)
 
 - **A — Extract a model port + adapter** (`llm.ts`): the core depends on a small `complete({system, user, schema}) → validated` port; native Anthropic + universal OpenAI-compatible adapters implement it. Fixes **seam 1** and adds multi-provider/gateway support. **✅ DONE** — see ADR-0007 + the design spec/plan; the model port also addresses most of seam 2 (config/.env moved out of `checker.ts`).
 - **B — Push fs I/O to the edge** (CLI reads files / passes strings; core stays pure transforms). Fixes **seam 3** — bigger, likely *defer*.
-- **C — Split `checker.ts`** into config / adapter (folds into A) / check-orchestration / persistence. Fixes **seam 2** — medium.
-- **D — Folder layering** (`src/core`, `src/adapters`) to make the split visible. Fixes **seam 4** — optional / cosmetic.
+- **C — Split `checker.ts`** into config / adapter (folds into A) / check-orchestration / persistence. Fixes **seam 2**. **✅ DONE** (2026-06-21 restructure — persistence split to `io/verdicts.ts`; `checker.ts` is now pure).
+- **D — Folder layering** (`src/core`, `src/adapters`) to make the split visible. Fixes **seam 4**. **✅ DONE** (2026-06-21 — `src/` grouped into `core/ · io/ · llm/ · cli/` + `cli/commands/`; adapter files renamed to match their classes).
 
 ## Acceptance criteria
 

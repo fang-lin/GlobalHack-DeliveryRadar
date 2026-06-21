@@ -1,6 +1,6 @@
 # Delivery Radar — Requirements Specification
 
-> **Authoritative version: Chinese (`delivery-radar-requirements.zh.md`) · This file: synchronized English translation (original v1.0 text) · Last synced: 2026-06-12 · On conflict, the Chinese version prevails.**
+> **Authoritative version: Chinese (`delivery-radar-requirements.zh.md`) · This file: synchronized English translation (original v1.0 text) · Last synced: 2026-06-21 · On conflict, the Chinese version prevails.**
 
 **System:** Intent–Implementation Governance Engine
 **Codename:** Delivery Radar (交付雷达)
