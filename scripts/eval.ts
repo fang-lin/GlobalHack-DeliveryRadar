@@ -18,12 +18,11 @@
  */
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import yaml from "js-yaml";
-import type Anthropic from "@anthropic-ai/sdk";
-import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { extractFromDir, adrSection } from "../src/extract.js";
 import { loadDiff } from "../src/diff.js";
 import { retrieve } from "../src/retrieve.js";
-import { makeClient, checkConstraint, DEFAULT_MODEL } from "../src/checker.js";
+import { checkConstraint } from "../src/checker.js";
+import { makeModelClient, DEFAULT_MODEL, type ModelClient } from "../src/llm.js";
 import { SemanticCheckOutputSchema } from "../src/models.js";
 
 const ADR_DIR = "eval/adr";
@@ -59,21 +58,13 @@ const UNGROUNDED_SYSTEM =
   "practice, risk), 'aligned' if it looks fine, or 'unknown' if you genuinely cannot tell. " +
   "Keep the explanation to one or two sentences.";
 
-async function ungroundedReview(
-  client: Anthropic,
-  diffText: string,
-  model: string,
-): Promise<ArmResult> {
-  const resp = await client.messages.parse({
-    model,
-    max_tokens: 4000,
-    thinking: { type: "adaptive" },
+async function ungroundedReview(client: ModelClient, diffText: string): Promise<ArmResult> {
+  const o = await client.complete({
     system: UNGROUNDED_SYSTEM,
-    messages: [{ role: "user", content: "Review this diff:\n```diff\n" + diffText + "\n```" }],
-    output_config: { format: zodOutputFormat(SemanticCheckOutputSchema) },
+    user: "Review this diff:\n```diff\n" + diffText + "\n```",
+    schema: SemanticCheckOutputSchema,
+    maxTokens: 4000,
   });
-  if (resp.parsed_output == null) throw new Error("ungrounded: no structured verdict");
-  const o = SemanticCheckOutputSchema.parse(resp.parsed_output);
   return { result: o.result, confidence: o.confidence, explanation: o.explanation };
 }
 
@@ -99,15 +90,23 @@ function violatedPRF(rows: Row[], pick: (r: Row) => ArmResult) {
 
 interface Row { cs: Case; grounded: ArmResult; ungrounded: ArmResult; }
 
+const argValue = (flag: string): string | undefined => {
+  const i = process.argv.indexOf(flag);
+  return i >= 0 ? process.argv[i + 1] : undefined;
+};
+
 async function main(): Promise<void> {
   const replay = process.argv.includes("--replay");
-  const model = DEFAULT_MODEL;
+  // Provider/model are selectable so the SAME benchmark runs across providers (ADR-0007).
+  if (argValue("--provider")) process.env.RADAR_PROVIDER = argValue("--provider");
+  if (argValue("--model")) process.env.RADAR_MODEL = argValue("--model");
+  const model = `${process.env.RADAR_PROVIDER ?? "anthropic"}/${process.env.RADAR_MODEL ?? DEFAULT_MODEL}`;
   const cases = yaml.load(readFileSync(CASES, "utf8")) as Case[];
   const constraints = extractFromDir(ADR_DIR);
 
   let cache: Record<string, ArmResult> = {};
   if (existsSync(CACHE)) cache = JSON.parse(readFileSync(CACHE, "utf8"));
-  const client = replay ? null : makeClient();
+  const client = replay ? null : makeModelClient();
   let calls = 0;
 
   const rows: Row[] = [];
@@ -118,7 +117,7 @@ async function main(): Promise<void> {
 
     // ---- GROUNDED arm ----
     let grounded: ArmResult;
-    const gKey = `grounded:${cs.id}`;
+    const gKey = `grounded:${model}:${cs.id}`;
     if (cs.target_constraint) {
       const pair = pairs.find(([c]) => c.id === cs.target_constraint);
       if (!pair) {
@@ -130,7 +129,7 @@ async function main(): Promise<void> {
       } else {
         const [c, diffs] = pair;
         const ctx = adrSection(ADR_DIR, c.adr, "Context");
-        const v = await checkConstraint(client!, c, diffs, ctx, model);
+        const v = await checkConstraint(client!, c, diffs, ctx);
         calls++;
         grounded = { result: v.result, confidence: v.confidence, explanation: v.explanation };
         cache[gKey] = grounded;
@@ -145,13 +144,13 @@ async function main(): Promise<void> {
 
     // ---- UNGROUNDED arm ----
     let ungrounded: ArmResult;
-    const uKey = `ungrounded:${cs.id}`;
+    const uKey = `ungrounded:${model}:${cs.id}`;
     if (cache[uKey]) {
       ungrounded = cache[uKey];
     } else if (replay) {
       ungrounded = { result: "?", note: "no cached verdict — run live first" };
     } else {
-      ungrounded = await ungroundedReview(client!, diffText, model);
+      ungrounded = await ungroundedReview(client!, diffText);
       calls++;
       cache[uKey] = ungrounded;
     }
