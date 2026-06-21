@@ -6,6 +6,7 @@ describe("reviewMarkdown (FR-CONF-7)", () => {
   it("renders the header and the advisory footer even with no verdicts", () => {
     const md = reviewMarkdown([], []);
     expect(md).toContain("🛰️ Delivery Radar");
+    expect(md).toContain("Nothing flagged"); // explicit clean result, not a bare header
     expect(md).toContain("_Advisory");
     expect(md).not.toContain("VIOLATED");
   });
