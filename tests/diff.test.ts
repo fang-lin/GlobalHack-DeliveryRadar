@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseUnifiedDiff } from "../src/diff.js";
+import { parseUnifiedDiff } from "../src/io/diff.js";
 
 // A realistic two-file unified diff: one modified file, one deleted file.
 const DIFF = `diff --git a/src/foo.ts b/src/foo.ts

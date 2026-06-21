@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { reviewMarkdown, verdictMarkdown } from "../src/comment.js";
+import { reviewMarkdown, verdictMarkdown } from "../src/core/comment.js";
 import { makeConstraint as constraint, makeVerdict as verdict } from "./fixtures/factories.js";
 
 describe("reviewMarkdown (FR-CONF-7)", () => {

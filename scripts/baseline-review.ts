@@ -9,7 +9,7 @@
  */
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import Anthropic from "@anthropic-ai/sdk";
-import { loadDotenv, DEFAULT_MODEL } from "../src/llm.js";
+import { DEFAULT_MODEL } from "../src/llm.js";
 
 const PR_TITLE = "Fix stale stock count on product page";
 const PR_BODY =
@@ -25,8 +25,7 @@ const SYSTEM =
 
 async function main(): Promise<void> {
   const diff = readFileSync(process.argv[2], "utf8");
-  loadDotenv("ANTHROPIC_API_KEY");
-  const client = new Anthropic();
+  const client = new Anthropic(); // reads ANTHROPIC_API_KEY from the environment
   const response = await client.messages.create({
     model: DEFAULT_MODEL,
     max_tokens: 2000,

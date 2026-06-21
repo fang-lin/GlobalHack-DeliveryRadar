@@ -56,7 +56,7 @@ export interface ModelClient {
 
 ## 4. 配置与选择(env 驱动:预设 + 逃生口)
 
-工厂 `makeModelClient(env)` 在 **CLI 边缘**执行(IO 在边缘,ADR-0006)。`.env` 加载也从 `checker.ts` 挪到这里。**全部配置走环境变量**;模板见仓库根 `.env.example`。
+工厂 `makeModelClient(env)` 在 **CLI 边缘**执行(IO 在边缘,ADR-0006)。**全部配置只来自环境变量(`process.env`)—— CLI 不读任何 `.env` 文件**:运行环境就是纯 shell,不假设前置条件;CI/pipeline 里没有 `.env`,靠注入 env/secrets。本地开发自己把 `.env` `source` 进 shell(`set -a; source .env; set +a`)即可;模板见仓库根 `.env.example`。
 
 **后端选择(数据驱动预设)**
 
@@ -74,7 +74,7 @@ export interface ModelClient {
 - `RADAR_JSON_MODE` —— `json_schema` | `json_object`,默认 `json_object`(兼容面最广,含 DeepSeek);目标支持 json_schema 时再开。
 - **key 解析(自洽规则)**:每个后端用 `原生KEY ?? RADAR_API_KEY` —— `RADAR_API_KEY` 是**通用兜底键**,各家原生名(`ANTHROPIC_API_KEY` / `OPENROUTER_API_KEY` / `AI_GATEWAY_API_KEY`)只是便利、优先生效。
 
-- key 一律 env,**绝不进 git**(`.env` + `.gitignore`;模板 `.env.example` 入库)。
+- key 一律走环境变量,**绝不进 git**(`.env` 仅本地 `source`、被 `.gitignore` 忽略;模板 `.env.example` 入库)。
 - 选 `anthropic` → AnthropicAdapter;其余三个 → OpenAICompatAdapter(数据驱动预设,仅 base_url/key/headers 不同)。
 
 ## 5. 代码改动清单(= ST-0022 调整A + 多 provider)

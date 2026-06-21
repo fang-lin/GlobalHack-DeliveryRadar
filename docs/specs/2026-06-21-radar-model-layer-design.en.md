@@ -56,7 +56,7 @@ Both paths share one **retry loop** (default cap 3): empty content or a `JSON.pa
 
 ## 4. Selection & config (env-driven: presets + escape hatch)
 
-The factory `makeModelClient(env)` runs at the **CLI edge** (I/O at the edge, ADR-0006). The `.env` loader also moves here from `checker.ts`. **All config is env vars**; see `.env.example` at the repo root for the template.
+The factory `makeModelClient(env)` runs at the **CLI edge** (I/O at the edge, ADR-0006). **All config comes from the environment (`process.env`) only — the CLI reads no `.env` file**: the runtime is a plain shell, no precondition is assumed; a CI pipeline has none, so inject env/secrets there. For local dev, source `.env` into your shell yourself (`set -a; source .env; set +a`); see `.env.example` at the repo root for the template.
 
 **Backend selection (data-driven presets)**
 
@@ -74,7 +74,7 @@ The factory `makeModelClient(env)` runs at the **CLI edge** (I/O at the edge, AD
 - `RADAR_JSON_MODE` — `json_schema` | `json_object`, default `json_object` (widest support, incl. DeepSeek); opt into json_schema where the target supports it.
 - **Key resolution (the coherent rule):** each backend uses `nativeKey ?? RADAR_API_KEY` — `RADAR_API_KEY` is the **universal fallback** key; the native vars (`ANTHROPIC_API_KEY` / `OPENROUTER_API_KEY` / `AI_GATEWAY_API_KEY`) are conveniences that take precedence.
 
-- keys always via env, **never committed** (`.env` + `.gitignore`; the `.env.example` template is checked in).
+- keys always via the environment, **never committed** (`.env` is only sourced locally and is `.gitignore`d; the `.env.example` template is checked in).
 - `anthropic` → AnthropicAdapter; the other three → OpenAICompatAdapter (data-driven presets; only base_url/key/headers differ).
 
 ## 5. Code change list (= ST-0022 adjustment A + multi-provider)

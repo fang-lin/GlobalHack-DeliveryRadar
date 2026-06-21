@@ -35,7 +35,7 @@
 - [ ] Open Terminal and run (enter the demo repo + load the API key into this shell; `radar` is symlinked onto PATH so it's callable directly):
   ```bash
   cd ~/Projects/shop-demo
-  export ANTHROPIC_API_KEY=$(sed -n 's/^ANTHROPIC_API_KEY=//p' ~/Projects/intent-impl-align/.env)
+  export ANTHROPIC_API_KEY=$(sed -n 's/^ANTHROPIC_API_KEY=//p' ~/Projects/intent-impl-align/.envrc)
   clear
   ```
   > If `radar` says command not found: replace every `radar` below with the absolute path `~/Projects/intent-impl-align/dist/cli.js` (after `npm run build`).

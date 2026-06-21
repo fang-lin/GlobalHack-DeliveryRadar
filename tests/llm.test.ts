@@ -116,13 +116,10 @@ describe("makeModelClient factory (ADR-0007)", () => {
     makeModelClient({ RADAR_PROVIDER: "openrouter", OPENROUTER_API_KEY: "", RADAR_API_KEY: "uni", RADAR_MODEL: "m" });
     expect(ctor.mock.calls[0][0].apiKey).toBe("uni");
   });
-  it("resolves a key from process.env even when the passed env object lacks it", () => {
-    process.env.OPENROUTER_API_KEY = "from-process-env";
-    try {
-      makeModelClient({ RADAR_PROVIDER: "openrouter", RADAR_MODEL: "m" });
-      expect(ctor.mock.calls[0][0].apiKey).toBe("from-process-env");
-    } finally {
-      delete process.env.OPENROUTER_API_KEY;
-    }
+  it("reads keys only from the given env — no .envrc file (platform-agnostic, ADR-0006)", () => {
+    // The factory must not consult a .envrc file; a key absent from the passed env throws.
+    expect(() => makeModelClient({ RADAR_PROVIDER: "openrouter", RADAR_MODEL: "m" })).toThrow(
+      /OPENROUTER_API_KEY or RADAR_API_KEY/,
+    );
   });
 });

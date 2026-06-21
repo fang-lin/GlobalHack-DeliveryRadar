@@ -9,15 +9,9 @@
  * The LLM is reached through the `ModelClient` port (ADR-0007) — this module
  * imports no provider SDK (ADR-0007-C1 / ADR-0006).
  */
-import { readFileSync, writeFileSync } from "node:fs";
-import {
-  SemanticCheckOutputSchema,
-  VerdictSchema,
-  type Constraint,
-  type Verdict,
-} from "./models.js";
-import type { FileDiff } from "./diff.js";
-import type { ModelClient } from "./llm.js";
+import { SemanticCheckOutputSchema, type Constraint, type Verdict } from "./models.js";
+import type { FileDiff } from "../io/diff.js";
+import type { ModelClient } from "../llm.js";
 
 const SYSTEM = `You are the conformance checker of Delivery Radar, an \
 intent-implementation governance engine. You evaluate whether a pull-request \
@@ -94,13 +88,4 @@ export async function checkConstraint(
     fix_locality: out.fix_locality,
     fix_direction: out.fix_direction,
   };
-}
-
-export function saveVerdicts(verdicts: Verdict[], path: string): void {
-  writeFileSync(path, JSON.stringify(verdicts, null, 2));
-}
-
-export function loadVerdicts(path: string): Verdict[] {
-  const data = JSON.parse(readFileSync(path, "utf8")) as unknown[];
-  return data.map((v) => VerdictSchema.parse(v));
 }

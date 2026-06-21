@@ -83,7 +83,7 @@ What's already healthy (don't disturb): one shared contract (`models.ts`, not fo
 
 ## Code review (self-review, 2026-06-21)
 
-`/code-review` (xhigh / recall) over this branch (PR #9 + working tree): 10 independent finder angles → verify → sweep → **15 findings**. **Fixed 12 (#1–#10, #14, and #15's double-send); 4 recorded as low / deferred.** They surfaced *after* lint/build/test were green — evidence that design-first still needs a review gate.
+`/code-review` (xhigh / recall) over this branch (PR #9 + working tree): 10 independent finder angles → verify → sweep → **15 findings**; plus **#16 caught only by live testing** → 16 total. **Fixed 13 (#1–#10, #14, #15's double-send, #16); 3 recorded as low / deferred.** All surfaced *after* lint/build/test were green — evidence that design-first still needs both a review gate **and** a real smoke run.
 
 > **绿 ≠ 对**:`tsc` 只编 `src/`(漏 `scripts/`);`--replay`、`--model`+`.env`、`json_schema` 真校验都没被测试覆盖(单测把 key 塞进 env、把 SDK mock 掉)。
 
@@ -103,11 +103,12 @@ What's already healthy (don't disturb): one shared contract (`models.ts`, not fo
 | 12 | 🟡 | `src/llm.ts` `jsonMode` | json 模式全局而非按 preset 能力;属早前"最稳默认"决策 | ⏭️ 记录 |
 | 13 | 🟡 | `src/llm.ts` | `AnthropicAdapter` 无 retry、`OpenAICompatAdapter` 有 → 失败处理不对称 | ⏭️ 记录 |
 | 14 | 🟡 | `scripts/eval.ts` cache key | key 不含 `RADAR_JSON_MODE` → 仅 json 模式不同的两次跑共用缓存 | ✅ 已修 |
-| 15 | 🟡 | `src/llm.ts` | 冗余 `loadDotenv`;json_schema 模式 schema 双发(prompt + `response_format`) | 🟡 部分(双发已修;冗余记录) |
+| 15 | 🟡 | `src/llm.ts` | 冗余 `loadDotenv`;json_schema 模式 schema 双发(prompt + `response_format`) | 🟡 部分(双发已修;冗余随 #16 一并消除) |
+| 16 | 🔴 | `src/llm.ts` `loadDotenv`(真机测试发现) | CLI 自己沿文件系统找 `.env`(假设前置条件;CI/pipeline 无 `.env`)→ 真机跑 Vercel 时 `.env` 里 `RADAR_PROVIDER` 等不生效、退回 anthropic 报 auth | ✅ 已修(删除 .env 读取,只读 `process.env`) |
 
 ### 修复记录
 
-- `src/llm.ts`:`loadDotenv` 返回值;新增 `resolveKey()`(`原生 || RADAR_API_KEY || loadDotenv(原生) || loadDotenv(RADAR_API_KEY)`,空串视未设)→ #2/#5;anthropic 分支 + `AnthropicAdapter` 接 `baseURL` → #7;`json_schema` 模式 `delete jsonSchema.$schema` 且不再把 schema 塞进 prompt → #4/#15。
+- `src/llm.ts`:新增 `resolveKey()`(`原生 || RADAR_API_KEY`,空串视未设;**只读传入 env**)→ #2/#5;**删除 `.env` 文件读取(`loadDotenv` 整个移除),CLI 只读 `process.env`** → #16,并固化为新约束 **ADR-0006-C2**;anthropic 分支 + `AnthropicAdapter` 接 `baseURL` → #7;`json_schema` 模式 `delete jsonSchema.$schema` 且不再把 schema 塞进 prompt → #4/#15。
 - `scripts/baseline-review.ts`:改用 `Anthropic` SDK + `llm.js` 的 `loadDotenv`/`DEFAULT_MODEL` → #1。
 - `scripts/eval.ts`:`argValue` 绑一次 + 守卫下一 token → #10;cache key 加 json 模式段 → #14;miss 回退查旧 key、去 `(replay\|\|true)` → #3/#6。
 - 文档:spec §3.2 zh/en 对齐真实实现(`z.toJSONSchema` 手搓 + zod-v4 原因、删 `$schema`、去掉未实现的自动降级)→ #8。

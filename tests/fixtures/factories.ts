@@ -3,7 +3,7 @@
  * live in one place — when src/models.ts changes, only this file updates (the
  * `as unknown as` casts otherwise hide schema drift across copies).
  */
-import type { Constraint, Verdict } from "../../src/models.js";
+import type { Constraint, Verdict } from "../../src/core/models.js";
 
 export const makeConstraint = (over: Partial<Constraint> = {}): Constraint =>
   ({
