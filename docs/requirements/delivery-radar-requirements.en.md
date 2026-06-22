@@ -1,6 +1,6 @@
 # Delivery Radar — Requirements Specification
 
-> **Authoritative version: Chinese (`delivery-radar-requirements.zh.md`) · This file: synchronized English translation (original v1.0 text) · Last synced: 2026-06-21 · On conflict, the Chinese version prevails.**
+> **Authoritative version: Chinese (`delivery-radar-requirements.zh.md`) · This file: synchronized English translation (original v1.0 text) · Last synced: 2026-06-22 · On conflict, the Chinese version prevails.**
 
 **System:** Intent–Implementation Governance Engine
 **Codename:** Delivery Radar (交付雷达)
@@ -132,7 +132,7 @@ flowchart TB
     I["Intent — source of truth<br/>carried by ADRs · specs · stories · requirement docs"]
     C["Constraints<br/>addressable · stable IDs"]
     CONF["Conformance<br/>on PR open + push"]
-    CAP["Decision Capture<br/>on PR open"]
+    CAP["Decision Capture<br/>after merge"]
     DRIFT["Drift Detection<br/>cron · on intent change"]
     R["Report<br/>typed advisory PR review"]
     DN["Decision Note<br/>draft · human triage"]
@@ -263,16 +263,21 @@ fix_locality: structural        # local | structural | none  (drives review proj
 
 ### 6.1 Two runtimes, one shared core
 
-- **Per-diff engine** — handles `conformance` + `capture`. Triggered by PR
-  events. Operates on the diff. One pass over the PR produces both a Conformance
-  Report and any Decision Notes.
+- **Per-diff engine** — `conformance` runs on PR open/update; `capture` runs
+  **after the PR merges** (revised 2026-06-22: capture moved from sharing
+  conformance's PR-open pass to running independently after merge — see
+  `ADR-0009`). Both operate on that PR's diff and produce a Conformance Report /
+  Decision Note respectively.
 - **Per-repo engine** — handles `drift`. Triggered by schedule and ADR changes.
   Operates on the whole tree. Produces a Drift Report. Never touches the build.
 - **Constraint extraction core** — shared library used by both runtimes and by
   graduation. Turns ADRs into constraints.
 
-**`FR-ARCH-1`** `conformance` and `capture` MUST share a single analysis pass
-over the PR diff (do not fetch/parse the diff twice).
+**`FR-ARCH-1`** (revised 2026-06-22) `conformance` (on PR open/update) and
+`capture` (after merge) are **independent runs**, no longer sharing a single
+pass; each parses the PR diff it needs once (still no double fetch/parse within a
+run). The original "shared single pass" requirement lapsed when capture moved to
+after-merge (see `ADR-0009`).
 
 ### 6.2 Constraint retrieval (the noise-control lever)
 
@@ -358,8 +363,11 @@ path/ownership mapping first; semantic similarity is a secondary signal only.
 ## 9. Functional requirements — Decision Capture (`capture`)
 
 **Trigger**
-- `FR-CAP-1` Runs on the same trigger and the same diff pass as `conformance`
-  (PR `opened` + `synchronize`). It does **not** run after merge.
+- `FR-CAP-1` (revised 2026-06-22) Runs **after the PR merges** (`pull_request`
+  `closed` with `merged == true`), decoupled from `conformance` (which runs on PR
+  open/update) — no longer a shared pass. The PR's diff is obtained via
+  `gh pr diff <PR#>` (still available after merge). It can also be re-run manually
+  via `workflow_dispatch` or a `/radar capture` comment. Rationale: see `ADR-0009`.
 
 **Detection**
 - `FR-CAP-2` Detect when a diff appears to *make a decision not covered by any
@@ -371,14 +379,19 @@ path/ownership mapping first; semantic similarity is a secondary signal only.
   drawn from the PR description / linked story.
 
 **Triage gate (human)**
-- `FR-CAP-4` The Decision Note is posted as a lightweight PR comment/annotation.
-  A human triages with three questions:
+- `FR-CAP-4` (revised 2026-06-22) The Decision Note is posted as a **draft PR /
+  issue** (capture runs after merge, so the original PR is closed — see
+  `FR-CAP-1` / `ADR-0009`). A human triages with three questions:
   1. Is this a real decision? (else → `dismissed`)
   2. Is it architecturally significant? (else → route to story/AC `[Phase 2]`)
   3. Is it net-new, or already covered by an existing ADR? (if covered, it is a
      `conformance`/`drift` matter, not a new ADR — do not create a duplicate.)
-- `FR-CAP-5` The system MUST NOT create an issue or ADR on detection. Issues/ADRs
-  are created only on human confirmation.
+- `FR-CAP-5` (revised 2026-06-22) Capture's outputs are **drafts**: it MAY open a
+  **draft PR** (an ADR with `Status: Proposed`) or an **issue** — these change no
+  recorded intent until a human merges/closes them, which is the draft step, and
+  the human confirms by **merging/closing**. Capture MUST NOT produce **accepted**
+  intent unattended: it MUST NOT merge/accept an ADR, push to the default branch,
+  or block any merge (see `ADR-0009-C2` / `NFR-TRUST-1`).
 
 **Graduation (Decision Note → ADR)**
 - `FR-CAP-6` On confirmation of an architectural, net-new decision, expand the

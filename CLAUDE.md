@@ -26,7 +26,7 @@ Ports & adapters: the core depends only on the `ModelClient` port (ADR-0007), ne
 ## Hard rules (ADR-enforced; the radar dogfoods these)
 - **Commit messages carry NO AI co-author / signature.** Conventional Commits; cite story/ADR IDs.
 - **Decisions → an ADR; code → a story (`docs/stories/ST-NNN`); CLI behaviour → a spec first.** Cite the IDs in commits.
-- **CLI is platform-agnostic (ADR-0006):** `src/` must not call git/gh/host/VCS (C1); config + secrets come from `process.env` ONLY — the CLI reads no `.env` file (C2).
+- **CLI is platform-agnostic (ADR-0006):** `src/core/` must not call git/gh/host/VCS (C1; refined to the pure core by ADR-0009 — edge adapters like the capture agent under `src/capture/` may); config + secrets come from `process.env` ONLY — the CLI reads no `.env` file (C2, all of `src/`).
 - **Core LLM access goes through the `ModelClient` port, not a provider SDK (ADR-0007-C1).**
 - **ESM-only — no CommonJS idioms in `src/` (ADR-0008-C1).**
 - **Docs:** Chinese is authoritative and the English mirror is updated in the SAME commit; ADRs are English-only (`docs/governance/doc-management.zh.md`).

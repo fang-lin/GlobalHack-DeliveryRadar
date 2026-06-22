@@ -14,7 +14,7 @@ Work-unit records for Delivery Radar's **own** development — we dogfood our ow
 | ST-0002 | Port legacy-dashboard content into the SPA, retire `dashboard/` | In progress | ADR-0001 |
 | ST-0003 | Migrate the contrast worked example into the SPA (Evidence sub-page) | Done | ADR-0002 |
 | ST-0004 | Two dashboards — rich shop-demo (parity) + Backstage | Done | ADR-0002 |
-| ST-0005 | `radar capture` — draft Decision Notes from a PR | Todo | — |
+| ST-0005 | `radar capture` — skill-driven agent that drafts Decision Notes (after merge) | In progress | ADR-0009 |
 | ST-0006 | `radar drift` — scan the codebase for drift | Todo | — |
 | ST-0007 | Conformance — richer comment projection types | Todo | — |
 | ST-0008 | Dogfood — run the radar on this repo (VIS-4) | In progress | ADR-0004 |

@@ -30,19 +30,21 @@ The same platform-agnosticism applies to **configuration**: the core takes its c
 ```constraints
 - id: ADR-0006-C1
   adr: ADR-0006
-  title: radar core stays platform-agnostic (no git/host/VCS calls in src/)
+  title: radar core stays platform-agnostic (no git/host/VCS calls in src/core/)
   rule: >
-    Domain code under src/ MUST NOT invoke or import platform / VCS / host
-    tooling — no child_process/exec of `gh` or `git`, no GitHub/GitLab API or
-    Octokit client, no posting/editing of reviews, comments, labels or status.
-    The core only reads inputs (ADRs, diff, verdicts) and emits outputs
-    (constraints, verdicts, rendered markdown) to stdout/files. All platform
-    I/O lives in the integration layer (the workflow / an adapter) that drives
-    the core. Adding such a call to src/ is a violation.
+    Domain code under src/core/ (the pure domain) MUST NOT invoke or import
+    platform / VCS / host tooling — no child_process/exec of `gh` or `git`, no
+    GitHub/GitLab API or Octokit client, no posting/editing of reviews, comments,
+    labels or status. The core only reads inputs (ADRs, diff, verdicts) and emits
+    outputs (constraints, verdicts, rendered markdown) to stdout/files. All
+    platform I/O lives in the integration layer (the workflow / an adapter) that
+    drives the core. Edge adapters — io, llm, cli, and the capture agent under
+    src/capture/ — perform their own I/O (ADR-0009 refined this scope from
+    src/** to src/core/**). Adding such a call to src/core/ is a violation.
   polarity: prohibition
   driver: ADR-0006 — testable, host-portable core; separation of check from publish
   scope:
-    paths: ["src/**"]
+    paths: ["src/core/**"]
     layers: ["radar-core"]
   check:
     type: semantic
