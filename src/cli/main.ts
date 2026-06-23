@@ -3,6 +3,7 @@
 import { cmdExtract } from "./commands/extract.ts";
 import { cmdCheck } from "./commands/check.ts";
 import { cmdComment } from "./commands/comment.ts";
+import { cmdCapture } from "./commands/capture.ts";
 import { fail } from "./util.ts";
 
 async function main(): Promise<number> {
@@ -14,8 +15,12 @@ async function main(): Promise<number> {
       return cmdCheck(rest);
     case "comment":
       return cmdComment(rest);
+    case "capture":
+      return cmdCapture(rest);
     default:
-      return fail(`unknown command '${command ?? ""}' (expected: extract | check | comment)`);
+      return fail(
+        `unknown command '${command ?? ""}' (expected: extract | check | comment | capture)`,
+      );
   }
 }
 
