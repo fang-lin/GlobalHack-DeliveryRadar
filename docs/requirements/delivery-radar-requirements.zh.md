@@ -1,6 +1,6 @@
 # 交付雷达（Delivery Radar）— 需求规格说明书
 
-> **权威: 中文（本文件） · 翻译: 英文（`delivery-radar-requirements.en.md`，原始 v1.0 文本） · 最后同步: 2026-06-21 · 两版冲突以中文为准**
+> **权威: 中文（本文件） · 翻译: 英文（`delivery-radar-requirements.en.md`，原始 v1.0 文本） · 最后同步: 2026-06-22 · 两版冲突以中文为准**
 >
 > 本文档译自原始英文规格 v1.0；自 2026-06-12 起，中文版为权威版本，英文版作为同步翻译维护。
 
@@ -100,7 +100,7 @@ flowchart TB
     I["Intent — source of truth<br/>carried by ADRs · specs · stories · requirement docs"]
     C["Constraints<br/>addressable · stable IDs"]
     CONF["Conformance<br/>on PR open + push"]
-    CAP["Decision Capture<br/>on PR open"]
+    CAP["Decision Capture<br/>after merge"]
     DRIFT["Drift Detection<br/>cron · on intent change"]
     R["Report<br/>typed advisory PR review"]
     DN["Decision Note<br/>draft · human triage"]
@@ -222,11 +222,11 @@ fix_locality: structural        # local | structural | none  (drives review proj
 
 ### 6.1 两个运行时，一个共享核心
 
-- **按 diff 引擎（Per-diff engine）** — 负责 `conformance` + `capture`。由 PR 事件触发。作用于 diff。对 PR 的一次扫描同时产出 Conformance Report 和（如有）Decision Note。
+- **按 diff 引擎（Per-diff engine）** — `conformance` 在 PR 打开/更新时运行；`capture` 在 PR **合并后**运行（2026-06-22 修订：capture 由"与 conformance 共用 PR-open 扫描"改为合并后独立运行，见 `ADR-0009`）。两者都作用于该 PR 的 diff，各自产出 Conformance Report / Decision Note。
 - **按仓库引擎（Per-repo engine）** — 负责 `drift`。由计划任务和 ADR 变更触发。作用于整棵代码树。产出 Drift Report。绝不触碰构建（build）。
 - **约束提取核心（Constraint extraction core）** — 两个运行时及毕业（graduation）流程共用的库。将 ADR 转化为约束。
 
-**`FR-ARCH-1`** `conformance` 和 `capture` MUST 共享对 PR diff 的单次分析扫描（不得重复抓取/解析 diff）。
+**`FR-ARCH-1`**（2026-06-22 修订）`conformance`（PR 打开/更新时）与 `capture`（合并后）是**独立运行**，不再共享单次扫描；各自只解析一次它所需的 PR diff（仍不得在同一次运行内重复抓取/解析）。原"共享单次扫描"的要求随 capture 移到合并后而失效（见 `ADR-0009`）。
 
 ### 6.2 约束检索（噪声控制的关键杠杆）
 
@@ -284,18 +284,18 @@ fix_locality: structural        # local | structural | none  (drives review proj
 ## 9. 功能需求 — 决策捕获（`capture`）
 
 **触发**
-- `FR-CAP-1` 与 `conformance` 共用同一触发器和同一次 diff 扫描（PR `opened` + `synchronize`）。它**不**在 merge 之后运行。
+- `FR-CAP-1`（2026-06-22 修订）在 PR **合并后**运行（`pull_request` 的 `closed` 且 `merged == true`），与 `conformance`（PR 打开/更新时）解耦——不再共用同一次扫描。该 PR 的 diff 经 `gh pr diff <PR号>` 取得（合并后仍可取）。仍可用 `workflow_dispatch` 或 `/radar capture` 评论手动重跑。理由见 `ADR-0009`。
 
 **检测**
 - `FR-CAP-2` 检测 diff 看似*做出了不被任何活跃约束覆盖的决策*的情形 — 例如引入新依赖、新数据存储或新的跨服务调用模式。最有价值的捕获对象是 PR *隐式*做出的决策，而不仅仅是未记录的决策。
 - `FR-CAP-3` 产出草稿态的 `DM-DECISION-NOTE`，含检测到的决策、证据 hunk、建议分类（`architectural`/`behavioral`），以及从 PR 描述/关联 story 提取的理由草稿。
 
 **分诊门（人类）**
-- `FR-CAP-4` Decision Note 以轻量 PR 评论/批注的形式发布。人类用三个问题分诊：
+- `FR-CAP-4`（2026-06-22 修订）Decision Note 以**草稿 PR / issue** 的形式发布（capture 在合并后运行，原 PR 已关闭——见 `FR-CAP-1` / `ADR-0009`）。人类用三个问题分诊：
   1. 这是真决策吗？（否则 → `dismissed`）
   2. 它具有架构意义吗？（否则 → 路由至 story/AC `[Phase 2]`）
   3. 它是净新增，还是已被某个既有 ADR 覆盖？（若已被覆盖，则属于 `conformance`/`drift` 的事务，不是新 ADR — 不要创建重复项。）
-- `FR-CAP-5` 系统 MUST NOT 在检测时创建 issue 或 ADR。issue/ADR 仅在人类确认后创建。
+- `FR-CAP-5`（2026-06-22 修订）capture 的产物是**草稿**：可以自动开一个**草稿 PR**（`Status: Proposed` 的 ADR）或 **issue**——它们在被人类合并/关闭前不改变任何已记录意图，这本身就是"草稿"那一步，人类靠**合并/关闭**来确认。capture MUST NOT 未经人类动作就**接受/合并** ADR、向默认分支 push、或阻塞任何合并（见 `ADR-0009-C2` / `NFR-TRUST-1`）。
 
 **毕业（Decision Note → ADR）**
 - `FR-CAP-6` 当一个架构性、净新增的决策被确认后，将笔记扩展为完整的 ADR 草稿：Context（含 `driver` 链接）、Decision、Consequences、`Status: Proposed`，以及机器可读的 `constraints` 块。人类的主要编辑对象是约束块。
