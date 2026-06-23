@@ -24,4 +24,17 @@ describe("decisionNotesMarkdown", () => {
     expect(md).toContain("No undocumented decisions detected");
     expect(md).not.toContain("Decision:");
   });
+  it("renders a note with empty evidence array without 'Lundefined'", () => {
+    const noteNoEvidence = {
+      detected_decision: "some decision",
+      evidence: [] as { file: string; lines: number[] }[],
+      suggested_class: "behavioral" as const,
+      draft_rationale: "a rationale",
+      confidence: 0.6,
+      why_net_new: "nothing recorded",
+    };
+    const md = decisionNotesMarkdown([noteNoEvidence]);
+    expect(md).not.toContain("Lundefined");
+    expect(md).toContain("**Evidence:** —");
+  });
 });

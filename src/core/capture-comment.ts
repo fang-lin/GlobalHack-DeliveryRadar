@@ -12,6 +12,7 @@ const ADVISORY =
 
 export function decisionNoteMarkdown(note: DecisionNote): string {
   const ev = note.evidence
+    .filter((e) => e.lines.length > 0)
     .map((e) => `\`${e.file}\` L${e.lines[0]}–L${e.lines[1] ?? e.lines[0]}`)
     .join(", ");
   return [

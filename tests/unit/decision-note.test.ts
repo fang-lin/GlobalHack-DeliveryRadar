@@ -23,4 +23,24 @@ describe("DecisionNote (DM-DECISION-NOTE)", () => {
       draft_rationale: "", confidence: 0.1, why_net_new: "",
     })).toThrow();
   });
+  it("rejects confidence > 1 (out-of-bounds)", () => {
+    expect(() => DecisionNoteSchema.parse({
+      detected_decision: "x", evidence: [], suggested_class: "architectural",
+      draft_rationale: "", confidence: 1.5, why_net_new: "",
+    })).toThrow();
+  });
+  it("rejects confidence < 0 (out-of-bounds)", () => {
+    expect(() => DecisionNoteSchema.parse({
+      detected_decision: "x", evidence: [], suggested_class: "architectural",
+      draft_rationale: "", confidence: -0.1, why_net_new: "",
+    })).toThrow();
+  });
+  it("rejects evidence with empty lines array", () => {
+    expect(() => DecisionNoteSchema.parse({
+      detected_decision: "x",
+      evidence: [{ file: "src/foo.ts", lines: [] }],
+      suggested_class: "architectural",
+      draft_rationale: "", confidence: 0.5, why_net_new: "",
+    })).toThrow();
+  });
 });

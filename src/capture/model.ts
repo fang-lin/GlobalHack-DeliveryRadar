@@ -21,6 +21,11 @@ export function selectCaptureModel(env: NodeJS.ProcessEnv): LanguageModel {
       const p = createOpenAICompatible({ name: "radar", baseURL: env.RADAR_BASE_URL, apiKey: env.RADAR_API_KEY ?? "" });
       return p.chatModel(model ?? "");
     }
+    case "openrouter": {
+      if (!env.OPENROUTER_API_KEY && !env.RADAR_API_KEY) throw new Error("openrouter provider requires OPENROUTER_API_KEY");
+      const p = createOpenAICompatible({ name: "openrouter", baseURL: "https://openrouter.ai/api/v1", apiKey: env.OPENROUTER_API_KEY ?? env.RADAR_API_KEY ?? "" });
+      return p.chatModel(model ?? "");
+    }
     default:
       throw new Error(`unknown RADAR_PROVIDER for capture: ${provider}`);
   }

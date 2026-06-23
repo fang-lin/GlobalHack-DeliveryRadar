@@ -132,7 +132,7 @@ export const SuggestedClass = z.enum(["architectural", "behavioral"]);
 
 export const DecisionEvidenceSchema = z.object({
   file: z.string(),
-  lines: z.array(z.number()), // [start, end] in the post-merge file
+  lines: z.array(z.number()).min(1), // [start, end] in the post-merge file; min 1 ensures no empty range
 });
 
 export const DecisionNoteSchema = z.object({
@@ -140,7 +140,7 @@ export const DecisionNoteSchema = z.object({
   evidence: z.array(DecisionEvidenceSchema).default([]),
   suggested_class: SuggestedClass,
   draft_rationale: z.string(),
-  confidence: z.number(),
+  confidence: z.number().min(0).max(1),
   why_net_new: z.string(),
 });
 export type DecisionNote = z.infer<typeof DecisionNoteSchema>;
