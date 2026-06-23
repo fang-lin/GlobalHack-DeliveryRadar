@@ -1,0 +1,90 @@
+# Dogfood: after a PR merges, run the capture agent to extract Decision Notes from
+# the diff and open an advisory issue per note (human decides whether to graduate
+# each note to a full ADR PR). Advisory only — opens issues, never blocks, never
+# merges anything automatically. Runs AUTOMATICALLY when a PR closes as merged;
+# also triggerable via workflow_dispatch (enter a PR number) or a "/radar capture"
+# comment from a write-access user. Needs the AI_GATEWAY_API_KEY secret
+# (Vercel AI Gateway → DeepSeek V4 Pro).
+name: "Radar — decision capture"
+
+run-name: "Decision capture for PR #${{ inputs.pr || github.event.issue.number || github.event.pull_request.number }}"
+
+on:
+  pull_request:
+    types: [closed]
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: "PR number to run decision capture against"
+        required: true
+        type: number
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: radar-capture-${{ inputs.pr || github.event.issue.number || github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  capture:
+    name: capture — advisory, never blocks
+    # Auto on merged PRs; also re-runnable manually via Actions or a "/radar capture"
+    # comment from a write-access user on a PR issue thread.
+    if: >-
+      (github.event_name == 'pull_request' && github.event.pull_request.merged == true) ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issue_comment' &&
+        github.event.issue.pull_request != null &&
+        startsWith(github.event.comment.body, '/radar capture') &&
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve the PR number from whichever event fired
+        id: pr
+        run: |
+          case "${{ github.event_name }}" in
+            workflow_dispatch) echo "num=${{ inputs.pr }}" >> "$GITHUB_OUTPUT" ;;
+            issue_comment)     echo "num=${{ github.event.issue.number }}" >> "$GITHUB_OUTPUT" ;;
+            pull_request)      echo "num=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT" ;;
+          esac
+
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Get merged PR diff
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr diff ${{ steps.pr.outputs.num }} --repo ${{ github.repository }} > pr.diff
+
+      - name: Capture
+        env:
+          RADAR_PROVIDER: vercel
+          RADAR_MODEL: deepseek/deepseek-v4-pro
+          AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
+        run: pnpm exec tsx src/cli/main.ts capture --diff pr.diff --adr-dir docs/adr --save notes.json > body.md
+
+      - name: Open an advisory issue per Decision Note (human decides whether to graduate to ADR)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          COUNT=$(jq 'length' notes.json)
+          if [ "$COUNT" = "0" ]; then echo "nothing flagged"; exit 0; fi
+          gh issue create --repo ${{ github.repository }} \
+            --title "Decision capture from #${{ steps.pr.outputs.num }}" \
+            --body-file body.md

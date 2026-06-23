@@ -125,3 +125,28 @@ export const SemanticCheckOutputSchema = z.object({
   fix_direction: z.string().nullable(),
 });
 export type SemanticCheckOutput = z.infer<typeof SemanticCheckOutputSchema>;
+
+/** DM-DECISION-NOTE — capture's draft output. id/pr/status/graduated_to are
+ * added by the integration layer; the agent emits the fields below. */
+export const SuggestedClass = z.enum(["architectural", "behavioral"]);
+
+export const DecisionEvidenceSchema = z.object({
+  file: z.string(),
+  lines: z.array(z.number()).min(1), // [start, end] in the post-merge file; min 1 ensures no empty range
+});
+
+export const DecisionNoteSchema = z.object({
+  detected_decision: z.string(),
+  evidence: z.array(DecisionEvidenceSchema).default([]),
+  suggested_class: SuggestedClass,
+  draft_rationale: z.string(),
+  confidence: z.number().min(0).max(1),
+  why_net_new: z.string(),
+});
+export type DecisionNote = z.infer<typeof DecisionNoteSchema>;
+
+/** The structured object the capture agent returns. Empty notes is valid. */
+export const CaptureOutputSchema = z.object({
+  notes: z.array(DecisionNoteSchema).default([]),
+});
+export type CaptureOutput = z.infer<typeof CaptureOutputSchema>;

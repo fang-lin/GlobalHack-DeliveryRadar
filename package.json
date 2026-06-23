@@ -17,7 +17,8 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "dist"
+    "dist",
+    "skills"
   ],
   "sideEffects": false,
   "scripts": {
@@ -30,7 +31,11 @@
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "3.0.85",
+    "@ai-sdk/gateway": "3.0.133",
+    "@ai-sdk/openai-compatible": "2.0.51",
     "@anthropic-ai/sdk": "^0.104.1",
+    "ai": "6.0.208",
     "js-yaml": "^4.1.0",
     "openai": "^6.44.0",
     "zod": "^3.25.0"
