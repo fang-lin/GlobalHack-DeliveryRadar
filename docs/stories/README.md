@@ -35,3 +35,4 @@ Work-unit records for Delivery Radar's **own** development — we dogfood our ow
 | ST-0023 | Footer on mobile — robust fix (visible + clean second-line wrap; recurring ST-0014) | In progress | ADR-0001 |
 | ST-0024 | Strengthen the radar test suite — co-locate units, fill coverage gaps, real integration tests | Todo · backlog | ADR-0007 |
 | ST-0025 | Auto-run the radar on every PR, on a low-cost provider (DeepSeek via Vercel) | In progress | FR-INT-6 |
+| ST-0026 | Empty conformance review says "Nothing flagged" (not a bare header) | In progress | FR-CONF-7 |
