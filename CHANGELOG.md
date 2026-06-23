@@ -1,3 +1,24 @@
+# [1.4.0](https://github.com/fang-lin/GlobalHack-DeliveryRadar/compare/v1.3.0...v1.4.0) (2026-06-23)
+
+
+### Bug Fixes
+
+* **capture:** openrouter provider branch + tighten DecisionNote bounds (ST-0005) ([ac70021](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/ac70021f96d54a3c75573ab65a51bdf79848f4e1))
+
+
+### Features
+
+* **capture:** investigative agent on the AI SDK (ST-0005, ADR-0009) ([fdea89d](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/fdea89df6a957411ba413b6b1120f1e0bb195a3c))
+* **capture:** read-only investigation tools (read/grep/git) (ST-0005, ADR-0009) ([4ea02c7](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/4ea02c73cb040c85f03cf25da4f74a49bc1ec523))
+* **capture:** select agent model from env (ST-0005, ADR-0007) ([bd195ba](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/bd195baa303e07bd6f0cd2bbb264b33abb1b0aaa))
+* **capture:** tolerant parser for agent output (ST-0005) ([9a17747](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/9a17747826ef552632609caff27b758aa3c52fa6))
+* **ci:** add radar-capture workflow; ship skills/ in package (ST-0005, ADR-0009) ([a6a2066](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/a6a2066a186e566ef4e4f3c503bae97711661f71))
+* **cli:** radar capture command (--diff/--save/--replay) (ST-0005) ([a568f56](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/a568f5643d54f61cf83dfc356d73234acf8e2d86))
+* **core:** DecisionNote data contract (DM-DECISION-NOTE) (ST-0005) ([3c3ddec](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/3c3ddec766117815b00f8c1edd036b3bf0eb6eda))
+* **core:** render Decision Notes to markdown (ST-0005) ([5af550f](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/5af550f2192b92f001c8add000ae12bbc556613b))
+* **io:** save/load Decision Notes for --save/--replay (ST-0005) ([b00972c](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/b00972cd9636bbbac95000236672d5e32770aac4))
+* **skills:** IIAC capture methodology skill (ST-0009, ST-0005) ([bdeb435](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/bdeb435349bd64b90f39ff533212388a8b50655a))
+
 # [1.3.0](https://github.com/fang-lin/GlobalHack-DeliveryRadar/compare/v1.2.0...v1.3.0) (2026-06-21)
 
 
