@@ -15,6 +15,11 @@ import type { Constraint, Verdict } from "./models.ts";
 
 const HEADER = "## 🛰️ Delivery Radar — Architecture Conformance";
 
+const ADVISORY =
+  "_Advisory — this check does not block your merge. The recorded intent " +
+  "behind the cited ADR is the source of truth; react with 👍/👎 so future " +
+  "checks can be calibrated._";
+
 function adrLink(constraint: Constraint): string {
   return `\`${constraint.adr}\` · constraint \`${constraint.id}\``;
 }
@@ -35,6 +40,37 @@ function rationaleQuote(driverContext: string, driver: string | null | undefined
   return cut.slice(0, cut.lastIndexOf(" ")) + "…";
 }
 
+/** Returns the "> Why this rule exists" block (with leading blank blockquote line), or "". */
+function driverBlock(constraint: Constraint, driverContext: string): string {
+  if (!constraint.driver) return "";
+  const quote = rationaleQuote(driverContext, constraint.driver);
+  if (quote) {
+    return (
+      ">\n" +
+      `> **Why this rule exists** (driver \`${constraint.driver}\`, ` +
+      `from ${constraint.adr}): ${quote}`
+    );
+  }
+  return (
+    ">\n" +
+    `> **Why this rule exists**: see driver \`${constraint.driver}\` ` +
+    `in ${constraint.adr} — violating it defeats the reason, not just the letter.`
+  );
+}
+
+/** Returns the evidence line (preceded by blank line) or "". */
+function evidenceLine(verdict: Verdict): string {
+  if (!verdict.evidence.code) return "";
+  const c = verdict.evidence.code;
+  return `\n\n**Evidence:** \`${c.file}\` L${c.lines[0]}–L${c.lines[1]}`;
+}
+
+/** Returns the fix-direction line (preceded by blank line) or "". */
+function fixLine(verdict: Verdict): string {
+  if (!verdict.fix_direction) return "";
+  return `\n\n**Direction:** ${verdict.fix_direction}`;
+}
+
 export function verdictMarkdown(
   verdict: Verdict,
   constraint: Constraint,
@@ -45,36 +81,33 @@ export function verdictMarkdown(
     aligned: "🟢 **ALIGNED**",
     unknown: "⚪ **UNKNOWN**",
   }[verdict.result];
-  const lines = [
-    `### ${badge} — ${constraint.title}`,
-    "",
+
+  const driver = driverBlock(constraint, driverContext);
+  const driverSection = driver ? `\n${driver}` : "";
+
+  return (
+    `### ${badge} — ${constraint.title}\n` +
+    `\n` +
     `${adrLink(constraint)} · severity **${constraint.severity}** · ` +
-      `confidence **${verdict.confidence.toFixed(2)}**`,
-    "",
-    `> **Rule:** ${constraint.rule.trim()}`,
-  ];
-  if (constraint.driver) {
-    const quote = rationaleQuote(driverContext, constraint.driver);
-    lines.push(">");
-    if (quote) {
-      lines.push(
-        `> **Why this rule exists** (driver \`${constraint.driver}\`, ` +
-          `from ${constraint.adr}): ${quote}`,
-      );
-    } else {
-      lines.push(
-        `> **Why this rule exists**: see driver \`${constraint.driver}\` ` +
-          `in ${constraint.adr} — violating it defeats the reason, not just the letter.`,
-      );
-    }
-  }
-  if (verdict.evidence.code) {
-    const c = verdict.evidence.code;
-    lines.push("", `**Evidence:** \`${c.file}\` L${c.lines[0]}–L${c.lines[1]}`);
-  }
-  lines.push("", `**Explanation:** ${verdict.explanation}`);
-  if (verdict.fix_direction) lines.push("", `**Direction:** ${verdict.fix_direction}`);
-  return lines.join("\n");
+    `confidence **${verdict.confidence.toFixed(2)}**\n` +
+    `\n` +
+    `> **Rule:** ${constraint.rule.trim()}` +
+    `${driverSection}` +
+    `${evidenceLine(verdict)}\n` +
+    `\n` +
+    `**Explanation:** ${verdict.explanation}` +
+    `${fixLine(verdict)}`
+  );
+}
+
+/**
+ * Joins an array of card strings with blank-line + separator + blank-line spacing,
+ * with a trailing separator after the last card (matching the original push-then-join
+ * structure where every card is followed by "", "---", "").
+ */
+function joinCards(cards: string[]): string {
+  // Each card is followed by \n\n---\n\n; the last card also gets a trailing separator.
+  return cards.map((c) => `${c}\n\n---\n\n`).join("");
 }
 
 export function reviewMarkdown(
@@ -83,37 +116,26 @@ export function reviewMarkdown(
   driverContexts: Record<string, string> = {},
 ): string {
   const byId = new Map(constraints.map((c) => [c.id, c]));
-  const blocks = [HEADER, ""];
   const ordered = [...verdicts].sort((a, b) => {
     const av = a.result !== "violated" ? 1 : 0;
     const bv = b.result !== "violated" ? 1 : 0;
     return av - bv || b.confidence - a.confidence;
   });
-  let rendered = 0;
+
+  const cards: string[] = [];
   for (const v of ordered) {
     const constraint = byId.get(v.constraint_id);
     if (!constraint) continue;
-    blocks.push(
-      verdictMarkdown(v, constraint, driverContexts[constraint.adr] ?? ""),
-      "",
-      "---",
-      "",
-    );
-    rendered++;
+    cards.push(verdictMarkdown(v, constraint, driverContexts[constraint.adr] ?? ""));
   }
-  if (rendered === 0) {
-    // No verdicts to show — make "nothing flagged" explicit, rather than leaving a
-    // bare header that reads like the check failed (FR-CONF-7 / NFR-EXPLAIN-1).
-    blocks.push(
-      "✅ **Nothing flagged** — the changed files raise no architecture-conformance " +
-        "issues against the recorded intent.",
-      "",
-    );
+
+  const nothingFlagged =
+    "✅ **Nothing flagged** — the changed files raise no architecture-conformance " +
+    "issues against the recorded intent.";
+
+  if (cards.length === 0) {
+    return `${HEADER}\n\n${nothingFlagged}\n\n${ADVISORY}`;
   }
-  blocks.push(
-    "_Advisory — this check does not block your merge. The recorded intent " +
-      "behind the cited ADR is the source of truth; react with 👍/👎 so future " +
-      "checks can be calibrated._",
-  );
-  return blocks.join("\n");
+  // Cards block already ends with \n\n (from the trailing separator), so ADVISORY follows directly.
+  return `${HEADER}\n\n${joinCards(cards)}${ADVISORY}`;
 }
