@@ -27,8 +27,10 @@ const SYSTEM =
 
 async function main(): Promise<void> {
   const diff = readFileSync(process.argv[2], "utf8");
+  // Honor the script's own default when RADAR_MODEL is unset (selectModel falls
+  // back to "claude-sonnet-4-5" which is not what this script intends).
+  process.env.RADAR_MODEL ??= DEFAULT_MODEL;
   const model = selectModel(process.env);
-  void DEFAULT_MODEL; // used implicitly via RADAR_MODEL env default in selectModel
   const response = await generateText({
     model,
     system: SYSTEM,
