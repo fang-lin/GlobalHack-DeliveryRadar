@@ -30,10 +30,13 @@ Reasons: (1) one language across the radar core and the showcase SPA (also TS); 
   adr: ADR-0003
   title: Model verdicts via typed structured outputs only
   rule: >
-    The radar's Anthropic model calls must obtain results through the SDK's
-    typed structured outputs (messages.parse + zodOutputFormat with a Zod
-    schema). They must not hand-parse free text or JSON out of the model's
-    message.content (no JSON.parse / regex extraction of verdict fields).
+    Model verdicts/outputs MUST be obtained as typed, zod-validated structured
+    output (a schema in, a validated object out), regardless of which
+    SDK/provider produces them. Code MUST NOT hand-parse verdict fields out of
+    the model's free-text message (no JSON.parse / regex extraction of
+    result/confidence/evidence as the primary path). A tolerant text-parse used
+    only as a documented fallback behind a schema-validated primary path is
+    allowed.
   polarity: requirement
   driver: ADR-0003 — typed, validated verdicts are the product's reliability guarantee
   scope:
@@ -44,12 +47,11 @@ Reasons: (1) one language across the radar core and the showcase SPA (also TS); 
     matcher: null
     examples:
       compliant:
-        - "client.messages.parse with zodOutputFormat(Schema)"
-        - "a Zod-validated Verdict returned by checkConstraint"
+        - "runAgent returns a zod-validated object via Output.object"
+        - "the engine validates with safeParse before returning a Verdict"
       violating:
-        - "JSON.parse(resp.content[0].text)"
-        - "regex-extracting result/confidence from the model's text reply"
-        - "messages.create then manually reading message.content for a verdict"
+        - "regex-extracting the verdict fields out of message.content as the primary path"
+        - "JSON.parse(resp.content[0].text) used as the sole path to obtain result/confidence"
   enforce: advisory
   severity: high
   status: active

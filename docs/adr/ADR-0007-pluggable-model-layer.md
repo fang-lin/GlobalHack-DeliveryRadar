@@ -1,6 +1,6 @@
 # ADR-0007: Pluggable model layer — a `ModelClient` port with native + OpenAI-compatible adapters
 
-- **Status:** Accepted
+- **Status:** Accepted · ADR-0007-C1 superseded by ADR-0010 (the ModelClient port is replaced by one shared investigative agent; ADR-0007's pluggable/cheap/edge-selected-provider intent is carried forward by the agent's model selection).
 - **Date:** 2026-06-21
 - **Deciders:** Lin Fang
 - **Related:** ADR-0006 (platform-agnostic core; the LLM is the core's one allowed outbound dependency) · ADR-0003 (TypeScript, typed structured outputs) · ST-0022 (architecture restructure, adjustment A)
@@ -72,6 +72,6 @@ So the LLM dependency must become **pluggable**, without losing the proven Anthr
         - "a model id, base_url, or response_format literal embedded in the check logic"
   enforce: advisory
   severity: high
-  status: active
-  superseded_by: null
+  status: superseded
+  superseded_by: ADR-0010
 ```

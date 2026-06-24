@@ -224,7 +224,7 @@ radar extract --adr-dir ../GlobalHack-shop-demo/docs/adr
 
 # check a PR diff against in-scope constraints (semantic, driver-grounded)
 gh pr diff 1 -R fang-lin/GlobalHack-shop-demo > pr1.diff
-radar check --adr-dir ../GlobalHack-shop-demo/docs/adr --diff pr1.diff --save verdicts.json
+radar conformance --adr-dir ../GlobalHack-shop-demo/docs/adr --diff pr1.diff --save verdicts.json
 
 # project verdicts as an advisory PR review
 radar comment --adr-dir ../GlobalHack-shop-demo/docs/adr --verdicts verdicts.json \

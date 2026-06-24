@@ -19,7 +19,7 @@ Work-unit records for Delivery Radar's **own** development — we dogfood our ow
 | ST-0007 | Conformance — richer comment projection types | Todo | — |
 | ST-0008 | Dogfood — run the radar on this repo (VIS-4) | In progress | ADR-0004 |
 | ST-0009 | IIAC `SKILL.md` (methodology as a skill) | Todo · backlog | — |
-| ST-0010 | radar as investigative agent + pre-PR self-check | Todo · backlog | — |
+| ST-0010 | radar as investigative agent + pre-PR self-check | Todo · backlog (partially realized by ST-0027 — agent engine + conformance-as-agent) | — |
 | ST-0011 | Migrate radar Python → TypeScript | Done | ADR-0003 |
 | ST-0012 | Replay/precision eval harness (Backstage) | Done | — |
 | ST-0013 | GitHub Action — radar-check a PR against recorded intent (manual, advisory) | In progress | FR-INT-6 |
@@ -36,3 +36,4 @@ Work-unit records for Delivery Radar's **own** development — we dogfood our ow
 | ST-0024 | Strengthen the radar test suite — co-locate units, fill coverage gaps, real integration tests | Todo · backlog | ADR-0007 |
 | ST-0025 | Auto-run the radar on every PR, on a low-cost provider (DeepSeek via Vercel) | In progress | FR-INT-6 |
 | ST-0026 | Empty conformance review says "Nothing flagged" (not a bare header) | In progress | FR-CONF-7 |
+| ST-0027 | Unify radar operations on one skill-driven agent; conformance becomes an agent | In progress | ADR-0010 |
