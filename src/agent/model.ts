@@ -1,10 +1,10 @@
-/** Select the capture agent's model from env (ADR-0007 spirit, ADR-0006-C2: env only). */
+/** Select the agent's model from env (ADR-0007 spirit, ADR-0006-C2: env only). */
 import type { LanguageModel } from "ai";
 import { gateway } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 
-export function selectCaptureModel(env: NodeJS.ProcessEnv): LanguageModel {
+export function selectModel(env: NodeJS.ProcessEnv): LanguageModel {
   const provider = env.RADAR_PROVIDER ?? "anthropic";
   const model = env.RADAR_MODEL;
   switch (provider) {
@@ -27,6 +27,6 @@ export function selectCaptureModel(env: NodeJS.ProcessEnv): LanguageModel {
       return p.chatModel(model ?? "");
     }
     default:
-      throw new Error(`unknown RADAR_PROVIDER for capture: ${provider}`);
+      throw new Error(`unknown RADAR_PROVIDER: ${provider}`);
   }
 }

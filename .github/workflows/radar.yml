@@ -111,13 +111,11 @@ jobs:
       - name: "Radar check — does the diff still match the ADRs? (LLM, advisory)"
         env:
           # DeepSeek V4 Pro via Vercel AI Gateway (ADR-0007 pluggable model layer).
-          # V4 Pro rejects response_format json_object, so use json_schema (verified
-          # live). Provider/model/mode are plain config; only the key is a secret.
+          # Provider/model are plain config; only the key is a secret.
           RADAR_PROVIDER: vercel
           RADAR_MODEL: deepseek/deepseek-v4-pro
-          RADAR_JSON_MODE: json_schema
           AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
-        run: pnpm exec tsx src/cli/main.ts check --adr-dir .radar-baseline/docs/adr --diff pr.diff --save verdicts.json
+        run: pnpm exec tsx src/cli/main.ts conformance --adr-dir .radar-baseline/docs/adr --diff pr.diff --save verdicts.json
 
       # Success: render the verdict with the CLI (pure — stdout only), then the
       # workflow edits the SAME 'started' review in place via gh api. All platform

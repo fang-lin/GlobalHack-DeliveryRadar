@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from "vitest";
-import { buildTools } from "../../src/capture/tools.ts";
+import { buildTools } from "../../src/agent/tools.ts";
 
 describe("buildTools (read-only)", () => {
   const tools = buildTools(process.cwd());
@@ -25,7 +25,7 @@ describe("buildTools (read-only)", () => {
   it("grep matches a pattern with metacharacters literally (regex mode would choke)", async () => {
     // "stepCountIs(" has an unbalanced paren — grep's default regex mode errors on
     // it and the result is swallowed as "no matches"; with -F it matches literally.
-    const out = await tools.grep.execute({ pattern: "stepCountIs(", path: "src/capture/agent.ts" }, {} as any);
+    const out = await tools.grep.execute({ pattern: "stepCountIs(", path: "src/agent/engine.ts" }, {} as any);
     expect(out).toMatch(/stepCountIs\(/);
   });
   it("grep refuses to escape the repo root", async () => {

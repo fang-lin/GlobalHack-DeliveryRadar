@@ -6,7 +6,7 @@
 import { parseArgs } from "node:util";
 import { extractFromDir, adrSection } from "../../io/extract.ts";
 import { loadVerdicts } from "../../io/verdicts.ts";
-import { reviewMarkdown } from "../../core/comment.ts";
+import { reviewMarkdown } from "../../core/conformance-comment.ts";
 import { fail } from "../util.ts";
 
 export async function cmdComment(argv: string[]): Promise<number> {

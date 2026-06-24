@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /** radar CLI — entry point. Dispatches to one-file-per-command (cli/commands/). */
 import { cmdExtract } from "./commands/extract.ts";
-import { cmdCheck } from "./commands/check.ts";
+import { cmdConformance } from "./commands/conformance.ts";
 import { cmdComment } from "./commands/comment.ts";
 import { cmdCapture } from "./commands/capture.ts";
 import { fail } from "./util.ts";
@@ -11,15 +11,15 @@ async function main(): Promise<number> {
   switch (command) {
     case "extract":
       return cmdExtract(rest);
-    case "check":
-      return cmdCheck(rest);
+    case "conformance":
+      return cmdConformance(rest);
     case "comment":
       return cmdComment(rest);
     case "capture":
       return cmdCapture(rest);
     default:
       return fail(
-        `unknown command '${command ?? ""}' (expected: extract | check | comment | capture)`,
+        `unknown command '${command ?? ""}' (expected: extract | conformance | comment | capture)`,
       );
   }
 }
