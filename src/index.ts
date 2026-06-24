@@ -13,7 +13,7 @@ export { selectModel } from "./agent/model.ts";
 // --- core engine (pure) ---
 export { buildUserPrompt, toVerdict } from "./core/checker.ts";
 export { retrieve } from "./core/retrieve.ts";
-export { reviewMarkdown } from "./core/comment.ts";
+export { reviewMarkdown } from "./core/conformance-comment.ts";
 
 // --- domain contracts ---
 export {

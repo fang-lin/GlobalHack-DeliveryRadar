@@ -1,5 +1,5 @@
 window.EVAL_DATA = {
-  "model": "anthropic/claude-sonnet-4-6",
+  "model": "vercel/deepseek/deepseek-v4-pro",
   "n": 7,
   "rows": [
     {
@@ -11,13 +11,13 @@ window.EVAL_DATA = {
       "source": "https://github.com/backstage/backstage/pull/28986",
       "grounded": {
         "result": "violated",
-        "confidence": 0.97,
-        "explanation": "The updated function still returns `strDateTime.toFormat('yyyy-MM-dd hh:mm:ss ZZZZ')`, a hard-coded custom pattern string, for the value that is ultimately displayed to users. This directly violates the prohibition on using `toFormat(...)` for UI-displayed dates."
+        "confidence": 0.9,
+        "explanation": "The function convertTimeToLocalTimezone still returns a value formatted with toFormat('yyyy-MM-dd hh:mm:ss ZZZZ'), a hard-coded pattern. The comment says the purpose is so users 'can easily understand the times,' confirming it targets UI display. This defeats ADR012's reason: locale-consistent, unambiguous date display."
       },
       "ungrounded": {
         "result": "aligned",
-        "confidence": 0.72,
-        "explanation": "The refactoring is cleaner: using `toISOString()` and `DateTime.fromISO` is more robust than calling `toLocaleString()` then parsing with a fixed format string. One pre-existing issue (`hh` is 12-hour clock, should be `HH` for 24-hour) is carried over but not introduced by this diff. The implicit assumption that string inputs are ISO-formatted should be consistent with callers."
+        "confidence": 0.7,
+        "explanation": "The change fixes a likely bug in date parsing (original used toLocaleString with an incompatible format) by switching to ISO-based parsing, which is more robust. However, the timezone assumption changed from UTC to local for string inputs without timezone, which could alter behavior, but this seems like a reasonable correction given the environment."
       }
     },
     {
@@ -29,13 +29,13 @@ window.EVAL_DATA = {
       "source": null,
       "grounded": {
         "result": "aligned",
-        "confidence": 0.98,
-        "explanation": "The diff replaces a raw ISO string display with `DateTime.fromISO(iso).toLocaleString(DateTime.DATETIME_MED)`, which is exactly the locale-aware preset pattern mandated by ADR-BS012-C1. No custom `toFormat` pattern strings are introduced."
+        "confidence": 0.99,
+        "explanation": "The diff replaces a raw ISO string display with a call to DateTime.fromISO(iso).toLocaleString(DateTime.DATETIME_MED), which uses a Luxon locale preset exactly as required by ADR-BS012-C1. No custom toFormat pattern is introduced."
       },
       "ungrounded": {
         "result": "aligned",
-        "confidence": 0.85,
-        "explanation": "The change correctly converts an ISO timestamp to a locale-aware human-readable string while preserving the raw ISO value as a tooltip, which is a straightforward and sensible improvement. No edge cases like invalid ISO strings are handled, but that's a minor omission rather than a blocking issue."
+        "confidence": 0.9,
+        "explanation": "The change improves user experience by formatting timestamps for the user's locale while preserving the raw ISO string as a tooltip, with no negative side effects."
       }
     },
     {
@@ -52,8 +52,8 @@ window.EVAL_DATA = {
       },
       "ungrounded": {
         "result": "aligned",
-        "confidence": 0.9,
-        "explanation": "The diff simply adds a documentation sentence explaining how to override the backend base URL. No code logic, security, or correctness issues are introduced."
+        "confidence": 0.95,
+        "explanation": "Adding documentation for the backend.baseUrl setting improves clarity and is a standard practice."
       }
     },
     {
@@ -66,12 +66,12 @@ window.EVAL_DATA = {
       "grounded": {
         "result": "violated",
         "confidence": 0.99,
-        "explanation": "The new component `StatusLabel` is typed as `React.FC<StatusLabelProps>`, which is explicitly prohibited by ADR-BS006-C1. This implicitly injects a `children` prop and uses the banned typing pattern."
+        "explanation": "The new component StatusLabel is typed with React.FC<StatusLabelProps>, which is prohibited for new code per ADR-BS006-C1. React.FC implicitly injects a children prop and cannot express a generic children type."
       },
       "ungrounded": {
         "result": "aligned",
-        "confidence": 0.9,
-        "explanation": "The component is a straightforward, well-typed presentational badge that maps a constrained union type to a CSS class and display text. No issues with the implementation."
+        "confidence": 0.95,
+        "explanation": "The component is simple and well-typed, with no obvious bugs or anti-patterns."
       }
     },
     {
@@ -83,13 +83,13 @@ window.EVAL_DATA = {
       "source": "packages/backend-defaults/src/entrypoints/urlReader/lib/GithubUrlReader.ts",
       "grounded": {
         "result": "violated",
-        "confidence": 0.99,
-        "explanation": "The diff explicitly adds `import fetch, { RequestInit, Response } from 'node-fetch'`, which is precisely the import pattern prohibited by ADR-BS014-C1. Node.js 20+ provides native global `fetch`, `RequestInit`, and `Response` without any import."
+        "confidence": 1,
+        "explanation": "The diff adds an explicit import of 'node-fetch', which is prohibited by ADR-BS014-C1. The business driver requires using the native global fetch to avoid compatibility issues on newer Node.js versions."
       },
       "ungrounded": {
         "result": "aligned",
-        "confidence": 0.75,
-        "explanation": "Explicitly importing `fetch`, `RequestInit`, and `Response` from `node-fetch` is appropriate here because `node-fetch` provides a Node.js-style readable stream body, which is required by `ReadUrlResponseFactory.fromNodeJSReadable`; relying on the global `fetch` (Node 18+) would yield a Web `ReadableStream` instead. The `Response` import isn't visible in use within this diff, but it may be referenced elsewhere in the file."
+        "confidence": 0.8,
+        "explanation": "The change correctly wraps the headers into a RequestInit object, likely fixing a bug where headers were passed incorrectly. The explicit import of fetch avoids reliance on global fetch."
       }
     },
     {
@@ -101,13 +101,13 @@ window.EVAL_DATA = {
       "source": null,
       "grounded": {
         "result": "violated",
-        "confidence": 0.99,
-        "explanation": "The test stubs HTTP by reassigning `global.fetch` with `jest.fn().mockResolvedValue(...)`, which is explicitly prohibited by ADR-BS007-C1. MSW's `setupServer` with `rest`/`http` handlers must be used instead."
+        "confidence": 0.98,
+        "explanation": "The PR introduces a hand-rolled HTTP mock by reassigning `global.fetch` inside `beforeEach`, which directly violates the prohibition against mocking fetch via global reassignment."
       },
       "ungrounded": {
         "result": "violated",
-        "confidence": 0.85,
-        "explanation": "The `global.fetch` mock is set in `beforeEach` but never restored in an `afterEach`, so the stub leaks into any test files that run afterward in the same Jest worker, potentially causing false positives or hard-to-diagnose failures. Add `afterEach(() => jest.restoreAllMocks())` or save and restore the original `global.fetch` to prevent the leak."
+        "confidence": 0.7,
+        "explanation": "Stubbing global.fetch in beforeEach without a corresponding afterEach to restore the original can lead to cross-test contamination when more tests are added. It's safer to clean up after the test."
       }
     },
     {
@@ -119,13 +119,13 @@ window.EVAL_DATA = {
       "source": "packages/integration/src/gitlab/GitLabIntegration.test.ts",
       "grounded": {
         "result": "aligned",
-        "confidence": 0.98,
-        "explanation": "The diff introduces MSW-based HTTP mocking via setupServer with rest.get handlers, exactly as required by ADR-BS007-C1. No hand-rolled fetch stubs, global.fetch reassignments, or nock usage are present."
+        "confidence": 0.95,
+        "explanation": "The diff adds an MSW `setupServer` with a `rest.get` handler — the exact compliant pattern prescribed by ADR007."
       },
       "ungrounded": {
-        "result": "unknown",
-        "confidence": 0.55,
-        "explanation": "The MSW server setup follows a standard pattern, but the intercepted URL `https://h.com/api/v4` looks like a placeholder or truncated hostname rather than a realistic GitLab test URL. Without seeing the rest of the test file it's impossible to confirm whether this handler actually matches the URLs used in the tests, or if it will silently never fire."
+        "result": "aligned",
+        "confidence": 0.9,
+        "explanation": "The diff adds a standard MSW mock server setup for HTTP request interception in tests, which follows common testing practices. The lifecycle hooks are correctly placed, and there are no apparent violations of best practices."
       }
     }
   ],

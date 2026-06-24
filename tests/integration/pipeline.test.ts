@@ -5,7 +5,7 @@ import { extractFromDir } from "../../src/io/extract.ts";
 import { loadDiff } from "../../src/io/diff.ts";
 import { retrieve } from "../../src/core/retrieve.ts";
 import { toVerdict } from "../../src/core/checker.ts";
-import { reviewMarkdown } from "../../src/core/comment.ts";
+import { reviewMarkdown } from "../../src/core/conformance-comment.ts";
 import type { Verdict } from "../../src/core/models.ts";
 
 const FIXTURES = join(dirname(fileURLToPath(import.meta.url)), "..", "fixtures");
