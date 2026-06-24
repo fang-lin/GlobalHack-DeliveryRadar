@@ -16,15 +16,17 @@ describe("buildTools (read-only)", () => {
     const out = await tools.git.execute({ args: ["push"] }, {} as any);
     expect(out).toMatch(/only read-only/i);
   });
-  it("grep finds a literal string in the repo", async () => {
-    const out = await tools.grep.execute({ pattern: "\"name\"", path: "package.json" }, {} as any);
-    expect(out).toMatch(/package\.json/);
+  it("grep finds a literal string and returns the matching line", async () => {
+    // Assert the matched LINE CONTENT, not the filename: GNU grep (Linux CI) omits
+    // the filename prefix for a single-file search, BSD grep (macOS) includes it.
+    const out = await tools.grep.execute({ pattern: "delivery-radar", path: "package.json" }, {} as any);
+    expect(out).toMatch(/delivery-radar/);
   });
-  it("grep treats regex metacharacters literally (does not error)", async () => {
-    // A pattern with unbalanced-looking parens would break grep's default regex
-    // mode; with -F it is matched literally and simply returns "no matches".
-    const out = await tools.grep.execute({ pattern: "fetch(", path: "." }, {} as any);
-    expect(out).not.toMatch(/parentheses|unbalanced|error/i);
+  it("grep matches a pattern with metacharacters literally (regex mode would choke)", async () => {
+    // "stepCountIs(" has an unbalanced paren — grep's default regex mode errors on
+    // it and the result is swallowed as "no matches"; with -F it matches literally.
+    const out = await tools.grep.execute({ pattern: "stepCountIs(", path: "src/capture/agent.ts" }, {} as any);
+    expect(out).toMatch(/stepCountIs\(/);
   });
   it("grep refuses to escape the repo root", async () => {
     const out = await tools.grep.execute({ pattern: "x", path: "../../etc" }, {} as any);
