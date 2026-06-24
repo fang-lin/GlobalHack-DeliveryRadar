@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/fang-lin/GlobalHack-DeliveryRadar/compare/v1.4.0...v1.4.1) (2026-06-24)
+
+
+### Bug Fixes
+
+* **capture:** grep tool matches literally (-F), not as a regex (ST-0005) ([3bc093b](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/3bc093b6b5d616574c9bb39cc949135f795dcd63))
+
 # [1.4.0](https://github.com/fang-lin/GlobalHack-DeliveryRadar/compare/v1.3.0...v1.4.0) (2026-06-23)
 
 

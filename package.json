@@ -1,6 +1,6 @@
 {
   "name": "delivery-radar",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Delivery Radar — intent-implementation governance engine (IIAC)",
   "type": "module",
   "packageManager": "pnpm@9.15.9",
