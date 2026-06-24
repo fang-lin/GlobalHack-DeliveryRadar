@@ -1,6 +1,6 @@
 # Delivery Radar — Requirements Specification
 
-> **Authoritative version: Chinese (`delivery-radar-requirements.zh.md`) · This file: synchronized English translation (original v1.0 text) · Last synced: 2026-06-22 · On conflict, the Chinese version prevails.**
+> **Authoritative version: Chinese (`delivery-radar-requirements.zh.md`) · This file: synchronized English translation (original v1.0 text) · Last synced: 2026-06-25 · On conflict, the Chinese version prevails.**
 
 **System:** Intent–Implementation Governance Engine
 **Codename:** Delivery Radar (交付雷达)
@@ -454,7 +454,13 @@ path/ownership mapping first; semantic similarity is a secondary signal only.
   always reflects the check's current state (started / done / failed) and never
   leaves a stuck "running" zombie; one run occupies one review, and separate
   runs each create their own (each check is an auditable record, `NFR-EVAL-1`).
-  State stays `COMMENT` (non-blocking, `FR-CONF-9`).
+  **(Revised 2026-06-25) Before posting the new review, each run SHOULD fold this
+  system's prior conformance reviews on the PR to `OUTDATED` (GraphQL
+  `minimizeComment`; top-level `COMMENT` reviews are minimizable), so only the
+  latest is expanded and repeated pushes don't flood the PR with reviews. No
+  auditable record is lost — each run still leaves its own (now-folded) review,
+  and the Actions run history is the full trail.** State stays `COMMENT`
+  (non-blocking, `FR-CONF-9`).
 
 ---
 
