@@ -79,12 +79,26 @@ jobs:
           AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
         run: pnpm exec tsx src/cli/main.ts capture --diff pr.diff --adr-dir docs/adr --save notes.json > body.md
 
-      - name: Open an advisory issue per Decision Note (human decides whether to graduate to ADR)
+      # Always leave a visible trace on the Actions run page (the job summary) so
+      # you can confirm capture ran even when it flags nothing — without opening a
+      # comment on the already-merged PR. On findings, open an advisory issue and
+      # link it in the summary. (Platform output lives in the workflow, never the
+      # core — ADR-0006.)
+      - name: Open an advisory issue on findings + always write a run summary
         env:
           GH_TOKEN: ${{ github.token }}
+          PR: ${{ steps.pr.outputs.num }}
         run: |
           COUNT=$(jq 'length' notes.json)
-          if [ "$COUNT" = "0" ]; then echo "nothing flagged"; exit 0; fi
-          gh issue create --repo ${{ github.repository }} \
-            --title "Decision capture from #${{ steps.pr.outputs.num }}" \
-            --body-file body.md
+          echo "## 🛰️ Decision Capture — PR #$PR" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$COUNT" = "0" ]; then
+            echo "✅ Ran successfully — **0 decision notes** (nothing flagged). No issue opened." >> "$GITHUB_STEP_SUMMARY"
+            echo "nothing flagged"
+            exit 0
+          fi
+          URL=$(gh issue create --repo ${{ github.repository }} \
+            --title "Decision capture from #$PR" \
+            --body-file body.md)
+          echo "🟡 Ran successfully — **$COUNT decision note(s)** drafted → $URL" >> "$GITHUB_STEP_SUMMARY"
+          echo "opened $URL"
