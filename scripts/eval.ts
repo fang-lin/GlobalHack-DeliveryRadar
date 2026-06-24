@@ -148,7 +148,7 @@ async function main(): Promise<void> {
     // ---- GROUNDED arm ----
     let grounded: ArmResult;
     const gKey = `grounded:${tag}:${cs.id}`;
-    const cachedG = cache[gKey] ?? cache[`grounded:${cs.id}`]; // legacy-key fallback for --replay
+    const cachedG = cache[gKey];
     if (cs.target_constraint) {
       const pair = pairs.find(([c]) => c.id === cs.target_constraint);
       if (!pair) {
@@ -185,7 +185,7 @@ async function main(): Promise<void> {
     // ---- UNGROUNDED arm ----
     let ungrounded: ArmResult;
     const uKey = `ungrounded:${tag}:${cs.id}`;
-    const cachedU = cache[uKey] ?? cache[`ungrounded:${cs.id}`]; // legacy-key fallback for --replay
+    const cachedU = cache[uKey];
     if (cachedU) {
       ungrounded = cachedU;
     } else if (replay) {

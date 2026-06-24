@@ -50,6 +50,7 @@ export async function cmdConformance(argv: string[]): Promise<number> {
         model, skill, tools,
         user: buildUserPrompt(constraint, diffs, context),
         outputSchema: SemanticCheckOutputSchema,
+        maxTokens: 16000,
       });
       // agent failed to produce a verdict → unknown (FR-CONF-6), never crash
       verdicts.push(
@@ -60,7 +61,10 @@ export async function cmdConformance(argv: string[]): Promise<number> {
               explanation: "the checker could not produce a verdict", fix_locality: "none", fix_direction: null },
       );
     }
-    if (values.save) saveVerdicts(verdicts, values.save);
+    if (values.save) {
+      saveVerdicts(verdicts, values.save);
+      console.error(`saved verdicts to ${values.save}`);
+    }
   }
   for (const v of verdicts) {
     console.log(`${v.constraint_id}: ${v.result} (confidence ${v.confidence.toFixed(2)})`);

@@ -31,6 +31,7 @@ async function main(): Promise<void> {
   // back to "claude-sonnet-4-5" which is not what this script intends).
   process.env.RADAR_MODEL ??= DEFAULT_MODEL;
   const model = selectModel(process.env);
+  // Intentionally NOT the radar agent engine: this is the ungrounded-contrast demo artifact (no tools, no schema), not a radar operation (ADR-0010-C1 scopes to conformance/capture/drift).
   const response = await generateText({
     model,
     system: SYSTEM,

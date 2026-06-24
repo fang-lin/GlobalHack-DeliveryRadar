@@ -15,6 +15,7 @@ export async function runAgent<T>(opts: {
   user: string;
   tools: Record<string, Tool>;
   outputSchema: z.ZodType<T>;
+  maxTokens?: number;
 }): Promise<T | null> {
   const shared = {
     model: opts.model,
@@ -22,6 +23,7 @@ export async function runAgent<T>(opts: {
     prompt: opts.user,
     tools: opts.tools,
     stopWhen: stepCountIs(24), // tool rounds + the structured-output step
+    ...(opts.maxTokens != null ? { maxOutputTokens: opts.maxTokens } : {}),
   } as const;
   try {
     const r = await generateText({ ...shared, output: Output.object({ schema: opts.outputSchema }) });
