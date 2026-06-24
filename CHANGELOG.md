@@ -1,3 +1,17 @@
+# [1.5.0](https://github.com/fang-lin/GlobalHack-DeliveryRadar/compare/v1.4.1...v1.5.0) (2026-06-24)
+
+
+### Bug Fixes
+
+* address final-review items — eval cache, dead json-mode env, output-token cap, --save message (ADR-0010) ([830664c](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/830664c243c72ef192553f1a869758375468c803))
+
+
+### Features
+
+* **agent:** generic runAgent engine; capture runs on it (ADR-0010) ([482122e](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/482122e4a1798706cebed728c4ce4e789c2ad545))
+* **cli:** radar conformance runs the agent per in-scope constraint (ADR-0010, ST-0010) ([e869b8c](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/e869b8c760f5482a88d1e7b7c0fff11563f05132))
+* **skills:** conformance methodology skill (ADR-0010, ST-0010) ([f02fb02](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/f02fb026c68dd32b84729a8b662b50bf4e03f055))
+
 ## [1.4.1](https://github.com/fang-lin/GlobalHack-DeliveryRadar/compare/v1.4.0...v1.4.1) (2026-06-24)
 
 
