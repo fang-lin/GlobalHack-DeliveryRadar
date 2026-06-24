@@ -36,6 +36,19 @@ export function buildUserPrompt(
   return parts.join("\n\n");
 }
 
+/** Pure: return an "unknown" Verdict when the agent could not produce a verdict (FR-CONF-6). */
+export function unknownVerdict(constraint: Constraint): Verdict {
+  return {
+    constraint_id: constraint.id,
+    result: "unknown",
+    confidence: 0,
+    evidence: { adr_clause: constraint.id, code: null },
+    explanation: "the checker could not produce a verdict",
+    fix_locality: "none",
+    fix_direction: null,
+  };
+}
+
 /** Pure: map the model's structured output to a DM-VERDICT for one constraint. */
 export function toVerdict(constraint: Constraint, out: SemanticCheckOutput): Verdict {
   let code = null;

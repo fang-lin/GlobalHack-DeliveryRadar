@@ -21,10 +21,9 @@ import yaml from "js-yaml";
 import { extractFromDir, adrSection } from "../src/io/extract.ts";
 import { loadDiff } from "../src/io/diff.ts";
 import { retrieve } from "../src/core/retrieve.ts";
-import { buildUserPrompt, toVerdict } from "../src/core/checker.ts";
 import { selectModel } from "../src/agent/model.ts";
 import { runAgent } from "../src/agent/engine.ts";
-import { buildTools } from "../src/agent/tools.ts";
+import { runConformanceCheck } from "../src/agent/conformance-run.ts";
 import { SemanticCheckOutputSchema } from "../src/core/models.ts";
 import type { LanguageModel, Tool } from "ai";
 
@@ -129,11 +128,9 @@ async function main(): Promise<void> {
 
   // Build live-call resources only when not replaying
   let liveModel: LanguageModel | null = null;
-  let liveTools: Record<string, Tool> = {};
   let conformanceSkill = "";
   if (!replay) {
     liveModel = selectModel(process.env);
-    liveTools = buildTools(process.cwd());
     conformanceSkill = readFileSync("skills/conformance/SKILL.md", "utf8");
   }
 
@@ -160,17 +157,8 @@ async function main(): Promise<void> {
       } else {
         const [c, diffs] = pair;
         const ctx = adrSection(ADR_DIR, c.adr, "Context");
-        const out = await runAgent({
-          model: liveModel!,
-          skill: conformanceSkill,
-          tools: liveTools,
-          user: buildUserPrompt(c, diffs, ctx),
-          outputSchema: SemanticCheckOutputSchema,
-        });
+        const v = await runConformanceCheck({ model: liveModel!, skill: conformanceSkill, constraint: c, diffs, driverContext: ctx, root: process.cwd() });
         calls++;
-        const v = out
-          ? toVerdict(c, out)
-          : { result: "unknown" as const, confidence: 0, explanation: "" };
         grounded = { result: v.result, confidence: v.confidence, explanation: v.explanation };
         cache[gKey] = grounded;
       }

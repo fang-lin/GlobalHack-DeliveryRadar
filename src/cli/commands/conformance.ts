@@ -4,11 +4,9 @@ import { readFileSync } from "node:fs";
 import { extractFromDir, adrSection } from "../../io/extract.ts";
 import { loadDiff } from "../../io/diff.ts";
 import { retrieve } from "../../core/retrieve.ts";
-import { buildUserPrompt, toVerdict } from "../../core/checker.ts";
-import { SemanticCheckOutputSchema, type Verdict } from "../../core/models.ts";
+import { type Verdict } from "../../core/models.ts";
 import { saveVerdicts, loadVerdicts } from "../../io/verdicts.ts";
-import { runAgent } from "../../agent/engine.ts";
-import { buildTools } from "../../agent/tools.ts";
+import { runConformanceCheck } from "../../agent/conformance-run.ts";
 import { selectModel } from "../../agent/model.ts";
 import { fail } from "../util.ts";
 
@@ -42,24 +40,11 @@ export async function cmdConformance(argv: string[]): Promise<number> {
   } else {
     const model = selectModel(process.env);
     const skill = readFileSync(values.skill!, "utf8");
-    const tools = buildTools(values.root!);
     verdicts = [];
     for (const [constraint, diffs] of inScope) {
       const context = adrSection(adrDir, constraint.adr, "Context");
-      const out = await runAgent({
-        model, skill, tools,
-        user: buildUserPrompt(constraint, diffs, context),
-        outputSchema: SemanticCheckOutputSchema,
-        maxTokens: 16000,
-      });
       // agent failed to produce a verdict → unknown (FR-CONF-6), never crash
-      verdicts.push(
-        out
-          ? toVerdict(constraint, out)
-          : { constraint_id: constraint.id, result: "unknown", confidence: 0,
-              evidence: { adr_clause: constraint.id, code: null },
-              explanation: "the checker could not produce a verdict", fix_locality: "none", fix_direction: null },
-      );
+      verdicts.push(await runConformanceCheck({ model, skill, constraint, diffs, driverContext: context, root: values.root! }));
     }
     if (values.save) {
       saveVerdicts(verdicts, values.save);

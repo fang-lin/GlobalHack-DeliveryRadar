@@ -1,11 +1,25 @@
 import { describe, it, expect } from "vitest";
-import { buildUserPrompt, toVerdict } from "../../src/core/checker.ts";
+import { buildUserPrompt, toVerdict, unknownVerdict } from "../../src/core/checker.ts";
 import type { FileDiff } from "../../src/io/diff.ts";
 import { makeConstraint } from "../fixtures/factories.ts";
 
 const constraint = makeConstraint();
 
 const diffs: FileDiff[] = [{ path: "a.ts", text: "+ some change" }];
+
+describe("unknownVerdict", () => {
+  it("returns an unknown Verdict with the expected shape", () => {
+    const v = unknownVerdict(constraint);
+    expect(v.constraint_id).toBe("ADR-001-C1");
+    expect(v.result).toBe("unknown");
+    expect(v.confidence).toBe(0);
+    expect(v.evidence.adr_clause).toBe("ADR-001-C1");
+    expect(v.evidence.code).toBeNull();
+    expect(v.fix_locality).toBe("none");
+    expect(v.fix_direction).toBeNull();
+    expect(v.explanation).toBe("the checker could not produce a verdict");
+  });
+});
 
 describe("buildUserPrompt", () => {
   it("includes rule, driver, and examples in the prompt", () => {

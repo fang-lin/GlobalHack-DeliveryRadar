@@ -14,7 +14,7 @@ export function parseAgentJson<T>(text: string, schema: z.ZodType<T>): T | null 
   return parsed.success ? parsed.data : null;
 }
 
-/** First ```json fence, else the first balanced {...} block. */
+/** First ```json fence, else a best-effort span from the first `{` to the last `}` (not a true balanced-brace parse — adequate for a single JSON object in the model's text). */
 function extractJsonObject(text: string): string | null {
   const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/);
   if (fence) return fence[1].trim();

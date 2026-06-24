@@ -27,6 +27,6 @@ export function selectModel(env: NodeJS.ProcessEnv): LanguageModel {
       return p.chatModel(model ?? "");
     }
     default:
-      throw new Error(`unknown RADAR_PROVIDER for capture: ${provider}`);
+      throw new Error(`unknown RADAR_PROVIDER: ${provider}`);
   }
 }

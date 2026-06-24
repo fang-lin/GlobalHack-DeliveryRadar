@@ -42,7 +42,7 @@ export function buildTools(root: string): Record<string, Tool> {
           // model-supplied string, so treat metacharacters like ( ) literally
           // rather than as a regex (which errors on e.g. "fetch(").
           return execFileSync("grep", ["-rnIF", "--", pattern, abs], {
-            encoding: "utf8", maxBuffer: 4 * MAX, cwd: root,
+            encoding: "utf8", maxBuffer: 4 * MAX, cwd: root, timeout: 10000,
           }).slice(0, MAX);
         } catch {
           return "no matches"; // grep exits non-zero on no match
@@ -58,7 +58,7 @@ export function buildTools(root: string): Record<string, Tool> {
           return `only read-only git subcommands are allowed: ${[...GIT_READONLY].join(", ")}`;
         }
         try {
-          return execFileSync("git", args, { encoding: "utf8", maxBuffer: 4 * MAX, cwd: root })
+          return execFileSync("git", args, { encoding: "utf8", maxBuffer: 4 * MAX, cwd: root, timeout: 10000 })
             .slice(0, MAX);
         } catch (e) {
           return `git failed: ${(e as Error).message}`;
