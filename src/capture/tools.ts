@@ -31,13 +31,17 @@ export function buildTools(root: string): Record<string, Tool> {
       },
     }),
     grep: tool({
-      description: "Search the repository for a regex; returns matching lines with file:line.",
+      description:
+        "Search the repository for a LITERAL substring (not a regex); returns matching lines with file:line.",
       inputSchema: z.object({ pattern: z.string(), path: z.string().default(".") }),
       execute: async ({ pattern, path }) => {
         const abs = inRoot(root, path);
         if (!abs) return `path is outside the repo root — not allowed`;
         try {
-          return execFileSync("grep", ["-rnI", "--", pattern, abs], {
+          // -F: fixed-string (literal) match — the pattern is an arbitrary
+          // model-supplied string, so treat metacharacters like ( ) literally
+          // rather than as a regex (which errors on e.g. "fetch(").
+          return execFileSync("grep", ["-rnIF", "--", pattern, abs], {
             encoding: "utf8", maxBuffer: 4 * MAX, cwd: root,
           }).slice(0, MAX);
         } catch {
