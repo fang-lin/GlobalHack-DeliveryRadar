@@ -8,8 +8,10 @@
  * Run:  npx tsx scripts/baseline-review.ts <diff-file>
  */
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
-import Anthropic from "@anthropic-ai/sdk";
-import { DEFAULT_MODEL } from "../src/llm.ts";
+import { selectModel } from "../src/agent/model.ts";
+import { generateText } from "ai";
+
+const DEFAULT_MODEL = "claude-sonnet-4-6";
 
 const PR_TITLE = "Fix stale stock count on product page";
 const PR_BODY =
@@ -25,23 +27,15 @@ const SYSTEM =
 
 async function main(): Promise<void> {
   const diff = readFileSync(process.argv[2], "utf8");
-  const client = new Anthropic(); // reads ANTHROPIC_API_KEY from the environment
-  const response = await client.messages.create({
-    model: DEFAULT_MODEL,
-    max_tokens: 2000,
-    thinking: { type: "adaptive" },
+  const model = selectModel(process.env);
+  void DEFAULT_MODEL; // used implicitly via RADAR_MODEL env default in selectModel
+  const response = await generateText({
+    model,
     system: SYSTEM,
-    messages: [
-      {
-        role: "user",
-        content: `PR title: ${PR_TITLE}\n\nPR description:\n${PR_BODY}\n\nDiff:\n\`\`\`diff\n${diff}\n\`\`\``,
-      },
-    ],
+    prompt: `PR title: ${PR_TITLE}\n\nPR description:\n${PR_BODY}\n\nDiff:\n\`\`\`diff\n${diff}\n\`\`\``,
+    maxTokens: 2000,
   });
-  const text = response.content
-    .filter((b): b is Extract<typeof b, { type: "text" }> => b.type === "text")
-    .map((b) => b.text)
-    .join("\n");
+  const text = response.text;
   mkdirSync("artifacts", { recursive: true });
   writeFileSync(
     "artifacts/baseline-review.md",

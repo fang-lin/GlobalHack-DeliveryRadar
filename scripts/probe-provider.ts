@@ -11,66 +11,51 @@
  * Config from the environment only (ADR-0006) — source your .env first:
  *   RADAR_MODEL        e.g. deepseek/deepseek-v4-pro          (required)
  *   RADAR_BASE_URL     default https://ai-gateway.vercel.sh/v1
- *   AI_GATEWAY_API_KEY or RADAR_API_KEY                       (required)
+ *   RADAR_PROVIDER     openai-compat | vercel | openrouter | anthropic (default: openai-compat)
+ *   AI_GATEWAY_API_KEY or RADAR_API_KEY                       (required for non-anthropic)
  *
  * Run:  set -a; source .env; set +a
  *       npx tsx scripts/probe-provider.ts
  */
-import OpenAI from "openai";
+import { selectModel } from "../src/agent/model.ts";
+import { generateText } from "ai";
+import * as z from "zod/v4";
 
-type CreateParams = OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming;
-
-const model = process.env.RADAR_MODEL;
+const modelId = process.env.RADAR_MODEL;
 const baseURL = process.env.RADAR_BASE_URL || "https://ai-gateway.vercel.sh/v1";
-const apiKey = process.env.AI_GATEWAY_API_KEY || process.env.RADAR_API_KEY;
 
-if (!model) {
+if (!modelId) {
   console.error("set RADAR_MODEL (e.g. deepseek/deepseek-v4-pro)");
   process.exit(2);
 }
-if (!apiKey) {
+
+const apiKey = process.env.AI_GATEWAY_API_KEY || process.env.RADAR_API_KEY;
+if (!apiKey && !process.env.ANTHROPIC_API_KEY) {
   console.error("set AI_GATEWAY_API_KEY or RADAR_API_KEY (source your .env first)");
   process.exit(2);
 }
 
-const client = new OpenAI({ baseURL, apiKey });
+const probeSchema = z.object({ ok: z.boolean() });
 
-// Mock data — trivial; we only care which request SHAPE the provider accepts.
-const messages: CreateParams["messages"] = [
-  { role: "system", content: "You are a JSON API. Reply with a single JSON object and nothing else." },
-  { role: "user", content: 'Return exactly {"ok": true}.' },
-];
-const probeSchema = {
-  type: "object",
-  properties: { ok: { type: "boolean" } },
-  required: ["ok"],
-  additionalProperties: false,
-};
-
-// Each variant patches the base request; we report which the provider accepts.
-const variants: { name: string; body: Partial<CreateParams> }[] = [
-  { name: "json_object + max_tokens", body: { max_tokens: 200, response_format: { type: "json_object" } } },
-  {
-    name: "json_schema + max_tokens",
-    body: {
-      max_tokens: 200,
-      response_format: { type: "json_schema", json_schema: { name: "probe", schema: probeSchema, strict: true } },
-    },
-  },
-  { name: "no response_format + max_tokens", body: { max_tokens: 200 } },
-  { name: "no response_format + max_completion_tokens", body: { max_completion_tokens: 200 } },
-  {
-    name: "json_object + max_completion_tokens",
-    body: { max_completion_tokens: 200, response_format: { type: "json_object" } },
-  },
+// Each variant tests a different maxTokens value (main thing that differs across providers).
+const variants: { name: string; maxTokens?: number }[] = [
+  { name: "maxTokens=200", maxTokens: 200 },
+  { name: "maxTokens=500", maxTokens: 500 },
+  { name: "no maxTokens" },
 ];
 
 async function main(): Promise<void> {
-  console.log(`probing ${model} @ ${baseURL}\n`);
+  console.log(`probing ${modelId} @ ${baseURL}\n`);
+  const model = selectModel(process.env);
   for (const v of variants) {
     try {
-      const res = await client.chat.completions.create({ model: model!, messages, ...v.body });
-      const content = (res.choices?.[0]?.message?.content ?? "").replace(/\s+/g, " ").trim();
+      const res = await generateText({
+        model,
+        system: "You are a JSON API. Reply with a single JSON object and nothing else.",
+        prompt: 'Return exactly {"ok": true}.',
+        maxTokens: v.maxTokens,
+      });
+      const content = res.text.replace(/\s+/g, " ").trim();
       console.log(`✅ ${v.name}`);
       console.log(`     content: ${content.slice(0, 100) || "(empty)"}`);
     } catch (e) {
@@ -80,6 +65,7 @@ async function main(): Promise<void> {
       console.log(`     ${err.status ?? "?"} ${err.message ?? String(e)}${body}`);
     }
   }
+  void probeSchema; // schema kept for reference; AI SDK handles output shaping
   console.log("\nPick the first ✅ shape; that tells us what the adapter should send for this model.");
 }
 

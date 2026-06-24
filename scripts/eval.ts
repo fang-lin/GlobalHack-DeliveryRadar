@@ -3,7 +3,7 @@
  *
  * Runs two arms over a HUMAN-labelled corpus of real Backstage diffs:
  *   - GROUNDED   = the radar conformance checker, with the ADR rule + business
- *                  driver + few-shot examples (src/checker.ts checkConstraint).
+ *                  driver + few-shot examples (buildUserPrompt / runAgent).
  *   - UNGROUNDED = the same model, same diff, but NO ADR/constraint — a generic
  *                  best-practice reviewer.
  * Both verdicts are scored against the gold label hand-set in eval/cases.yaml.
@@ -21,9 +21,14 @@ import yaml from "js-yaml";
 import { extractFromDir, adrSection } from "../src/io/extract.ts";
 import { loadDiff } from "../src/io/diff.ts";
 import { retrieve } from "../src/core/retrieve.ts";
-import { checkConstraint } from "../src/core/checker.ts";
-import { makeModelClient, DEFAULT_MODEL, type ModelClient } from "../src/llm.ts";
+import { buildUserPrompt, toVerdict } from "../src/core/checker.ts";
+import { selectModel } from "../src/agent/model.ts";
+import { runAgent } from "../src/agent/engine.ts";
+import { buildTools } from "../src/agent/tools.ts";
 import { SemanticCheckOutputSchema } from "../src/core/models.ts";
+import type { LanguageModel, Tool } from "ai";
+
+const DEFAULT_MODEL = "claude-sonnet-4-6";
 
 const ADR_DIR = "eval/adr";
 const CASES = "eval/cases.yaml";
@@ -58,14 +63,22 @@ const UNGROUNDED_SYSTEM =
   "practice, risk), 'aligned' if it looks fine, or 'unknown' if you genuinely cannot tell. " +
   "Keep the explanation to one or two sentences.";
 
-async function ungroundedReview(client: ModelClient, diffText: string): Promise<ArmResult> {
-  const o = await client.complete({
-    system: UNGROUNDED_SYSTEM,
+async function ungroundedReview(
+  model: LanguageModel,
+  diffText: string,
+): Promise<ArmResult> {
+  const o = await runAgent({
+    model,
+    skill: UNGROUNDED_SYSTEM,
+    tools: {} as Record<string, Tool>,
     user: "Review this diff:\n```diff\n" + diffText + "\n```",
-    schema: SemanticCheckOutputSchema,
-    maxTokens: 4000,
+    outputSchema: SemanticCheckOutputSchema,
   });
-  return { result: o.result, confidence: o.confidence, explanation: o.explanation };
+  return {
+    result: o?.result ?? "unknown",
+    confidence: o?.confidence,
+    explanation: o?.explanation,
+  };
 }
 
 function fmt(x: number | null): string {
@@ -104,16 +117,26 @@ async function main(): Promise<void> {
   const modelArg = argValue("--model");
   if (providerArg) process.env.RADAR_PROVIDER = providerArg;
   if (modelArg) process.env.RADAR_MODEL = modelArg;
-  const model = `${process.env.RADAR_PROVIDER ?? "anthropic"}/${process.env.RADAR_MODEL ?? DEFAULT_MODEL}`;
+  const modelLabel = `${process.env.RADAR_PROVIDER ?? "anthropic"}/${process.env.RADAR_MODEL ?? DEFAULT_MODEL}`;
   // json mode changes how the model is prompted, so it is part of the cache identity.
   const jsonMode = process.env.RADAR_JSON_MODE === "json_schema" ? "json_schema" : "json_object";
-  const tag = `${model}:${jsonMode}`;
+  const tag = `${modelLabel}:${jsonMode}`;
   const cases = yaml.load(readFileSync(CASES, "utf8")) as Case[];
   const constraints = extractFromDir(ADR_DIR);
 
   let cache: Record<string, ArmResult> = {};
   if (existsSync(CACHE)) cache = JSON.parse(readFileSync(CACHE, "utf8"));
-  const client = replay ? null : makeModelClient();
+
+  // Build live-call resources only when not replaying
+  let liveModel: LanguageModel | null = null;
+  let liveTools: Record<string, Tool> = {};
+  let conformanceSkill = "";
+  if (!replay) {
+    liveModel = selectModel(process.env);
+    liveTools = buildTools(process.cwd());
+    conformanceSkill = readFileSync("skills/conformance/SKILL.md", "utf8");
+  }
+
   let calls = 0;
 
   const rows: Row[] = [];
@@ -137,8 +160,17 @@ async function main(): Promise<void> {
       } else {
         const [c, diffs] = pair;
         const ctx = adrSection(ADR_DIR, c.adr, "Context");
-        const v = await checkConstraint(client!, c, diffs, ctx);
+        const out = await runAgent({
+          model: liveModel!,
+          skill: conformanceSkill,
+          tools: liveTools,
+          user: buildUserPrompt(c, diffs, ctx),
+          outputSchema: SemanticCheckOutputSchema,
+        });
         calls++;
+        const v = out
+          ? toVerdict(c, out)
+          : { result: "unknown" as const, confidence: 0, explanation: "" };
         grounded = { result: v.result, confidence: v.confidence, explanation: v.explanation };
         cache[gKey] = grounded;
       }
@@ -159,7 +191,7 @@ async function main(): Promise<void> {
     } else if (replay) {
       ungrounded = { result: "?", note: "no cached verdict — run live first" };
     } else {
-      ungrounded = await ungroundedReview(client!, diffText);
+      ungrounded = await ungroundedReview(liveModel!, diffText);
       calls++;
       cache[uKey] = ungrounded;
     }
@@ -201,7 +233,7 @@ async function main(): Promise<void> {
   lines.push(`  GROUNDED    P=${fmt(g.p)} R=${fmt(g.r)} F1=${fmt(g.f1)}   (tp=${g.tp} fp=${g.fp} fn=${g.fn})`);
   lines.push(`  UNGROUNDED  P=${fmt(u.p)} R=${fmt(u.r)} F1=${fmt(u.f1)}   (tp=${u.tp} fp=${u.fp} fn=${u.fn})`);
   lines.push(`retrieval precision (out-of-scope respected): ${oosOk}/${oos.length}`);
-  if (!replay) lines.push(`\n(live: ${calls} model calls on ${model}; cached to ${CACHE})`);
+  if (!replay) lines.push(`\n(live: ${calls} model calls on ${modelLabel}; cached to ${CACHE})`);
   const out = lines.join("\n");
   console.log("\n" + out + "\n");
 
@@ -210,7 +242,7 @@ async function main(): Promise<void> {
   md.push("# Delivery Radar — eval report (grounded vs ungrounded)\n");
   md.push(
     `Corpus: ${cases.length} human-labelled cases on **real Backstage ADRs**. ` +
-      `Model: \`${model}\`. Ground truth is hand-labelled in \`eval/cases.yaml\` — ` +
+      `Model: \`${modelLabel}\`. Ground truth is hand-labelled in \`eval/cases.yaml\` — ` +
       `the harness never asks the model for the gold label.\n`,
   );
   md.push("| case | gold | grounded | ungrounded | source |");
@@ -243,7 +275,7 @@ async function main(): Promise<void> {
 
   // ---- machine-readable results for the showcase (contrast page) ----
   const results = {
-    model,
+    model: modelLabel,
     n: cases.length,
     rows: rows.map(({ cs, grounded, ungrounded }) => ({
       id: cs.id,

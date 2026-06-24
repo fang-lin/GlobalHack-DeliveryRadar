@@ -6,8 +6,9 @@
  * API is declared. The supported entry point today is the `radar` CLI.
  */
 
-// --- model layer (ADR-0007) ---
-export { makeModelClient, DEFAULT_MODEL, type ModelClient } from "./llm.ts";
+// --- agent layer (ADR-0010) ---
+export { runAgent } from "./agent/engine.ts";
+export { selectModel } from "./agent/model.ts";
 
 // --- core engine (pure) ---
 export { buildUserPrompt, toVerdict } from "./core/checker.ts";
