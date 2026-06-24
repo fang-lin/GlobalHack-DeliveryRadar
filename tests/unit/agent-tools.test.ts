@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from "vitest";
-import { buildTools } from "../../src/capture/tools.ts";
+import { buildTools } from "../../src/agent/tools.ts";
 
 describe("buildTools (read-only)", () => {
   const tools = buildTools(process.cwd());

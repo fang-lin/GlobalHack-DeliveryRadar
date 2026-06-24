@@ -8,13 +8,13 @@
  *  1. Primary: generateText with Output.object → result.output.notes (ai@6 structured output).
  *  2. Fallback A: if Output.object throws (ai@6 open bugs #11348/#10023 on output+tools,
  *     or mock emitting fenced JSON), retry without structured output and parse result.text.
- *  3. Fallback B: parseCaptureNotes tolerantly extracts from any text that contains JSON.
+ *  3. Fallback B: parseAgentJson tolerantly extracts from any text that contains JSON.
  *  4. Final: [] — advisory, never crashes the check.
  */
 import { generateText, Output, stepCountIs, type LanguageModel } from "ai";
 import { CaptureOutputSchema, type Constraint, type DecisionNote } from "../core/models.ts";
-import { buildTools } from "./tools.ts";
-import { parseCaptureNotes } from "./parse.ts";
+import { buildTools } from "../agent/tools.ts";
+import { parseAgentJson } from "../agent/parse.ts";
 
 export function buildCaptureUserPrompt(diff: string, constraints: Constraint[]): string {
   const recorded = constraints.map((c) => `- ${c.id} (${c.adr}): ${c.title}`).join("\n") || "(none)";
@@ -67,7 +67,7 @@ export async function runCapture(opts: {
   // Text-parse fallback: run without Output.object to get raw text, then parse tolerantly.
   try {
     const textResult = await generateText(shared);
-    return parseCaptureNotes(textResult.text ?? "");
+    return parseAgentJson(textResult.text ?? "", CaptureOutputSchema)?.notes ?? [];
   } catch {
     return []; // advisory — never crash the check
   }

@@ -1,17 +1,17 @@
-/** Tolerant text -> DecisionNote[]: extract a JSON object, zod-validate, never throw. */
-import { CaptureOutputSchema, type DecisionNote } from "../core/models.ts";
+/** Tolerant text -> validated T: extract a JSON object, zod-validate, never throw. */
+import * as z from "zod/v4";
 
-export function parseCaptureNotes(text: string): DecisionNote[] {
+export function parseAgentJson<T>(text: string, schema: z.ZodType<T>): T | null {
   const candidate = extractJsonObject(text);
-  if (!candidate) return [];
+  if (!candidate) return null;
   let raw: unknown;
   try {
     raw = JSON.parse(candidate);
   } catch {
-    return [];
+    return null;
   }
-  const parsed = CaptureOutputSchema.safeParse(raw);
-  return parsed.success ? parsed.data.notes : [];
+  const parsed = schema.safeParse(raw);
+  return parsed.success ? parsed.data : null;
 }
 
 /** First ```json fence, else the first balanced {...} block. */

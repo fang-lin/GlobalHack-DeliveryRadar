@@ -6,7 +6,7 @@ import { loadDiff } from "../../io/diff.ts";
 import { saveNotes, loadNotes } from "../../io/notes.ts";
 import { decisionNotesMarkdown } from "../../core/capture-comment.ts";
 import { runCapture } from "../../capture/agent.ts";
-import { selectCaptureModel } from "../../capture/model.ts";
+import { selectModel } from "../../agent/model.ts";
 import { fail } from "../util.ts";
 import type { DecisionNote } from "../../core/models.ts";
 
@@ -34,7 +34,7 @@ export async function cmdCapture(argv: string[]): Promise<number> {
     const diffText = readFileSync(values.diff!, "utf8");
     loadDiff(values.diff!); // validate the diff parses (changed-file sanity)
     const skill = readFileSync(values.skill!, "utf8");
-    const model = selectCaptureModel(process.env);
+    const model = selectModel(process.env);
     notes = await runCapture({ model, skill, diff: diffText, constraints, root: values.root! });
     if (values.save) saveNotes(notes, values.save);
   }
