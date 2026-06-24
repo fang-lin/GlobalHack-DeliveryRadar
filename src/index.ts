@@ -10,7 +10,7 @@
 export { makeModelClient, DEFAULT_MODEL, type ModelClient } from "./llm.ts";
 
 // --- core engine (pure) ---
-export { checkConstraint } from "./core/checker.ts";
+export { buildUserPrompt, toVerdict } from "./core/checker.ts";
 export { retrieve } from "./core/retrieve.ts";
 export { reviewMarkdown } from "./core/comment.ts";
 
