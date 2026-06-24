@@ -29,7 +29,7 @@ Status flips to **Done** only after this gate passes (see `README.md`). **Fill t
 |---|---|---|
 | Automated | CI on the PR — lint · typecheck · unit tests · build | ⬜ pending → ✅ green (run #___) |
 | Live / web behaviour | N/A — CLI/tooling change, no web UI | ✅ N/A |
-| Eval quality gate | `pnpm eval --replay` agent arm vs single-shot baseline: precision/recall MUST NOT regress (NFR-EVAL-1 / AC-2) — maintainer-triggered live run | ⬜ pending (maintainer triggers; results to be recorded here) |
+| Eval quality gate | `pnpm eval` (live) agent arm vs single-shot baseline: precision/recall MUST NOT regress (NFR-EVAL-1 / AC-2) | ✅ **no regression** — live run 2026-06-24 at maintainer's instruction. Agent + DeepSeek (`vercel/deepseek-v4-pro`, the shipped CI config): grounded **P/R/F1 = 1.00** (tp=4 fp=0 fn=0), ungrounded F1 = 0.40, retrieval 1/1 — matches the single-shot + `claude-sonnet-4-6` baseline (grounded 1.00, ungrounded 0.40) and preserves the grounding gap. **Caveats:** 7-case corpus (illustrative, not a statistical claim — per the report's own note); comparison is confounded (architecture *and* model both changed vs baseline), but both score 1.00 so there is no regression to attribute. |
 | Maintainer sign-off | maintainer reviews/tests the result | ⬜ pending → ✅ \<who\>, \<date\> |
 
 > Note: the eval quality gate (`pnpm eval` live, not `--replay`) is a spending action and is triggered by the maintainer, not by Claude.
