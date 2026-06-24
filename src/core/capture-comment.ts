@@ -20,19 +20,19 @@ function evidenceString(note: DecisionNote): string {
 }
 
 export function decisionNoteMarkdown(note: DecisionNote): string {
-  return (
-    `### 🟡 Possible undocumented decision — ${note.suggested_class}\n` +
-    `\n` +
-    `**Decision:** ${note.detected_decision}\n` +
-    `\n` +
-    `**Why it looks net-new:** ${note.why_net_new}\n` +
-    `\n` +
-    `**Rationale (draft):** ${note.draft_rationale}\n` +
-    `\n` +
-    `**Evidence:** ${evidenceString(note)}\n` +
-    `\n` +
-    `confidence **${note.confidence.toFixed(2)}**`
-  );
+  // All fields are always present (no optional sections), so this reads as the
+  // output: blank lines in the source are the blank lines in the markdown.
+  return `### 🟡 Possible undocumented decision — ${note.suggested_class}
+
+**Decision:** ${note.detected_decision}
+
+**Why it looks net-new:** ${note.why_net_new}
+
+**Rationale (draft):** ${note.draft_rationale}
+
+**Evidence:** ${evidenceString(note)}
+
+confidence **${note.confidence.toFixed(2)}**`;
 }
 
 export function decisionNotesMarkdown(notes: DecisionNote[]): string {
