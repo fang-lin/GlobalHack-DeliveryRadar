@@ -1,3 +1,11 @@
+# [1.6.0](https://github.com/fang-lin/GlobalHack-DeliveryRadar/compare/v1.5.1...v1.6.0) (2026-06-25)
+
+
+### Features
+
+* **ci:** capture runs at PR-open, posts a sticky Decision-Note review; marker-based folding (ADR-0009, FR-CAP-1/4/5) ([d5a9445](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/d5a944538a274176f0275ef095ee515eb0fd6d83))
+* **core:** hidden stream marker + positioning line in conformance/capture review bodies (ADR-0009) ([8602681](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/8602681fcd5f58ac6c41433960f127aaf7714054))
+
 ## [1.5.1](https://github.com/fang-lin/GlobalHack-DeliveryRadar/compare/v1.5.0...v1.5.1) (2026-06-25)
 
 
