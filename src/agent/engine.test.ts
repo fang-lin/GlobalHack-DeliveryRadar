@@ -2,7 +2,7 @@
 import { describe, it, expect } from "vitest";
 import * as z from "zod/v4";
 import { MockLanguageModelV3 } from "ai/test";
-import { runAgent } from "../../src/agent/engine.ts";
+import { runAgent } from "./engine.ts";
 
 const Schema = z.object({ ok: z.boolean() });
 function model(text: string) {

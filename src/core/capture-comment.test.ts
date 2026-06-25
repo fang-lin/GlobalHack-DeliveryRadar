@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { decisionNotesMarkdown } from "../../src/core/capture-comment.ts";
+import { decisionNotesMarkdown } from "./capture-comment.ts";
 
 const note = {
   detected_decision: "orders calls inventory over direct HTTP",

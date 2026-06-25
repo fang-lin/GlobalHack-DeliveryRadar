@@ -6,8 +6,8 @@ import { cmdComment } from "./commands/comment.ts";
 import { cmdCapture } from "./commands/capture.ts";
 import { fail } from "./util.ts";
 
-async function main(): Promise<number> {
-  const [command, ...rest] = process.argv.slice(2);
+export async function dispatch(argv: string[]): Promise<number> {
+  const [command, ...rest] = argv;
   switch (command) {
     case "extract":
       return cmdExtract(rest);
@@ -24,10 +24,17 @@ async function main(): Promise<number> {
   }
 }
 
-main().then(
-  (code) => process.exit(code),
-  (err) => {
-    console.error(err instanceof Error ? err.message : String(err));
-    process.exit(1);
-  },
-);
+// Only run as CLI entry point when executed directly (not when imported by tests).
+const isMain =
+  process.argv[1] != null &&
+  import.meta.url === new URL(process.argv[1], "file://").href;
+
+if (isMain) {
+  dispatch(process.argv.slice(2)).then(
+    (code) => process.exit(code),
+    (err) => {
+      console.error(err instanceof Error ? err.message : String(err));
+      process.exit(1);
+    },
+  );
+}

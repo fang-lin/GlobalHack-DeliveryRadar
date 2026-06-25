@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveNotes, loadNotes } from "../../src/io/notes.ts";
+import { saveNotes, loadNotes } from "./notes.ts";
 
 describe("notes save/load", () => {
   it("round-trips notes through a file", () => {
