@@ -9,8 +9,9 @@ import { runCapture } from "../../capture/agent.ts";
 import { selectModel } from "../../agent/model.ts";
 import { fail } from "../util.ts";
 import type { DecisionNote } from "../../core/models.ts";
+import type { LanguageModel, Tool } from "ai";
 
-export async function cmdCapture(argv: string[]): Promise<number> {
+export async function cmdCapture(argv: string[], deps?: { makeModel?: () => LanguageModel; makeTools?: (root: string) => Record<string, Tool> }): Promise<number> {
   const { values } = parseArgs({
     args: argv,
     options: {
@@ -34,8 +35,8 @@ export async function cmdCapture(argv: string[]): Promise<number> {
     const diffText = readFileSync(values.diff!, "utf8");
     loadDiff(values.diff!); // validate the diff parses (changed-file sanity)
     const skill = readFileSync(values.skill!, "utf8");
-    const model = selectModel(process.env);
-    notes = await runCapture({ model, skill, diff: diffText, constraints, root: values.root! });
+    const model = deps?.makeModel ? deps.makeModel() : selectModel(process.env);
+    notes = await runCapture({ model, skill, diff: diffText, constraints, root: values.root!, tools: deps?.makeTools?.(values.root!) });
     if (values.save) saveNotes(notes, values.save);
   }
 

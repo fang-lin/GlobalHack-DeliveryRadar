@@ -6,7 +6,7 @@
  *
  * Thin wrapper over runAgent (ADR-0010): dual-path logic lives in the engine.
  */
-import type { LanguageModel } from "ai";
+import type { LanguageModel, Tool } from "ai";
 import { CaptureOutputSchema, type Constraint, type DecisionNote } from "../core/models.ts";
 import { buildTools } from "../agent/tools.ts";
 import { runAgent } from "../agent/engine.ts";
@@ -34,12 +34,13 @@ export async function runCapture(opts: {
   diff: string;
   constraints: Constraint[];
   root: string;
+  tools?: Record<string, Tool>;
 }): Promise<DecisionNote[]> {
   const out = await runAgent({
     model: opts.model,
     skill: opts.skill,
     user: buildCaptureUserPrompt(opts.diff, opts.constraints),
-    tools: buildTools(opts.root),
+    tools: opts.tools ?? buildTools(opts.root),
     outputSchema: CaptureOutputSchema,
   });
   return out?.notes ?? [];

@@ -9,8 +9,9 @@ import { saveVerdicts, loadVerdicts } from "../../io/verdicts.ts";
 import { runConformanceCheck } from "../../agent/conformance-run.ts";
 import { selectModel } from "../../agent/model.ts";
 import { fail } from "../util.ts";
+import type { LanguageModel, Tool } from "ai";
 
-export async function cmdConformance(argv: string[]): Promise<number> {
+export async function cmdConformance(argv: string[], deps?: { makeModel?: () => LanguageModel; makeTools?: (root: string) => Record<string, Tool> }): Promise<number> {
   const { values } = parseArgs({
     args: argv,
     options: {
@@ -38,13 +39,13 @@ export async function cmdConformance(argv: string[]): Promise<number> {
   if (values.replay) {
     verdicts = loadVerdicts(values.replay);
   } else {
-    const model = selectModel(process.env);
+    const model = deps?.makeModel ? deps.makeModel() : selectModel(process.env);
     const skill = readFileSync(values.skill!, "utf8");
     verdicts = [];
     for (const [constraint, diffs] of inScope) {
       const context = adrSection(adrDir, constraint.adr, "Context");
       // agent failed to produce a verdict → unknown (FR-CONF-6), never crash
-      verdicts.push(await runConformanceCheck({ model, skill, constraint, diffs, driverContext: context, root: values.root! }));
+      verdicts.push(await runConformanceCheck({ model, skill, constraint, diffs, driverContext: context, root: values.root!, tools: deps?.makeTools?.(values.root!) }));
     }
     if (values.save) {
       saveVerdicts(verdicts, values.save);

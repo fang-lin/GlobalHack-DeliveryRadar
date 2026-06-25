@@ -4,7 +4,7 @@ import { SemanticCheckOutputSchema, type Constraint, type Verdict } from "../cor
 import type { FileDiff } from "../io/diff.ts";
 import { runAgent } from "./engine.ts";
 import { buildTools } from "./tools.ts";
-import type { LanguageModel } from "ai";
+import type { LanguageModel, Tool } from "ai";
 
 /** Run conformance for ONE in-scope constraint via the shared agent. */
 export async function runConformanceCheck(opts: {
@@ -14,11 +14,12 @@ export async function runConformanceCheck(opts: {
   diffs: FileDiff[];
   driverContext: string;
   root: string;
+  tools?: Record<string, Tool>;
 }): Promise<Verdict> {
   const out = await runAgent({
     model: opts.model,
     skill: opts.skill,
-    tools: buildTools(opts.root),
+    tools: opts.tools ?? buildTools(opts.root),
     user: buildUserPrompt(opts.constraint, opts.diffs, opts.driverContext),
     outputSchema: SemanticCheckOutputSchema,
     maxTokens: 16000,
