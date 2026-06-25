@@ -3,28 +3,74 @@ import { tool, type LanguageModel, type Tool } from "ai";
 import * as z from "zod/v4";
 import { digestInput, type Cassette } from "./cassette.ts";
 
-export function replayModel(c: Cassette): LanguageModel {
-  // MockLanguageModelV3 accepts a results array and returns one per doGenerate call, in order.
-  return new MockLanguageModelV3({ doGenerate: c.modelCalls.map((m) => m.result) as never }) as unknown as LanguageModel;
+export interface Replay {
+  model: LanguageModel;
+  tools: Record<string, Tool>;
+  mismatches: string[];
 }
 
-export function replayTools(c: Cassette): Record<string, Tool> {
-  let i = 0;
+// Normalise a model result so it is compatible with the Vercel AI SDK's
+// MockLanguageModelV3: tool-call `input` must be a JSON string (the SDK calls
+// `.trim()` on it before parsing), but cassettes store it as a plain object
+// for readability. This function converts in-place without mutating the original.
+function normResult(result: unknown): unknown {
+  if (!result || typeof result !== "object") return result;
+  const r = result as Record<string, unknown>;
+  if (!Array.isArray(r.content)) return result;
+  return {
+    ...r,
+    content: (r.content as unknown[]).map((item) => {
+      if (item && typeof item === "object" && (item as Record<string, unknown>).type === "tool-call") {
+        const c = item as Record<string, unknown>;
+        return { ...c, input: typeof c.input === "string" ? c.input : JSON.stringify(c.input) };
+      }
+      return item;
+    }),
+  };
+}
+
+// Replay drives a REAL runAgent loop from a recorded cassette. Each model/tool
+// call's input is verified against the recording; a mismatch is RECORDED into
+// `mismatches` (not thrown — the engine swallows thrown tool errors into its
+// loop, making a throw silent). A stale cassette is caught by asserting
+// `mismatches` is empty after the run.
+export function createReplay(c: Cassette): Replay {
+  const mismatches: string[] = [];
+  let mi = 0;
+  const model = new MockLanguageModelV3({
+    doGenerate: async (options: { prompt?: unknown }) => {
+      const rec = c.modelCalls[mi++];
+      if (!rec) {
+        mismatches.push(`unexpected model call #${mi}: cassette has only ${c.modelCalls.length}`);
+        return normResult(c.modelCalls.at(-1)?.result) as never;
+      }
+      // Synthetic cassettes use a sentinel digest ("synthetic"/"ignored…") — skip
+      // model-input verification for those; real recordings carry a real digest.
+      if (!/^(synthetic|ignored)/.test(rec.inputDigest) && digestInput(options.prompt) !== rec.inputDigest) {
+        mismatches.push(`model call #${mi} input drift: recorded ${rec.inputDigest}, got ${digestInput(options.prompt)}`);
+      }
+      return normResult(rec.result) as never;
+    },
+  }) as unknown as LanguageModel;
+
+  let ti = 0;
   const names = [...new Set(c.toolCalls.map((t) => t.name))];
   const make = (name: string): Tool =>
     tool({
       description: `replayed ${name}`,
       inputSchema: z.any(),
       execute: async (input: unknown) => {
-        const rec = c.toolCalls[i++];
+        const rec = c.toolCalls[ti++];
         if (!rec || rec.name !== name || digestInput(rec.input) !== digestInput(input)) {
-          throw new Error(
-            `cassette stale: expected ${rec?.name}(${rec ? digestInput(rec.input) : "—"}) ` +
-              `but got ${name}(${digestInput(input)}). Re-record with RADAR_CASSETTE=update.`,
+          mismatches.push(
+            `tool call #${ti} drift: expected ${rec?.name ?? "—"}(${rec ? digestInput(rec.input) : "—"}), ` +
+              `got ${name}(${digestInput(input)})`,
           );
+          return rec?.output ?? "";
         }
         return rec.output;
       },
     });
-  return Object.fromEntries(names.map((n) => [n, make(n)]));
+  const tools = Object.fromEntries(names.map((n) => [n, make(n)]));
+  return { model, tools, mismatches };
 }
