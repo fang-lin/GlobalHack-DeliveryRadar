@@ -82,7 +82,10 @@ describe("capture via cassette (real agent loop, no API)", () => {
     // Output must indicate no decisions found (no note markdown headers)
     const out = cap.log.join("\n");
     expect(out).toContain("No undocumented decisions detected");
-    // Must NOT contain any architectural note content
+    // Primary guard: must NOT contain the actual decision text from the has-notes cassette
+    // (guaranteed to appear if any note leaked through — not a heading sentinel)
+    expect(out).not.toContain("fraud-detection-service");
+    // Secondary guard: must NOT contain the markdown note heading
     expect(out).not.toContain("Possible undocumented decision");
 
     // Stale gate: cassette must have matched the real agent run exactly
