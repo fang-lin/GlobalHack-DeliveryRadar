@@ -364,7 +364,7 @@ path/ownership mapping first; semantic similarity is a secondary signal only.
 
 **Trigger**
 - `FR-CAP-1` (revised 2026-06-25, supersedes the 06-22 "after-merge" version) Runs
-  **once on PR `opened`** + on-demand via `workflow_dispatch` / a `/radar capture`
+  **once on PR `opened`** + on-demand via `workflow_dispatch` / a `/capture`
   comment; it does **not** run on every `synchronize` (capture is the heavy
   whole-diff agent — `conformance` covers per-push). Runs alongside `conformance`
   over the PR diff (back to the `FR-ARCH-1` per-diff-engine framing); each fetches
@@ -450,8 +450,8 @@ path/ownership mapping first; semantic similarity is a secondary signal only.
   (`NFR-RETRIEVAL-1` — only in-scope constraints call the LLM) + a **configurable
   low-cost provider** (ADR-0007, e.g. DeepSeek) + advisory non-blocking, not by
   manual gating (`NFR-COST-1`, revised 2026-06-21; previously user-initiated). It
-  can still be **re-run manually**: a **`/radar conformance` PR comment** (SHOULD
-  verify the commenter has write access; symmetric with capture's `/radar capture`,
+  can still be **re-run manually**: a **`/conformance` PR comment** (SHOULD
+  verify the commenter has write access; symmetric with capture's `/capture`,
   no prefix overlap) or **`workflow_dispatch`** (the Actions "Run workflow" button
   + a PR number). Either way it stays **advisory** — posted via
   the Reviews API as a `COMMENT` event, never blocking the merge. First landing:

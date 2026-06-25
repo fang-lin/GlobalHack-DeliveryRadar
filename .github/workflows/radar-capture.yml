@@ -6,7 +6,7 @@
 # merges or records anything. Recording a confirmed Note as an ADR (graduation)
 # is a separate, human-confirmed step (a draft ADR PR / issue), not done here.
 # Capture is the heavy whole-diff agent, so it runs on `opened` + on demand
-# (workflow_dispatch with a PR number, or a "/radar capture" comment from a
+# (workflow_dispatch with a PR number, or a "/capture" comment from a
 # write-access user) — NOT on every push (conformance covers per-push). Posts a
 # review only when it finds something; nothing-found writes only a run summary.
 # Needs the AI_GATEWAY_API_KEY secret (Vercel AI Gateway → DeepSeek V4 Pro).
@@ -37,14 +37,14 @@ concurrency:
 jobs:
   capture:
     name: capture — advisory, never blocks
-    # On PR opened; also re-runnable via the Actions button or a "/radar capture"
+    # On PR opened; also re-runnable via the Actions button or a "/capture"
     # comment from a write-access user. NOT on synchronize (heavy agent).
     if: >-
       github.event_name == 'pull_request' ||
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'issue_comment' &&
         github.event.issue.pull_request != null &&
-        startsWith(github.event.comment.body, '/radar capture') &&
+        startsWith(github.event.comment.body, '/capture') &&
         contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association))
     runs-on: ubuntu-latest
     steps:
