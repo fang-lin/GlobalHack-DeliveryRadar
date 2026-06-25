@@ -3,6 +3,8 @@ import { tool, type LanguageModel, type Tool } from "ai";
 import * as z from "zod/v4";
 import { digestInput, type Cassette } from "./cassette.ts";
 
+export const SYNTHETIC = "synthetic";
+
 export interface Replay {
   model: LanguageModel;
   tools: Record<string, Tool>;
@@ -46,7 +48,7 @@ export function createReplay(c: Cassette): Replay {
       }
       // Synthetic cassettes use a sentinel digest ("synthetic"/"ignored…") — skip
       // model-input verification for those; real recordings carry a real digest.
-      if (!/^(synthetic|ignored)/.test(rec.inputDigest) && digestInput(options.prompt) !== rec.inputDigest) {
+      if (rec.inputDigest !== SYNTHETIC && digestInput(options.prompt) !== rec.inputDigest) {
         mismatches.push(`model call #${mi} input drift: recorded ${rec.inputDigest}, got ${digestInput(options.prompt)}`);
       }
       return normResult(rec.result) as never;

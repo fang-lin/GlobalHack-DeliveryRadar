@@ -3,6 +3,7 @@ import { describe, it, expect } from "vitest";
 import * as z from "zod/v4";
 import { runAgent } from "../../src/agent/engine.ts";
 import { createReplay } from "./replay.ts";
+import { digestInput } from "./cassette.ts";
 import type { Cassette } from "./cassette.ts";
 
 const Schema = z.object({ found: z.string() });
@@ -42,5 +43,15 @@ describe("createReplay drives a real agent loop", () => {
     const r = createReplay(c);
     await runAgent({ model: r.model as any, skill: "s", user: "u", tools: r.tools, outputSchema: Schema });
     expect(r.mismatches.length).toBeGreaterThan(0); // stale detected end-to-end
+  });
+
+  it("records a model-input mismatch when the prompt drifts from a real recording", async () => {
+    const c = twoStep();
+    // give the first model call a REAL (non-sentinel) recorded digest, then drive
+    // doGenerate with a different prompt → the model-input verification must fire.
+    c.modelCalls[0].inputDigest = digestInput([{ role: "user", content: "ORIGINAL" }]);
+    const r = createReplay(c);
+    await (r.model as any).doGenerate({ prompt: [{ role: "user", content: "DRIFTED" }] });
+    expect(r.mismatches.some((m) => m.includes("input drift"))).toBe(true);
   });
 });
