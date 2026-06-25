@@ -450,9 +450,10 @@ path/ownership mapping first; semantic similarity is a secondary signal only.
   (`NFR-RETRIEVAL-1` — only in-scope constraints call the LLM) + a **configurable
   low-cost provider** (ADR-0007, e.g. DeepSeek) + advisory non-blocking, not by
   manual gating (`NFR-COST-1`, revised 2026-06-21; previously user-initiated). It
-  can still be **re-run manually**: a **`/radar` PR comment** (SHOULD verify the
-  commenter has write access) or **`workflow_dispatch`** (the Actions "Run
-  workflow" button + a PR number). Either way it stays **advisory** — posted via
+  can still be **re-run manually**: a **`/radar conformance` PR comment** (SHOULD
+  verify the commenter has write access; symmetric with capture's `/radar capture`,
+  no prefix overlap) or **`workflow_dispatch`** (the Actions "Run workflow" button
+  + a PR number). Either way it stays **advisory** — posted via
   the Reviews API as a `COMMENT` event, never blocking the merge. First landing:
   checking this repo's own PRs (dogfood — see `ST-0013` / `ST-0008`).
 - `FR-INT-7` **Visible progress (sticky progress review).** Once a `radar check`
