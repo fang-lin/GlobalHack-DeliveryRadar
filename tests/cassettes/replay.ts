@@ -46,8 +46,22 @@ export function createReplay(c: Cassette): Replay {
         mismatches.push(`unexpected model call #${mi}: cassette has only ${c.modelCalls.length}`);
         return normResult(c.modelCalls.at(-1)?.result) as never;
       }
-      // Synthetic cassettes use a sentinel digest ("synthetic"/"ignored…") — skip
-      // model-input verification for those; real recordings carry a real digest.
+      // SYNTHETIC sentinel DISABLES model-input verification for this call.
+      //
+      // Why: synthetic cassettes are hand-authored; the exact prompt that runAgent
+      // will produce cannot be predicted at authoring time, so no real digest can
+      // be embedded.  The sentinel lets the replay proceed without a spurious
+      // mismatch.
+      //
+      // REAL recordings (recorded in Task 9 against a live provider) carry a
+      // sha256 digest of the actual prompt that was sent.  For those calls
+      // rec.inputDigest !== SYNTHETIC, so the gate below IS live: any change to
+      // the skill file, the user prompt, or the retrieve pipeline that alters
+      // what the model sees will produce a digest mismatch and turn the test RED.
+      //
+      // Consequence: prompt/skill drift is caught ONLY against real cassettes.
+      // Synthetic cassettes guard tool-call order/inputs and agent output shape,
+      // but they do NOT guard the model-input prompt.
       if (rec.inputDigest !== SYNTHETIC && digestInput(options.prompt) !== rec.inputDigest) {
         mismatches.push(`model call #${mi} input drift: recorded ${rec.inputDigest}, got ${digestInput(options.prompt)}`);
       }

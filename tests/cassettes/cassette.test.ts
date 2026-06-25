@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { digestInput, saveCassette, loadCassette, type Cassette } from "./cassette.ts";
@@ -34,5 +34,41 @@ describe("save/load round-trip", () => {
     };
     saveCassette(c, dir);
     expect(loadCassette("conformance", "rt", dir)).toEqual(c);
+  });
+});
+
+describe("loadCassette shape validation", () => {
+  function writeBadCassette(dir: string, name: string, content: unknown): void {
+    writeFileSync(join(dir, `conformance-${name}.json`), JSON.stringify(content));
+  }
+
+  it("throws a named error for an empty object (missing meta, modelCalls, toolCalls)", () => {
+    const dir = mkdtempSync(join(tmpdir(), "radar-cass-"));
+    writeBadCassette(dir, "bad-empty", {});
+    expect(() => loadCassette("conformance", "bad-empty", dir)).toThrow(
+      /Malformed cassette.*missing or invalid meta/,
+    );
+  });
+
+  it("throws a named error when modelCalls is absent", () => {
+    const dir = mkdtempSync(join(tmpdir(), "radar-cass-"));
+    writeBadCassette(dir, "bad-no-model-calls", {
+      meta: { op: "conformance", case: "x", recordedAt: "", model: "m", jsonMode: "json_object" },
+      toolCalls: [],
+    });
+    expect(() => loadCassette("conformance", "bad-no-model-calls", dir)).toThrow(
+      /Malformed cassette.*missing modelCalls/,
+    );
+  });
+
+  it("throws a named error when toolCalls is absent", () => {
+    const dir = mkdtempSync(join(tmpdir(), "radar-cass-"));
+    writeBadCassette(dir, "bad-no-tool-calls", {
+      meta: { op: "conformance", case: "x", recordedAt: "", model: "m", jsonMode: "json_object" },
+      modelCalls: [],
+    });
+    expect(() => loadCassette("conformance", "bad-no-tool-calls", dir)).toThrow(
+      /Malformed cassette.*missing toolCalls/,
+    );
   });
 });

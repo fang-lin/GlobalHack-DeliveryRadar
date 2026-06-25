@@ -30,7 +30,22 @@ export function digestInput(input: unknown): string {
 const file = (op: string, c: string, dir = DIR) => join(dir, `${op}-${c}.json`);
 
 export function loadCassette(op: string, caseName: string, dir = DIR): Cassette {
-  return JSON.parse(readFileSync(file(op, caseName, dir), "utf8")) as Cassette;
+  const path = file(op, caseName, dir);
+  const raw: unknown = JSON.parse(readFileSync(path, "utf8"));
+  if (!raw || typeof raw !== "object") {
+    throw new Error(`Malformed cassette ${path}: not an object`);
+  }
+  const obj = raw as Record<string, unknown>;
+  if (!obj.meta || typeof obj.meta !== "object" || Array.isArray(obj.meta)) {
+    throw new Error(`Malformed cassette ${path}: missing or invalid meta`);
+  }
+  if (!Array.isArray(obj.modelCalls)) {
+    throw new Error(`Malformed cassette ${path}: missing modelCalls`);
+  }
+  if (!Array.isArray(obj.toolCalls)) {
+    throw new Error(`Malformed cassette ${path}: missing toolCalls`);
+  }
+  return raw as Cassette;
 }
 
 export function saveCassette(c: Cassette, dir = DIR): void {
