@@ -1,8 +1,8 @@
-# ST-0005: `radar capture` — a skill-driven agent that drafts Decision Notes from a merged PR
+# ST-0005: `radar capture` — a skill-driven agent that drafts Decision Notes from a PR
 
-- **Status:** In progress (design done — ADR-0009 + spec; implementation pending)
+- **Status:** Implemented & merged (PR #13 + #14 grep fix + #15 run summary); the after-merge behaviour was later redesigned to PR-time in [ST-0028](ST-0028-capture-pr-time-and-unified-triggers.md). Pending maintainer sign-off.
 - **Type:** feature / core operation (Capture)
-- **Implements / Relates:** `FR-CAP-1..9` (capture) · `DM-DECISION-NOTE` · `ADR-0009` (skill-driven agent on the AI SDK, at the edge) · `ADR-0006` (platform-agnostic core) · design spec `docs/specs/2026-06-22-decision-capture-design.zh.md` · `ST-0009` (the IIAC skill) · ST-0008 (dogfood consumes it)
+- **Implements / Relates:** `FR-CAP-1..9` (capture) · `DM-DECISION-NOTE` · `ADR-0009` (skill-driven agent on the AI SDK, at the edge) · `ADR-0006` (platform-agnostic core) · design spec `docs/specs/2026-06-22-decision-capture-design.zh.md` · `ST-0009` (the IIAC skill) · ST-0008 (dogfood consumes it) · **superseded behaviour →** [ST-0028](ST-0028-capture-pr-time-and-unified-triggers.md) (moved to PR-time)
 
 ## Story
 
@@ -10,7 +10,9 @@ As a reviewer/maintainer, I want the radar to notice decisions a PR made *implic
 
 ## Design (per ADR-0009)
 
-Capture is a **skill-driven investigative agent**, not a single LLM call: it reads the merged PR's diff and investigates the repo (read / grep / read-only git) to judge whether a change is an **implicit, net-new, architecturally-significant** decision. The agent is **hand-written on the Vercel AI SDK** (no framework), lives at the edge (`src/capture/`), and runs on the same pluggable cheap provider as conformance. Its methodology lives in `skills/capture/SKILL.md` (`ST-0009`), injected as the agent's instructions. It runs **after merge** (decoupled from conformance) and emits **draft** Decision Notes; the workflow turns each into a **draft PR (proposed ADR) or issue** for the maintainer to merge/close.
+Capture is a **skill-driven investigative agent**, not a single LLM call: it reads the PR's diff and investigates the repo (read / grep / read-only git) to judge whether a change is an **implicit, net-new, architecturally-significant** decision. The agent is **hand-written on the Vercel AI SDK** (no framework), lives at the edge (`src/capture/`), and runs on the same pluggable cheap provider as conformance. Its methodology lives in `skills/capture/SKILL.md` (`ST-0009`), injected as the agent's instructions. It emits **draft** Decision Notes — surfacing them, never recording.
+
+> **Redesigned in [ST-0028](ST-0028-capture-pr-time-and-unified-triggers.md) (2026-06-25):** this first cut ran **after merge** and opened a **draft PR / issue**. Per the ADR-0009 revision, capture now runs **at PR-open** and surfaces its Notes as a **sticky advisory review on the open PR** (where a human can still act before merge). The agent + skill are unchanged; only when/where it runs and how findings surface moved.
 
 ## Acceptance criteria
 
