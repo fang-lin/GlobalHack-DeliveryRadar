@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "op": "conformance",
+    "case": "violated",
+    "recordedAt": "2026-06-26",
+    "model": "synthetic",
+    "jsonMode": "json_object"
+  },
+  "modelCalls": [
+    {
+      "inputDigest": "synthetic",
+      "result": {
+        "content": [
+          {
+            "type": "tool-call",
+            "toolCallId": "tc-1",
+            "toolName": "grep",
+            "input": { "pattern": "child_process", "path": "src/core" }
+          }
+        ],
+        "finishReason": { "unified": "tool-calls", "raw": null },
+        "usage": { "inputTokens": { "total": 1 }, "outputTokens": { "total": 1 } },
+        "warnings": []
+      }
+    },
+    {
+      "inputDigest": "synthetic",
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"result\":\"violated\",\"confidence\":0.95,\"explanation\":\"src/core/checker.ts imports execFileSync from node:child_process and shells out to git — a direct violation of ADR-0006-C1 which prohibits VCS/platform calls from the pure core\",\"evidence_file\":\"src/core/checker.ts\",\"evidence_line_start\":1,\"evidence_line_end\":1,\"fix_locality\":\"local\",\"fix_direction\":\"remove the execFileSync import and git call; move any VCS interaction to the CLI edge layer\"}"
+          }
+        ],
+        "finishReason": { "unified": "stop", "raw": null },
+        "usage": { "inputTokens": { "total": 1 }, "outputTokens": { "total": 1 } },
+        "warnings": []
+      }
+    }
+  ],
+  "toolCalls": [
+    {
+      "name": "grep",
+      "input": { "pattern": "child_process", "path": "src/core" },
+      "output": "src/core/checker.ts:1: import { execFileSync } from \"node:child_process\";"
+    }
+  ]
+}

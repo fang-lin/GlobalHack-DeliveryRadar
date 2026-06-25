@@ -1,0 +1,26 @@
+{
+  "meta": {
+    "op": "conformance",
+    "case": "aligned",
+    "recordedAt": "2026-06-26",
+    "model": "synthetic",
+    "jsonMode": "json_object"
+  },
+  "modelCalls": [
+    {
+      "inputDigest": "synthetic",
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"result\":\"aligned\",\"confidence\":0.9,\"explanation\":\"src/core/checker.ts contains only pure domain logic with no VCS or platform calls — fully aligned with ADR-0006-C1\",\"evidence_file\":null,\"evidence_line_start\":null,\"evidence_line_end\":null,\"fix_locality\":\"none\",\"fix_direction\":null}"
+          }
+        ],
+        "finishReason": { "unified": "stop", "raw": null },
+        "usage": { "inputTokens": { "total": 1 }, "outputTokens": { "total": 1 } },
+        "warnings": []
+      }
+    }
+  ],
+  "toolCalls": []
+}
