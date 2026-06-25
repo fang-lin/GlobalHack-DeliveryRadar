@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { buildUserPrompt, toVerdict, unknownVerdict } from "../../src/core/checker.ts";
-import type { FileDiff } from "../../src/io/diff.ts";
-import { makeConstraint } from "../fixtures/factories.ts";
+import { buildUserPrompt, toVerdict, unknownVerdict } from "./checker.ts";
+import type { FileDiff } from "../io/diff.ts";
+import { makeConstraint } from "../../tests/fixtures/factories.ts";
 
 const constraint = makeConstraint();
 

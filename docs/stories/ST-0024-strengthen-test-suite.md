@@ -44,7 +44,7 @@ Tests live in `tests/unit/` (flat) + `tests/integration/` + `tests/fixtures/`. R
 
 ## Acceptance criteria
 
-- [ ] Unit tests co-located with source; `tsc` build emits no `*.test.*` into `dist/` (verify `pnpm pack:check` stays green).
+- [x] Unit tests co-located with source; `tsc` build emits no `*.test.*` into `dist/` (verify `pnpm pack:check` stays green).
 - [ ] The five gap modules each have a unit test (validateConstraint, verdicts, dump/load, anthropic-adapter, buildUserPrompt).
 - [ ] Integration covers violated + aligned + out-of-scope (in-process) AND a CLI-level `extract`/`check --replay`/`comment` test.
 - [ ] `pnpm lint` + `build` + `test` green; no real network in any test.

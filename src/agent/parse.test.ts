@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { parseAgentJson } from "../../src/agent/parse.ts";
-import { CaptureOutputSchema } from "../../src/core/models.ts";
+import { parseAgentJson } from "./parse.ts";
+import { CaptureOutputSchema } from "../core/models.ts";
 
 const valid = JSON.stringify({ notes: [{
   detected_decision: "x", evidence: [{ file: "a.ts", lines: [1, 2] }],

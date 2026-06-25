@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from "vitest";
 import { MockLanguageModelV3 } from "ai/test";
-import { runCapture } from "../../src/capture/agent.ts";
+import { runCapture } from "./agent.ts";
 
 const NOTES = { notes: [{
   detected_decision: "orders calls inventory over direct HTTP",

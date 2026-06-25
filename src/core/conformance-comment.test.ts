@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { reviewMarkdown, verdictMarkdown } from "../../src/core/conformance-comment.ts";
-import { makeConstraint as constraint, makeVerdict as verdict } from "../fixtures/factories.ts";
+import { reviewMarkdown, verdictMarkdown } from "./conformance-comment.ts";
+import { makeConstraint as constraint, makeVerdict as verdict } from "../../tests/fixtures/factories.ts";
 
 describe("reviewMarkdown (FR-CONF-7)", () => {
   it("renders the header and the advisory footer even with no verdicts", () => {

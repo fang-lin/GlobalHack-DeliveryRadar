@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { CaptureOutputSchema, DecisionNoteSchema } from "../../src/core/models.ts";
+import { CaptureOutputSchema, DecisionNoteSchema } from "./models.ts";
 
 describe("DecisionNote (DM-DECISION-NOTE)", () => {
   it("parses a full note", () => {

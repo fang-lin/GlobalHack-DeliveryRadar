@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from "vitest";
-import { selectModel } from "../../src/agent/model.ts";
+import { selectModel } from "./model.ts";
 
 describe("selectModel", () => {
   it("builds a native Anthropic model", () => {
