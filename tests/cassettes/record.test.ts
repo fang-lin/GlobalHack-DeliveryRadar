@@ -19,6 +19,7 @@ describe("recordingModel", () => {
     expect((r.content[0] as any).text).toBe("hello");
     expect(sink).toHaveLength(1);
     expect(sink[0].inputDigest).toMatch(/^[0-9a-f]{16}$/);
+    expect(sink[0].result).toEqual(r); // captured verbatim, equals what was returned
   });
 });
 
@@ -26,9 +27,19 @@ describe("recordingTools", () => {
   it("captures real tool output (grep over the repo root)", async () => {
     const sink: ToolCall[] = [];
     const tools = recordingTools(process.cwd(), sink) as any;
+    expect(Object.keys(tools).sort()).toEqual(["git", "grep", "read_file"]);
     const out = await tools.grep.execute({ pattern: "stopWhen", path: "src/agent" }, {} as any);
     expect(out).toContain("stopWhen");
     expect(sink).toHaveLength(1);
     expect(sink[0].name).toBe("grep");
+  });
+
+  it("records a real read_file call too", async () => {
+    const sink: ToolCall[] = [];
+    const tools = recordingTools(process.cwd(), sink) as any;
+    const out = await tools.read_file.execute({ path: "package.json" }, {} as any);
+    expect(out).toContain("delivery-radar"); // package.json content
+    expect(sink).toHaveLength(1);
+    expect(sink[0].name).toBe("read_file");
   });
 });
