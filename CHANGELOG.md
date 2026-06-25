@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/fang-lin/GlobalHack-DeliveryRadar/compare/v1.5.0...v1.5.1) (2026-06-25)
+
+
+### Bug Fixes
+
+* **ci:** fold prior conformance reviews as Outdated so repeated pushes don't flood the PR (FR-INT-7) ([3c60ea1](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/3c60ea1a8a67b853024d853a0326b7b8ee371670))
+
 # [1.5.0](https://github.com/fang-lin/GlobalHack-DeliveryRadar/compare/v1.4.1...v1.5.0) (2026-06-24)
 
 
