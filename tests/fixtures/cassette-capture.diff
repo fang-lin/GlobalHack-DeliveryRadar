@@ -1,0 +1,40 @@
+diff --git a/services/payments/src/processor.ts b/services/payments/src/processor.ts
+index 1a2b3c4..5d6e7f8 100644
+--- a/services/payments/src/processor.ts
++++ b/services/payments/src/processor.ts
+@@ -1,8 +1,20 @@
+ import { Payment } from "./types.ts";
+ import { logger } from "./logger.ts";
++import fetch from "node-fetch";
+
++const FRAUD_SERVICE_URL = process.env.FRAUD_SERVICE_URL ?? "http://fraud-detection-service";
++
+ export async function processPayment(payment: Payment): Promise<boolean> {
+-  logger.info("processPayment", { amount: payment.amount });
+-  return true;
++  // New: synchronous HTTP call to an external fraud-detection microservice
++  const resp = await fetch(`${FRAUD_SERVICE_URL}/check`, {
++    method: "POST",
++    headers: { "Content-Type": "application/json" },
++    body: JSON.stringify({ amount: payment.amount, userId: payment.userId }),
++    signal: AbortSignal.timeout(3000),
++  });
++  const { approved } = (await resp.json()) as { approved: boolean };
++  if (!approved) {
++    logger.warn("processPayment blocked by fraud check", { userId: payment.userId });
++    return false;
++  }
++  logger.info("processPayment approved", { amount: payment.amount });
++  return approved;
+ }
+diff --git a/services/payments/package.json b/services/payments/package.json
+index 2b3c4d5..6e7f8a9 100644
+--- a/services/payments/package.json
++++ b/services/payments/package.json
+@@ -8,6 +8,7 @@
+   "dependencies": {
+     "fastify": "^4.26.0",
++    "node-fetch": "^3.3.2",
+     "zod": "^3.23.0"
+   }
+ }

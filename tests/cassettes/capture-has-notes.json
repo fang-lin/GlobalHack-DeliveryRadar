@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "op": "capture",
+    "case": "has-notes",
+    "recordedAt": "2026-06-26",
+    "model": "synthetic",
+    "jsonMode": "json_object"
+  },
+  "modelCalls": [
+    {
+      "inputDigest": "synthetic",
+      "result": {
+        "content": [
+          {
+            "type": "tool-call",
+            "toolCallId": "tc-1",
+            "toolName": "grep",
+            "input": { "pattern": "fraud-detection-service", "path": "docs/adr" }
+          }
+        ],
+        "finishReason": { "unified": "tool-calls", "raw": null },
+        "usage": { "inputTokens": { "total": 1 }, "outputTokens": { "total": 1 } },
+        "warnings": []
+      }
+    },
+    {
+      "inputDigest": "synthetic",
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"notes\":[{\"detected_decision\":\"payments service calls fraud-detection-service over synchronous HTTP\",\"evidence\":[{\"file\":\"services/payments/src/processor.ts\",\"lines\":[10,14]}],\"suggested_class\":\"architectural\",\"draft_rationale\":\"Introducing a synchronous cross-service HTTP dependency from payments to fraud-detection constitutes an architectural coupling decision that should be recorded as an ADR constraint.\",\"confidence\":0.92,\"why_net_new\":\"No existing ADR records a payments→fraud-detection synchronous HTTP dependency; grep of docs/adr found no reference to fraud-detection-service.\"}]}"
+          }
+        ],
+        "finishReason": { "unified": "stop", "raw": null },
+        "usage": { "inputTokens": { "total": 1 }, "outputTokens": { "total": 1 } },
+        "warnings": []
+      }
+    }
+  ],
+  "toolCalls": [
+    {
+      "name": "grep",
+      "input": { "pattern": "fraud-detection-service", "path": "docs/adr" },
+      "output": ""
+    }
+  ]
+}
