@@ -28,4 +28,9 @@ describe("cassetteDeps (replay)", () => {
     expect(deps.mismatches).toEqual([]);
     expect(deps.finalize).toBeUndefined();
   });
+
+  it("throws a clear error when a replay cassette is missing", () => {
+    const dir = mkdtempSync(join(tmpdir(), "radar-missing-"));
+    expect(() => cassetteDeps("conformance", "nope", dir)).toThrow(/Cassette not found/);
+  });
 });

@@ -24,9 +24,15 @@ export function cassetteDeps(op: string, caseName: string, dir = DIR): CassetteD
   const mode = cassetteMode();
   const path = join(dir, `${op}-${caseName}.json`);
   if (mode === "replay" || (mode === "record" && existsSync(path))) {
+    // Friendly error when the cassette file is missing in replay mode.
+    if (!existsSync(path)) {
+      throw new Error(`Cassette not found: ${path}. Record it with RADAR_CASSETTE=record (maintainer-triggered).`);
+    }
     const c = loadCassette(op, caseName, dir);
     const r = createReplay(c);
-    return { makeModel: () => r.model, makeTools: () => r.tools, mismatches: r.mismatches };
+    // Replay tools don't touch the filesystem, so `root` is unused.
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return { makeModel: () => r.model, makeTools: (_root: string) => r.tools, mismatches: r.mismatches };
   }
   // record / update — spends API; maintainer-triggered.
   const modelCalls: ModelCall[] = [];
