@@ -15,7 +15,7 @@ const DIR = new URL(".", import.meta.url).pathname; // tests/cassettes/
 // Stable stringify (sorted keys) with volatile bits normalized, so a digest is
 // reproducible regardless of key order or the per-run tmp dir in a path.
 function normalize(v: unknown): unknown {
-  if (typeof v === "string") return v.replace(/\/[^\s"]*radar-[A-Za-z0-9]+\//g, "/<tmp>/");
+  if (typeof v === "string") return v.replace(/[/\\][^\s"]*radar-[A-Za-z0-9-]+[/\\]/g, "/<tmp>/");
   if (Array.isArray(v)) return v.map(normalize);
   if (v && typeof v === "object") {
     return Object.fromEntries(Object.keys(v as object).sort().map((k) => [k, normalize((v as Record<string, unknown>)[k])]));
