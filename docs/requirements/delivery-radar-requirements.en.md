@@ -363,11 +363,13 @@ path/ownership mapping first; semantic similarity is a secondary signal only.
 ## 9. Functional requirements — Decision Capture (`capture`)
 
 **Trigger**
-- `FR-CAP-1` (revised 2026-06-22) Runs **after the PR merges** (`pull_request`
-  `closed` with `merged == true`), decoupled from `conformance` (which runs on PR
-  open/update) — no longer a shared pass. The PR's diff is obtained via
-  `gh pr diff <PR#>` (still available after merge). It can also be re-run manually
-  via `workflow_dispatch` or a `/radar capture` comment. Rationale: see `ADR-0009`.
+- `FR-CAP-1` (revised 2026-06-25, supersedes the 06-22 "after-merge" version) Runs
+  **once on PR `opened`** + on-demand via `workflow_dispatch` / a `/radar capture`
+  comment; it does **not** run on every `synchronize` (capture is the heavy
+  whole-diff agent — `conformance` covers per-push). Runs alongside `conformance`
+  over the PR diff (back to the `FR-ARCH-1` per-diff-engine framing); each fetches
+  the diff via `gh pr diff <PR#>`. Rationale: see `ADR-0009` (incl. the revision
+  note on why it moved back from after-merge to PR-time).
 
 **Detection**
 - `FR-CAP-2` Detect when a diff appears to *make a decision not covered by any
@@ -379,19 +381,27 @@ path/ownership mapping first; semantic similarity is a secondary signal only.
   drawn from the PR description / linked story.
 
 **Triage gate (human)**
-- `FR-CAP-4` (revised 2026-06-22) The Decision Note is posted as a **draft PR /
-  issue** (capture runs after merge, so the original PR is closed — see
-  `FR-CAP-1` / `ADR-0009`). A human triages with three questions:
+- `FR-CAP-4` (revised 2026-06-25) The Decision Notes are posted as a **sticky,
+  foldable, advisory "Decision Capture" review on the open PR** (alongside the
+  conformance review, with its own hidden marker `<!-- radar:capture -->` so the
+  two streams fold independently and stay distinguishable); a review is posted
+  **only when there are findings** (notes > 0) — nothing-found writes only a run
+  summary, to avoid noise on every PR. A human triages in place with three
+  questions:
   1. Is this a real decision? (else → `dismissed`)
   2. Is it architecturally significant? (else → route to story/AC `[Phase 2]`)
   3. Is it net-new, or already covered by an existing ADR? (if covered, it is a
      `conformance`/`drift` matter, not a new ADR — do not create a duplicate.)
-- `FR-CAP-5` (revised 2026-06-22) Capture's outputs are **drafts**: it MAY open a
-  **draft PR** (an ADR with `Status: Proposed`) or an **issue** — these change no
-  recorded intent until a human merges/closes them, which is the draft step, and
-  the human confirms by **merging/closing**. Capture MUST NOT produce **accepted**
-  intent unattended: it MUST NOT merge/accept an ADR, push to the default branch,
-  or block any merge (see `ADR-0009-C2` / `NFR-TRUST-1`).
+- `FR-CAP-5` (revised 2026-06-25) **Surfacing ≠ recording.** Capture *surfaces*
+  draft Notes on the PR (the review above); turning a confirmed Note into recorded
+  intent (graduation, `FR-CAP-6/7`) is a separate, **human-confirmed** step that
+  produces a **draft ADR PR or issue** (a durable, separate work item) — capture
+  does NOT auto-create those each run. Capture MUST NOT produce **accepted** intent
+  unattended: it MUST NOT merge/accept an ADR, push to the default branch, or block
+  any merge (see `ADR-0009-C2` / `NFR-TRUST-1`). Repeated scans: prior capture
+  reviews fold to `OUTDATED`; a recorded decision stops being flagged (net-new
+  check); a *dismissed* one is not yet remembered (known limitation — future tie-in
+  to the `FR-CONF-10` feedback signal).
 
 **Graduation (Decision Note → ADR)**
 - `FR-CAP-6` On confirmation of an architectural, net-new decision, expand the
