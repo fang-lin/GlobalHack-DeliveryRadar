@@ -3,6 +3,26 @@ import { reviewMarkdown, verdictMarkdown } from "./conformance-comment.ts";
 import { makeConstraint as constraint, makeVerdict as verdict } from "../../tests/fixtures/factories.ts";
 
 describe("reviewMarkdown (FR-CONF-7)", () => {
+  it("starts with the exact conformance stream marker as the very first line", () => {
+    const md = reviewMarkdown([], []);
+    expect(md.startsWith("<!-- radar:conformance -->")).toBe(true);
+  });
+
+  it("contains the conformance marker on both the empty and non-empty paths", () => {
+    const constraints = [constraint({ id: "ADR-001-C1", title: "V1" })];
+    const verdicts = [verdict({ constraint_id: "ADR-001-C1", result: "violated" })];
+    expect(reviewMarkdown([], [])).toContain("<!-- radar:conformance -->");
+    expect(reviewMarkdown(verdicts, constraints)).toContain("<!-- radar:conformance -->");
+  });
+
+  it("contains the positioning sentence on both paths", () => {
+    const positioning = "_Does this PR still match what we decided — the recorded ADRs?_";
+    const constraints = [constraint({ id: "ADR-001-C1", title: "V1" })];
+    const verdicts = [verdict({ constraint_id: "ADR-001-C1", result: "violated" })];
+    expect(reviewMarkdown([], [])).toContain(positioning);
+    expect(reviewMarkdown(verdicts, constraints)).toContain(positioning);
+  });
+
   it("renders the header and the advisory footer even with no verdicts", () => {
     const md = reviewMarkdown([], []);
     expect(md).toContain("🛰️ Delivery Radar");

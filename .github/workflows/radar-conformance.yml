@@ -3,7 +3,7 @@
 # cost is controlled by scope-first retrieval (only in-scope constraints call the
 # LLM) + a low-cost provider (DeepSeek) + advisory non-blocking, not by manual
 # gating (FR-INT-6 / NFR-COST-1, revised 2026-06-21). Can also be re-run manually:
-#   • comment "/radar" on the PR (ChatOps; commenter must have write access)
+#   • comment "/conformance" on the PR (ChatOps; commenter must have write access)
 #   • Actions → Run workflow (workflow_dispatch) with a PR number
 # Always checks the PR diff against MAIN's ADRs. Needs the AI_GATEWAY_API_KEY secret
 # (Vercel AI Gateway → DeepSeek V4 Pro).
@@ -37,13 +37,13 @@ jobs:
   radar:
     name: radar check — advisory, never blocks
     # Auto on every PR (opened / updated); also re-runnable manually via the Actions
-    # button or a "/radar" comment from a write-access user.
+    # button or a "/conformance" comment from a write-access user.
     if: >-
       github.event_name == 'pull_request' ||
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'issue_comment' &&
         github.event.issue.pull_request != null &&
-        startsWith(github.event.comment.body, '/radar') &&
+        startsWith(github.event.comment.body, '/conformance') &&
         contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association))
     runs-on: ubuntu-latest
     steps:
@@ -70,7 +70,7 @@ jobs:
           OWNER="${REPO%/*}"; NAME="${REPO#*/}"
           IDS=$(gh api graphql -f query='query($o:String!,$r:String!,$n:Int!){repository(owner:$o,name:$r){pullRequest(number:$n){reviews(first:100){nodes{id author{login} isMinimized body}}}}}' \
             -f o="$OWNER" -f r="$NAME" -F n="$PR" \
-            --jq '.data.repository.pullRequest.reviews.nodes[] | select(.author.login=="github-actions" and (.isMinimized|not) and (.body|contains("Delivery Radar — Architecture Conformance"))) | .id')
+            --jq '.data.repository.pullRequest.reviews.nodes[] | select(.author.login=="github-actions" and (.isMinimized|not) and (.body|contains("<!-- radar:conformance -->"))) | .id')
           for id in $IDS; do
             gh api graphql -f query='mutation($id:ID!){minimizeComment(input:{subjectId:$id,classifier:OUTDATED}){minimizedComment{isMinimized}}}' -f id="$id" >/dev/null && echo "folded $id"
           done
@@ -87,7 +87,7 @@ jobs:
           REPO: ${{ github.repository }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          BODY=$(printf '## 🛰️ Delivery Radar — Architecture Conformance\n\n⏳ **Check started** — reading the recorded intent (the ADRs) and checking PR #%s against it…\n\n_Edits itself in place with the verdict when the run finishes (~1-2 min). Advisory — never blocks your merge._\n\n[Live log →](%s)' "$PR" "$RUN_URL")
+          BODY=$(printf '<!-- radar:conformance -->\n## 🛰️ Delivery Radar — Architecture Conformance\n\n⏳ **Check started** — reading the recorded intent (the ADRs) and checking PR #%s against it…\n\n_Edits itself in place with the verdict when the run finishes (~1-2 min). Advisory — never blocks your merge._\n\n[Live log →](%s)' "$PR" "$RUN_URL")
           RID=$(gh api "repos/${REPO}/pulls/${PR}/reviews" -f event=COMMENT -f body="$BODY" --jq .id)
           echo "review_id=$RID" >> "$GITHUB_OUTPUT"
           echo "posted started review #$RID"
@@ -160,5 +160,5 @@ jobs:
           RID: ${{ steps.start.outputs.review_id }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          BODY=$(printf '## 🛰️ Delivery Radar — Architecture Conformance\n\n🟠 **Check did not finish** — the run ended before producing a verdict. The recorded intent is unchanged, and nothing here blocks your merge.\n\n[See the run log →](%s) — fix the cause and re-trigger /radar to retry.' "$RUN_URL")
+          BODY=$(printf '<!-- radar:conformance -->\n## 🛰️ Delivery Radar — Architecture Conformance\n\n🟠 **Check did not finish** — the run ended before producing a verdict. The recorded intent is unchanged, and nothing here blocks your merge.\n\n[See the run log →](%s) — fix the cause and re-trigger /conformance to retry.' "$RUN_URL")
           gh api -X PUT "repos/${REPO}/pulls/${PR}/reviews/${RID}" -f body="$BODY"

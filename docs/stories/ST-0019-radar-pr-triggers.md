@@ -1,14 +1,16 @@
-# ST-0019: Trigger radar from the PR — `/radar` comment + `radar` label
+# ST-0019: Trigger radar from the PR — comment command
 
-- **Status:** In progress — triggers built on `main` (`radar.yml`); pending a real trigger + maintainer sign-off.
+- **Status:** In progress — comment trigger built on `main`; the `radar` label was later removed (ST-0025) and the keyword generalized to `/conformance` · `/capture` ([ST-0028](ST-0028-capture-pr-time-and-unified-triggers.md)). Pending a real trigger + maintainer sign-off.
 - **Type:** integration
-- **Implements / Relates:** `FR-INT-6` (user-initiated triggers) · builds on [ST-0013](ST-0013-github-action.md) (the radar-on-PR workflow) · **split out of ST-0013 on 2026-06-18** so this follow-up increment has its own card (was folded in — corrected per the new-increment-→-new-story rule).
+- **Implements / Relates:** `FR-INT-6` (user-initiated triggers) · builds on [ST-0013](ST-0013-github-action.md) (the radar-on-PR workflow) · **split out of ST-0013 on 2026-06-18** so this follow-up increment has its own card (was folded in — corrected per the new-increment-→-new-story rule) · **superseded keyword / label →** [ST-0028](ST-0028-capture-pr-time-and-unified-triggers.md).
 
 ## Story
 
 As the maintainer, I want to trigger the radar check **from the PR itself** — by commenting `/radar` or adding a `radar` label — instead of going to the Actions tab, so running it is one natural action on the PR.
 
 ## Design
+
+> **Superseded by [ST-0028](ST-0028-capture-pr-time-and-unified-triggers.md) (2026-06-25):** the `radar` **label** trigger was removed (ST-0025); the comment keyword `/radar` (which overlapped both ops) became **`/conformance`**, and capture got its own symmetric **`/capture`** comment trigger. The write-access guard below is unchanged. The original two-trigger design is kept here as the record.
 
 Adds two user-initiated triggers to `radar.yml` (alongside ST-0013's `workflow_dispatch`):
 

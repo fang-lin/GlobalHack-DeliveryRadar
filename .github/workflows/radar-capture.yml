@@ -1,17 +1,22 @@
-# Dogfood: after a PR merges, run the capture agent to extract Decision Notes from
-# the diff and open an advisory issue per note (human decides whether to graduate
-# each note to a full ADR PR). Advisory only — opens issues, never blocks, never
-# merges anything automatically. Runs AUTOMATICALLY when a PR closes as merged;
-# also triggerable via workflow_dispatch (enter a PR number) or a "/radar capture"
-# comment from a write-access user. Needs the AI_GATEWAY_API_KEY secret
-# (Vercel AI Gateway → DeepSeek V4 Pro).
+# Dogfood: when a PR is OPENED, run the capture agent to surface Decision Notes —
+# decisions the PR makes implicitly but records in no ADR — as a sticky, foldable,
+# advisory review on the open PR (next to the conformance review, with its own
+# hidden marker so the two fold independently). Findings land where a human can
+# still act on them. Advisory only — posts a COMMENT review, never blocks, never
+# merges or records anything. Recording a confirmed Note as an ADR (graduation)
+# is a separate, human-confirmed step (a draft ADR PR / issue), not done here.
+# Capture is the heavy whole-diff agent, so it runs on `opened` + on demand
+# (workflow_dispatch with a PR number, or a "/capture" comment from a
+# write-access user) — NOT on every push (conformance covers per-push). Posts a
+# review only when it finds something; nothing-found writes only a run summary.
+# Needs the AI_GATEWAY_API_KEY secret (Vercel AI Gateway → DeepSeek V4 Pro).
 name: "Radar — decision capture"
 
 run-name: "Decision capture for PR #${{ inputs.pr || github.event.issue.number || github.event.pull_request.number }}"
 
 on:
   pull_request:
-    types: [closed]
+    types: [opened]
   workflow_dispatch:
     inputs:
       pr:
@@ -23,8 +28,7 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
-  issues: write
+  pull-requests: write # post the advisory Decision-Note review + fold prior ones
 
 concurrency:
   group: radar-capture-${{ inputs.pr || github.event.issue.number || github.event.pull_request.number }}
@@ -33,14 +37,14 @@ concurrency:
 jobs:
   capture:
     name: capture — advisory, never blocks
-    # Auto on merged PRs; also re-runnable manually via Actions or a "/radar capture"
-    # comment from a write-access user on a PR issue thread.
+    # On PR opened; also re-runnable via the Actions button or a "/capture"
+    # comment from a write-access user. NOT on synchronize (heavy agent).
     if: >-
-      (github.event_name == 'pull_request' && github.event.pull_request.merged == true) ||
+      github.event_name == 'pull_request' ||
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'issue_comment' &&
         github.event.issue.pull_request != null &&
-        startsWith(github.event.comment.body, '/radar capture') &&
+        startsWith(github.event.comment.body, '/capture') &&
         contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association))
     runs-on: ubuntu-latest
     steps:
@@ -67,7 +71,7 @@ jobs:
       - name: Install (frozen lockfile)
         run: pnpm install --frozen-lockfile
 
-      - name: Get merged PR diff
+      - name: Get the PR diff
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh pr diff ${{ steps.pr.outputs.num }} --repo ${{ github.repository }} > pr.diff
@@ -79,26 +83,33 @@ jobs:
           AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
         run: pnpm exec tsx src/cli/main.ts capture --diff pr.diff --adr-dir docs/adr --save notes.json > body.md
 
-      # Always leave a visible trace on the Actions run page (the job summary) so
-      # you can confirm capture ran even when it flags nothing — without opening a
-      # comment on the already-merged PR. On findings, open an advisory issue and
-      # link it in the summary. (Platform output lives in the workflow, never the
-      # core — ADR-0006.)
-      - name: Open an advisory issue on findings + always write a run summary
+      # Fold prior capture reviews to Outdated (match our hidden marker so we never
+      # touch the conformance stream), then — only if there are findings — post the
+      # new sticky Decision-Note review on the OPEN PR. Nothing-found posts no review
+      # (avoids noise on every PR); the run summary always records what happened.
+      # Platform I/O lives here, never in the core (ADR-0006).
+      - name: Fold prior capture reviews + post on findings + run summary
         env:
           GH_TOKEN: ${{ github.token }}
           PR: ${{ steps.pr.outputs.num }}
+          REPO: ${{ github.repository }}
         run: |
+          OWNER="${REPO%/*}"; NAME="${REPO#*/}"
+          IDS=$(gh api graphql -f query='query($o:String!,$r:String!,$n:Int!){repository(owner:$o,name:$r){pullRequest(number:$n){reviews(first:100){nodes{id author{login} isMinimized body}}}}}' \
+            -f o="$OWNER" -f r="$NAME" -F n="$PR" \
+            --jq '.data.repository.pullRequest.reviews.nodes[] | select(.author.login=="github-actions" and (.isMinimized|not) and (.body|contains("<!-- radar:capture -->"))) | .id')
+          for id in $IDS; do
+            gh api graphql -f query='mutation($id:ID!){minimizeComment(input:{subjectId:$id,classifier:OUTDATED}){minimizedComment{isMinimized}}}' -f id="$id" >/dev/null && echo "folded $id"
+          done
           COUNT=$(jq 'length' notes.json)
           echo "## 🛰️ Decision Capture — PR #$PR" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           if [ "$COUNT" = "0" ]; then
-            echo "✅ Ran successfully — **0 decision notes** (nothing flagged). No issue opened." >> "$GITHUB_STEP_SUMMARY"
+            echo "✅ Ran successfully — **0 decision notes** (nothing flagged). No review posted; any prior capture reviews were folded as outdated." >> "$GITHUB_STEP_SUMMARY"
             echo "nothing flagged"
             exit 0
           fi
-          URL=$(gh issue create --repo ${{ github.repository }} \
-            --title "Decision capture from #$PR" \
-            --body-file body.md)
-          echo "🟡 Ran successfully — **$COUNT decision note(s)** drafted → $URL" >> "$GITHUB_STEP_SUMMARY"
-          echo "opened $URL"
+          BODY=$(cat body.md)
+          gh api "repos/${REPO}/pulls/${PR}/reviews" -f event=COMMENT -f body="$BODY" >/dev/null
+          echo "🟡 Ran successfully — **$COUNT decision note(s)** posted as a sticky Decision-Note review on PR #$PR (prior ones folded)." >> "$GITHUB_STEP_SUMMARY"
+          echo "posted $COUNT note(s)"

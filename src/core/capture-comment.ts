@@ -36,13 +36,16 @@ confidence **${note.confidence.toFixed(2)}**`;
 }
 
 export function decisionNotesMarkdown(notes: DecisionNote[]): string {
+  const MARKER = "<!-- radar:capture -->";
+  const POSITIONING = "_Did this PR make an architectural decision that isn't recorded in any ADR?_";
+
   if (notes.length === 0) {
     const nothingFlagged =
       "✅ **No undocumented decisions detected** — this merge introduces no " +
       "architecturally-significant decision that isn't already recorded.";
-    return `${HEADER}\n\n${nothingFlagged}\n\n${ADVISORY}`;
+    return `${MARKER}\n${HEADER}\n\n${POSITIONING}\n\n${nothingFlagged}\n\n${ADVISORY}`;
   }
   // Each note card is followed by \n\n---\n\n (matching original push-then-join structure).
   const body = notes.map((n) => `${decisionNoteMarkdown(n)}\n\n---\n\n`).join("");
-  return `${HEADER}\n\n${body}${ADVISORY}`;
+  return `${MARKER}\n${HEADER}\n\n${POSITIONING}\n\n${body}${ADVISORY}`;
 }

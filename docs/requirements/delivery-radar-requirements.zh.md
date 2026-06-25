@@ -284,18 +284,18 @@ fix_locality: structural        # local | structural | none  (drives review proj
 ## 9. 功能需求 — 决策捕获（`capture`）
 
 **触发**
-- `FR-CAP-1`（2026-06-22 修订）在 PR **合并后**运行（`pull_request` 的 `closed` 且 `merged == true`），与 `conformance`（PR 打开/更新时）解耦——不再共用同一次扫描。该 PR 的 diff 经 `gh pr diff <PR号>` 取得（合并后仍可取）。仍可用 `workflow_dispatch` 或 `/radar capture` 评论手动重跑。理由见 `ADR-0009`。
+- `FR-CAP-1`（2026-06-25 修订，取代 06-22 的"合并后"版）在 PR **打开时（`opened`）运行一次** + 可用 `workflow_dispatch` / `/capture` 手动重跑;**不**挂在每次 `synchronize` 上(capture 是重型整-diff agent,成本高;`conformance` 负责每次 push)。与 `conformance` 并列作用于 PR diff(回归 `FR-ARCH-1` 的 per-diff engine);各自 `gh pr diff <PR号>` 取 diff。理由见 `ADR-0009`(含"为何从合并后改回 PR 阶段"的修订说明)。
 
 **检测**
 - `FR-CAP-2` 检测 diff 看似*做出了不被任何活跃约束覆盖的决策*的情形 — 例如引入新依赖、新数据存储或新的跨服务调用模式。最有价值的捕获对象是 PR *隐式*做出的决策，而不仅仅是未记录的决策。
 - `FR-CAP-3` 产出草稿态的 `DM-DECISION-NOTE`，含检测到的决策、证据 hunk、建议分类（`architectural`/`behavioral`），以及从 PR 描述/关联 story 提取的理由草稿。
 
 **分诊门（人类）**
-- `FR-CAP-4`（2026-06-22 修订）Decision Note 以**草稿 PR / issue** 的形式发布（capture 在合并后运行，原 PR 已关闭——见 `FR-CAP-1` / `ADR-0009`）。人类用三个问题分诊：
+- `FR-CAP-4`（2026-06-25 修订）Decision Note 以 **PR 上一条 sticky、可折叠、advisory 的"Decision Capture"评审**发布(与 conformance 评审并列,带独立隐藏标记 `<!-- radar:capture -->` 以区分与折叠);**仅在有发现(notes>0)时发评审,0 条只写运行总结**,避免每个 PR 刷屏。人类在 PR 上就地分诊,用三个问题:
   1. 这是真决策吗？（否则 → `dismissed`）
   2. 它具有架构意义吗？（否则 → 路由至 story/AC `[Phase 2]`）
   3. 它是净新增，还是已被某个既有 ADR 覆盖？（若已被覆盖，则属于 `conformance`/`drift` 的事务，不是新 ADR — 不要创建重复项。）
-- `FR-CAP-5`（2026-06-22 修订）capture 的产物是**草稿**：可以自动开一个**草稿 PR**（`Status: Proposed` 的 ADR）或 **issue**——它们在被人类合并/关闭前不改变任何已记录意图，这本身就是"草稿"那一步，人类靠**合并/关闭**来确认。capture MUST NOT 未经人类动作就**接受/合并** ADR、向默认分支 push、或阻塞任何合并（见 `ADR-0009-C2` / `NFR-TRUST-1`）。
+- `FR-CAP-5`（2026-06-25 修订）**呈现 ≠ 记录。** capture 在 PR 上**呈现**草稿 Note(上条评审);把已确认的 Note **记成意图**(毕业,`FR-CAP-6/7`)是**人确认后**的单独一步,产出一个**草稿 ADR PR 或 issue**(持久的独立工作项)——capture **不**每次跑都自动开它们。capture MUST NOT 未经人类动作就**接受/合并** ADR、向默认分支 push、或阻塞任何合并(见 `ADR-0009-C2` / `NFR-TRUST-1`)。重复扫描:折叠旧的 capture 评审为 `OUTDATED`;已记录的决策(加了 ADR)下次扫描不再 flag;被 dismiss 的暂不记忆(已知局限,将来接 `FR-CONF-10` 反馈)。
 
 **毕业（Decision Note → ADR）**
 - `FR-CAP-6` 当一个架构性、净新增的决策被确认后，将笔记扩展为完整的 ADR 草稿：Context（含 `driver` 链接）、Decision、Consequences、`Status: Proposed`，以及机器可读的 `constraints` 块。人类的主要编辑对象是约束块。
@@ -320,7 +320,7 @@ fix_locality: structural        # local | structural | none  (drives review proj
 - `FR-INT-3` 按仓库引擎以计划任务（cron）外加 ADR 变更钩子的形式运行。
 - `FR-INT-4` `[Phase 2]` issue 跟踪器（GitHub Issues 或 Linear）作为整改 issue 和行为类 Decision Note 的可配置目的地。
 - `FR-INT-5` 确定性检查 SHOULD 集成现有引擎（如 semgrep），而非重新实现匹配。
-- `FR-INT-6` `radar check` 在 CI 中**默认对每个 PR 自动运行**（PR 打开 / 更新时）；成本由**作用域优先检索**（`NFR-RETRIEVAL-1`，只对命中的约束调 LLM）+ **可配置的低成本 provider**（ADR-0007，如 DeepSeek）+ advisory 不阻塞 来控制，而非靠手动门控（`NFR-COST-1`，2026-06-21 修订；此前为用户发起）。仍可**手动重跑**：**PR 评论命令 `/radar`**（SHOULD 校验评论者写权限）或 **`workflow_dispatch`**（Actions 的 "Run workflow" 按钮 + PR 号）。无论触发方式如何，保持 **advisory**——经 Reviews API 以 `COMMENT` 事件发布，绝不阻塞 merge。首个落地形态：对本仓库自身的 PR 做检查（dogfood，见 `ST-0013` / `ST-0008`）。
+- `FR-INT-6` `radar check` 在 CI 中**默认对每个 PR 自动运行**（PR 打开 / 更新时）；成本由**作用域优先检索**（`NFR-RETRIEVAL-1`，只对命中的约束调 LLM）+ **可配置的低成本 provider**（ADR-0007，如 DeepSeek）+ advisory 不阻塞 来控制，而非靠手动门控（`NFR-COST-1`，2026-06-21 修订；此前为用户发起）。仍可**手动重跑**：**PR 评论命令 `/conformance`**（SHOULD 校验评论者写权限;与 capture 的 `/capture` 对称,前缀不重叠）或 **`workflow_dispatch`**（Actions 的 "Run workflow" 按钮 + PR 号）。无论触发方式如何，保持 **advisory**——经 Reviews API 以 `COMMENT` 事件发布，绝不阻塞 merge。首个落地形态：对本仓库自身的 PR 做检查（dogfood，见 `ST-0013` / `ST-0008`）。
 - `FR-INT-7` **进度可见（sticky 进度评审）。** 一次 `radar check` 被触发后（`FR-INT-6`），系统 SHOULD **立即**在该 PR 上发布一条可见的 advisory 评审（Reviews API，`COMMENT` 事件），内容为"检查已开始"占位 + 指向本次运行实时日志的链接；运行结束后**就地编辑同一条评审**为最终裁定投影（`FR-CONF-7`），若运行失败则就地编辑为失败说明 + 日志链接。目的：PR 上始终反映检查的当前状态（开始 / 完成 / 失败），绝不残留"正在运行"的僵尸状态；一次运行只占用一条评审，跨多次运行各自新建（每次检查是一条可审计记录，`NFR-EVAL-1`）。**（2026-06-25 修订）每次运行 SHOULD 在发布新评审前，把本 PR 上此前由本系统发布的 conformance 评审折叠为 `OUTDATED`（GraphQL `minimizeComment`；顶层 `COMMENT` 评审可折叠），使 PR 上只展开最新一条、避免频繁 push 时评审刷屏；可审计记录不丢——每次运行仍各留一条（折叠态）评审，且完整轨迹在 Actions 运行历史里。** 状态始终为 `COMMENT`（不阻断，`FR-CONF-9`）。
 
 ---

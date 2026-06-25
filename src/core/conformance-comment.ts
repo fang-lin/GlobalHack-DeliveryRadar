@@ -133,9 +133,12 @@ export function reviewMarkdown(
     "✅ **Nothing flagged** — the changed files raise no architecture-conformance " +
     "issues against the recorded intent.";
 
+  const MARKER = "<!-- radar:conformance -->";
+  const POSITIONING = "_Does this PR still match what we decided — the recorded ADRs?_";
+
   if (cards.length === 0) {
-    return `${HEADER}\n\n${nothingFlagged}\n\n${ADVISORY}`;
+    return `${MARKER}\n${HEADER}\n\n${POSITIONING}\n\n${nothingFlagged}\n\n${ADVISORY}`;
   }
   // Cards block already ends with \n\n (from the trailing separator), so ADVISORY follows directly.
-  return `${HEADER}\n\n${joinCards(cards)}${ADVISORY}`;
+  return `${MARKER}\n${HEADER}\n\n${POSITIONING}\n\n${joinCards(cards)}${ADVISORY}`;
 }
