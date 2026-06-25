@@ -47,6 +47,7 @@ Tests live in `tests/unit/` (flat) + `tests/integration/` + `tests/fixtures/`. R
 - [x] Unit tests co-located with source; `tsc` build emits no `*.test.*` into `dist/` (verify `pnpm pack:check` stays green).
 - [ ] The five gap modules each have a unit test (validateConstraint, verdicts, dump/load, anthropic-adapter, buildUserPrompt).
 - [ ] Integration covers violated + aligned + out-of-scope (in-process) AND a CLI-level `extract`/`check --replay`/`comment` test.
+  - [x] CLI-level `extract` + `comment` integration tests added (ST-0024, 2026-06-25); `dispatch` unit tests + `fail()` unit test added; in-process violated/aligned/out-of-scope still pending.
 - [ ] `pnpm lint` + `build` + `test` green; no real network in any test.
 - [ ] (Sign-off by the maintainer before marking Done.)
 
