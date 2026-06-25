@@ -14,7 +14,7 @@ describe("cmdConformance dependency injection", () => {
     const diff = join(dir, "pr.diff");
     // a diff touching src/core so retrieval fires ADR-0006-C1
     writeFileSync(diff, "diff --git a/src/core/x.ts b/src/core/x.ts\n--- a/src/core/x.ts\n+++ b/src/core/x.ts\n@@ -1 +1 @@\n+import {execSync} from 'child_process'\n");
-    let toolsUsed = false;
+    let makeToolsCalled = false;
     const code = await cmdConformance(
       ["--diff", diff, "--adr-dir", "docs/adr", "--root", process.cwd()],
       {
@@ -22,12 +22,10 @@ describe("cmdConformance dependency injection", () => {
           content: [{ type: "text", text: JSON.stringify({ result: "aligned", confidence: 0.9, explanation: "ok", evidence_file: null, evidence_line_start: null, evidence_line_end: null, fix_locality: "none", fix_direction: "" }) }],
           finishReason: { unified: "stop", raw: undefined }, usage: { inputTokens: { total: 1 }, outputTokens: { total: 1 } }, warnings: [],
         }) }) as any,
-        makeTools: () => ({ grep: tool({ description: "x", inputSchema: z.any(), execute: async () => { toolsUsed = true; return "x"; } }) }),
+        makeTools: () => { makeToolsCalled = true; return { grep: tool({ description: "x", inputSchema: z.any(), execute: async () => "x" }) }; },
       },
     );
     expect(code).toBe(0);
-    // toolsUsed may remain false since the mock model doesn't call tools — we
-    // verify injection is wired (no ANTHROPIC_API_KEY error) rather than tool invocation
-    void toolsUsed;
+    expect(makeToolsCalled).toBe(true);
   });
 });
