@@ -11,6 +11,22 @@ const note = {
 };
 
 describe("decisionNotesMarkdown", () => {
+  it("starts with the exact capture stream marker as the very first line", () => {
+    expect(decisionNotesMarkdown([]).startsWith("<!-- radar:capture -->")).toBe(true);
+    expect(decisionNotesMarkdown([note]).startsWith("<!-- radar:capture -->")).toBe(true);
+  });
+
+  it("contains the capture marker on both the empty and non-empty paths", () => {
+    expect(decisionNotesMarkdown([])).toContain("<!-- radar:capture -->");
+    expect(decisionNotesMarkdown([note])).toContain("<!-- radar:capture -->");
+  });
+
+  it("contains the positioning sentence on both paths", () => {
+    const positioning = "_Did this PR make an architectural decision that isn't recorded in any ADR?_";
+    expect(decisionNotesMarkdown([])).toContain(positioning);
+    expect(decisionNotesMarkdown([note])).toContain(positioning);
+  });
+
   it("renders a note with header, evidence and confidence", () => {
     const md = decisionNotesMarkdown([note]);
     expect(md).toContain("Delivery Radar — Decision Capture");
