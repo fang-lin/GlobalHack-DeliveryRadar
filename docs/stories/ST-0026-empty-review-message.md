@@ -1,6 +1,6 @@
 # ST-0026: Make the clean conformance review explicit ("Nothing flagged")
 
-- **Status:** In progress (shipped 2026-06-22; pending maintainer sign-off)
+- **Status:** Done (2026-06-25 — maintainer sign-off; shipped 2026-06-22)
 - **Type:** radar / UX
 - **Implements / Relates:** `FR-CONF-7` (review projection) · `NFR-EXPLAIN-1` (explainability) · surfaced by [ST-0025](ST-0025-radar-auto-check.md) (auto-run on every PR)
 
@@ -25,7 +25,7 @@ This covers both empty cases the function can see: zero in-scope constraints, an
 - [x] Empty-verdict `reviewMarkdown` renders an explicit "Nothing flagged" line, not just the header.
 - [x] Unit test in `comment.test.ts` asserts it.
 - [x] `pnpm lint` + `build` + `test` green.
-- [ ] Maintainer sign-off.
+- [x] Maintainer sign-off (fang-lin, 2026-06-25).
 
 ## Notes
 

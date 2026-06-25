@@ -1,6 +1,6 @@
 # ST-0028: Capture at PR time — sticky Decision-Note review; unify comment triggers to `/conformance` + `/capture`
 
-- **Status:** In progress (shipped on `capture-pr-time` / PR #19; pending maintainer sign-off)
+- **Status:** Done (2026-06-25 — maintainer sign-off; merged via PR #19, release 1.6.0). ⚠️ Accepted on code review + merge — the CI "post a Decision-Note review when notes > 0" branch and the `/conformance` · `/capture` comment triggers have **not** been exercised end-to-end yet (see the unverified-path note in QA).
 - **Type:** integration / tooling
 - **Implements / Relates:** `ADR-0009` (revised 2026-06-25: capture moves after-merge → PR-time) · `FR-CAP-1` / `FR-CAP-4` / `FR-CAP-5` (PR-time run, sticky review, surfacing ≠ recording) · `FR-INT-6` (conformance comment trigger) · `FR-INT-7` (fold prior reviews to Outdated) · evolves [ST-0005](ST-0005-radar-capture.md) (capture impl, originally after-merge) · generalizes [ST-0019](ST-0019-radar-pr-triggers.md) (PR triggers; `radar` label dropped) · reuses [ST-0021](ST-0021-sticky-progress-review.md) (sticky-progress review pattern) · both ops share the one engine from [ST-0027](ST-0027-unified-agent.md)
 
@@ -31,10 +31,10 @@ Builds on ST-0005 (capture exists, runs on the shared agent) and ST-0019 (PR tri
 
 | gate | how | result |
 |---|---|---|
-| Automated | CI / local — lint · typecheck · unit tests · build | ✅ green locally (66 tests); CI on PR #19 |
+| Automated | CI / local — lint · typecheck · unit tests · build | ✅ green (74 tests / 22 files after rebase onto #18; merged via PR #19) |
 | Live / web behaviour | n/a — CI/tooling, no web UI | — |
 | Capture detection | local capture run on a real diff | ✅ **partial** — local run on PR #18's diff found 1 high-quality Note (co-located unit tests; cited ST-0024 + ADR-0008-C2). PR #19's own `opened` auto-run found **0** notes — correct: its decisions are recorded in the same PR's ADR-0009 (demonstrates net-new dedup). |
-| Maintainer sign-off | maintainer reviews/tests | ⬜ pending |
+| Maintainer sign-off | maintainer reviews/tests | ✅ fang-lin, 2026-06-25 (code review + merge) — ⚠️ end-to-end pipeline run still pending (see note below) |
 
 > **Unverified path:** the CI "post a Decision-Note review when notes > 0" branch has never actually fired (PR #19 ran with 0 notes). To verify, open a small PR off this branch carrying an undocumented decision (the `opened` event runs the HEAD branch's workflow version).
 

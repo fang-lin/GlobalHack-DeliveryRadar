@@ -1,6 +1,6 @@
 # ST-0019: Trigger radar from the PR — comment command
 
-- **Status:** In progress — comment trigger built on `main`; the `radar` label was later removed (ST-0025) and the keyword generalized to `/conformance` · `/capture` ([ST-0028](ST-0028-capture-pr-time-and-unified-triggers.md)). Pending a real trigger + maintainer sign-off.
+- **Status:** Done (2026-06-25 — maintainer sign-off; accepted on code review + merge). The `radar` label was removed (ST-0025) and the keyword generalized to `/conformance` · `/capture` ([ST-0028](ST-0028-capture-pr-time-and-unified-triggers.md)). ⚠️ **The live comment-trigger has not been exercised on a real PR** — it only became usable once ST-0028 merged to main (`issue_comment` runs main's workflow). Accepted on review, not an end-to-end run.
 - **Type:** integration
 - **Implements / Relates:** `FR-INT-6` (user-initiated triggers) · builds on [ST-0013](ST-0013-github-action.md) (the radar-on-PR workflow) · **split out of ST-0013 on 2026-06-18** so this follow-up increment has its own card (was folded in — corrected per the new-increment-→-new-story rule) · **superseded keyword / label →** [ST-0028](ST-0028-capture-pr-time-and-unified-triggers.md).
 
@@ -31,7 +31,7 @@ Adds two user-initiated triggers to `radar.yml` (alongside ST-0013's `workflow_d
 |---|---|---|
 | Automated | `radar.yml` YAML valid; triggers + `if` parse | ✅ js-yaml + structure checked |
 | Live / web behaviour | n/a — this is CI, not web (`qa-engineer` not applicable) | — |
-| Maintainer sign-off | maintainer comments `/radar` on a PR, confirms the advisory posts | ⬜ pending |
+| Maintainer sign-off | maintainer comments `/conformance` on a PR, confirms the advisory posts | ✅ fang-lin, 2026-06-25 (code review + merge) — ⚠️ live comment-trigger not yet exercised on a PR |
 
 ## Notes
 

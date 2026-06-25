@@ -1,6 +1,6 @@
 # ST-0025: Auto-run the radar on every PR, on a low-cost provider (DeepSeek via Vercel)
 
-- **Status:** In progress (shipped 2026-06-21; pending maintainer sign-off)
+- **Status:** Done (2026-06-25 — maintainer sign-off; shipped 2026-06-21)
 - **Type:** radar / CI / dogfood
 - **Implements / Relates:** `FR-INT-6` + `NFR-COST-1` (both **revised** 2026-06-21) · ADR-0007 (pluggable model layer) · builds on [ST-0013](ST-0013-github-action.md) / [ST-0019](ST-0019-radar-pr-triggers.md) (manual triggers — now superseded by auto)
 
@@ -22,7 +22,7 @@ As the maintainer, I want the radar to check **every** PR automatically, on a ch
 - [x] Check runs on DeepSeek V4 Pro via Vercel (json_schema) through the ADR-0007 layer; verified live in CI on PR #9 (produced a real verdict).
 - [x] Runs via `tsx` (no build); engine from the PR, ADR baseline from main.
 - [x] `FR-INT-6` / `NFR-COST-1` revised + mirrored (zh/en), banner synced.
-- [ ] Maintainer sign-off.
+- [x] Maintainer sign-off (fang-lin, 2026-06-25).
 
 ## Notes
 

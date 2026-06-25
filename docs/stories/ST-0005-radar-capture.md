@@ -1,6 +1,6 @@
 # ST-0005: `radar capture` — a skill-driven agent that drafts Decision Notes from a PR
 
-- **Status:** Implemented & merged (PR #13 + #14 grep fix + #15 run summary); the after-merge behaviour was later redesigned to PR-time in [ST-0028](ST-0028-capture-pr-time-and-unified-triggers.md). Pending maintainer sign-off.
+- **Status:** Done (2026-06-25 — maintainer sign-off). Implemented & merged (PR #13 + #14 grep fix + #15 run summary); the `radar capture` command itself was validated locally (real diff → real Decision Note). The after-merge behaviour was later redesigned to PR-time in [ST-0028](ST-0028-capture-pr-time-and-unified-triggers.md).
 - **Type:** feature / core operation (Capture)
 - **Implements / Relates:** `FR-CAP-1..9` (capture) · `DM-DECISION-NOTE` · `ADR-0009` (skill-driven agent on the AI SDK, at the edge) · `ADR-0006` (platform-agnostic core) · design spec `docs/specs/2026-06-22-decision-capture-design.zh.md` · `ST-0009` (the IIAC skill) · ST-0008 (dogfood consumes it) · **superseded behaviour →** [ST-0028](ST-0028-capture-pr-time-and-unified-triggers.md) (moved to PR-time)
 
@@ -16,11 +16,11 @@ Capture is a **skill-driven investigative agent**, not a single LLM call: it rea
 
 ## Acceptance criteria
 
-- [ ] `radar capture --diff <file> --adr-dir <dir>` reads a merged PR's diff, investigates the repo, and emits 0..n **draft Decision Notes** (Zod-validated): each = `detected_decision` + `evidence (file:lines)` + `suggested_class` (architectural/behavioral) + `draft_rationale` + `confidence` + `why_net_new`. **Emitting nothing is valid — do not invent decisions.**
-- [ ] The agent is dedup-aware: it takes the existing constraint set and does not re-flag what's already recorded.
-- [ ] Pure core (`src/core/`) stays SDK-free and platform-free; the agent + AI SDK + read-only tools live in `src/capture/` (`ADR-0009-C1`). Config from `process.env` only.
-- [ ] Advisory + human-triage only: capture drafts; it MUST NOT auto-accept/merge an ADR, push, or block a merge (`ADR-0009-C2`).
-- [ ] `--save` / `--replay` for demo determinism; tested with a mock model (no real LLM in tests, `ST-0024` discipline).
+- [x] `radar capture --diff <file> --adr-dir <dir>` reads a merged PR's diff, investigates the repo, and emits 0..n **draft Decision Notes** (Zod-validated): each = `detected_decision` + `evidence (file:lines)` + `suggested_class` (architectural/behavioral) + `draft_rationale` + `confidence` + `why_net_new`. **Emitting nothing is valid — do not invent decisions.**
+- [x] The agent is dedup-aware: it takes the existing constraint set and does not re-flag what's already recorded.
+- [x] Pure core (`src/core/`) stays SDK-free and platform-free; the agent + AI SDK + read-only tools live in `src/capture/` (`ADR-0009-C1`). Config from `process.env` only.
+- [x] Advisory + human-triage only: capture drafts; it MUST NOT auto-accept/merge an ADR, push, or block a merge (`ADR-0009-C2`).
+- [x] `--save` / `--replay` for demo determinism; tested with a mock model (no real LLM in tests, `ST-0024` discipline).
 
 ## Notes
 
