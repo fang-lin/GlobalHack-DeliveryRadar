@@ -2,6 +2,7 @@ import { MockLanguageModelV3 } from "ai/test";
 import { tool, type LanguageModel, type Tool } from "ai";
 import * as z from "zod/v4";
 import { digestInput, type Cassette } from "./cassette.ts";
+import { buildTools } from "../../src/agent/tools.ts";
 
 export const SYNTHETIC = "synthetic";
 
@@ -69,12 +70,16 @@ export function createReplay(c: Cassette): Replay {
     },
   }) as unknown as LanguageModel;
 
+  // Build real tools once so we can reuse their inputSchema (with zod defaults).
+  // The root path is irrelevant here — we only need the schema, never execute real tools.
+  const realTools = buildTools(process.cwd());
+
   let ti = 0;
   const names = [...new Set(c.toolCalls.map((t) => t.name))];
   const make = (name: string): Tool =>
     tool({
       description: `replayed ${name}`,
-      inputSchema: z.any(),
+      inputSchema: realTools[name]?.inputSchema ?? z.any(),
       execute: async (input: unknown) => {
         const rec = c.toolCalls[ti++];
         if (!rec || rec.name !== name || digestInput(rec.input) !== digestInput(input)) {
