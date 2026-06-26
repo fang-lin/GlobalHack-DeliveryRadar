@@ -691,10 +691,10 @@ git commit -m "test: drop flimsy skill tests, unify integration naming, add data
 
 ### Task 9 (maintainer-triggered, not automated): record real cassettes
 
-> **This step costs API and is run by the maintainer in person, not the implementing agent.** The synthetic cassettes already get the mechanism + agent logic under test and CI green; this step replaces the synthetic data with **real model behaviour** for higher fidelity.
+> **This step costs API and is run by the maintainer in person, not the implementing agent.** The synthetic cassettes already get the mechanism + agent logic under test and CI green; this step **adds** real cassettes (`*-recorded.json`, alongside the synthetic ones — not replacing them) for higher fidelity from real model behaviour.
 
 - [ ] Configure real provider env (`set -a; source .envrc; set +a`).
-- [ ] Re-record each case: `RADAR_CASSETTE=update pnpm vitest run tests/integration/conformance-cassette.test.ts tests/integration/capture-cassette.test.ts` (the harness's `finalize` writes back real cassettes).
+- [ ] Record via the script: `RADAR_CASSETTE=update pnpm exec tsx scripts/record-cassettes.ts` (runs conformance + capture once each against the real model + calls `finalize` to write `conformance-recorded.json` / `capture-recorded.json`). `recorded-cassette.test.ts` flips from skipped to replay-verifying once the real cassettes exist.
 - [ ] **Review** the resulting cassette diffs: no key/sensitive content; if a case's agent called the `git` tool and the fixture isn't a git repo, re-record using a `read_file`/`grep`-judgable fixture (see spec §8).
 - [ ] Rerun the full suite with `RADAR_CASSETTE` unset, confirm the real cassettes still PASS (input verification matches).
 - [ ] Commit the real cassettes: `git commit -m "test(cassette): record real conformance + capture interactions (ST-0024)"`.

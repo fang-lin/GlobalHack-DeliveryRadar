@@ -691,10 +691,10 @@ git commit -m "test: drop flimsy skill tests, unify integration naming, add data
 
 ### Task 9(维护者触发,非自动):录制真 cassette
 
-> **这一步花 API,由维护者本人执行,不由实现 agent 触发。** 合成 cassette 已让机制 + agent 逻辑被测、CI 绿;这一步把合成数据替换成**真实模型行为**,提高保真度。
+> **这一步花 API,由维护者本人执行,不由实现 agent 触发。** 合成 cassette 已让机制 + agent 逻辑被测、CI 绿;这一步**新增**真 cassette(`*-recorded.json`,与合成 cassette 并存、不替换),用真实模型行为提高保真度。
 
 - [ ] 配置真 provider env(`set -a; source .envrc; set +a`)。
-- [ ] 逐个用例重录:`RADAR_CASSETTE=update pnpm vitest run tests/integration/conformance-cassette.test.ts tests/integration/capture-cassette.test.ts`(harness 的 `finalize` 写回真 cassette)。
+- [ ] 用录制脚本录制:`RADAR_CASSETTE=update pnpm exec tsx scripts/record-cassettes.ts`(脚本对 conformance + capture 各跑一次真模型 + 调 `finalize` 写出 `conformance-recorded.json` / `capture-recorded.json`)。`recorded-cassette.test.ts` 在真 cassette 存在后自动从 skip 变为回放校验。
 - [ ] **审查** diff 出来的 cassette:不含 key/敏感内容;若某用例 agent 调了 `git` 工具而 fixture 非 git 仓库,改用 `read_file`/`grep` 能判的 fixture 重录(见 spec §8)。
 - [ ] 不设 `RADAR_CASSETTE` 重跑全套,确认真 cassette 仍 PASS(校验输入匹配)。
 - [ ] 提交真 cassette:`git commit -m "test(cassette): record real conformance + capture interactions (ST-0024)"`。
