@@ -6,7 +6,11 @@
  *
  * Usage:
  *   set -a; source .envrc; set +a
- *   RADAR_CASSETTE=record tsx scripts/record-cassettes.ts
+ *   RADAR_CASSETTE=record tsx scripts/record-cassettes.ts   # first recording
+ *   RADAR_CASSETTE=update tsx scripts/record-cassettes.ts   # overwrite existing cassettes
+ *
+ * Note: RADAR_CASSETTE=record is idempotent — it reuses (replays) an existing
+ * cassette instead of re-recording it. Use RADAR_CASSETTE=update to overwrite.
  *
  * Produces:
  *   tests/cassettes/conformance-recorded.json
@@ -53,10 +57,16 @@ console.error(`Output dir: ${CASSETTE_DIR}`);
     ],
     deps,
   );
-  deps.finalize?.();
-  console.error(
-    `[1/2] conformance-recorded done (exit ${code}) → ${join(CASSETTE_DIR, "conformance-recorded.json")}`,
-  );
+  if (deps.finalize) {
+    deps.finalize();
+    console.error(
+      `[1/2] recorded conformance-recorded.json (exit ${code}) → ${join(CASSETTE_DIR, "conformance-recorded.json")}`,
+    );
+  } else {
+    console.error(
+      `[1/2] WARNING: conformance-recorded.json already exists — it was REPLAYED, not re-recorded. Use RADAR_CASSETTE=update to overwrite.`,
+    );
+  }
 }
 
 // ── 2. capture-recorded ──────────────────────────────────────────────────────
@@ -74,10 +84,16 @@ console.error(`Output dir: ${CASSETTE_DIR}`);
     ],
     deps,
   );
-  deps.finalize?.();
-  console.error(
-    `[2/2] capture-recorded done (exit ${code}) → ${join(CASSETTE_DIR, "capture-recorded.json")}`,
-  );
+  if (deps.finalize) {
+    deps.finalize();
+    console.error(
+      `[2/2] recorded capture-recorded.json (exit ${code}) → ${join(CASSETTE_DIR, "capture-recorded.json")}`,
+    );
+  } else {
+    console.error(
+      `[2/2] WARNING: capture-recorded.json already exists — it was REPLAYED, not re-recorded. Use RADAR_CASSETTE=update to overwrite.`,
+    );
+  }
 }
 
 console.error("\nAll cassettes recorded.");

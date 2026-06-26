@@ -10,7 +10,7 @@
  * RADAR_CASSETTE is set to "update" for the duration of the test and restored
  * in a finally block regardless of failure.
  */
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -47,58 +47,54 @@ const FIXTURE_DIFF = new URL("../fixtures/cassette-conformance.diff", import.met
 const ADR_DIR = new URL("../fixtures/adr-cassette", import.meta.url).pathname;
 
 describe("record round-trip (mock model, zero API)", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it("finalize() writes a cassette that loadCassette can read back with ≥1 modelCall", async () => {
-    const prev = process.env.RADAR_CASSETTE;
-    process.env.RADAR_CASSETTE = "update";
-    try {
-      // Sanity: confirm we are in a record-capable mode
-      expect(cassetteMode()).toBe("update");
+    vi.stubEnv("RADAR_CASSETTE", "update");
 
-      const tmpDir = mkdtempSync(join(tmpdir(), "radar-rt-"));
+    // Sanity: confirm we are in a record-capable mode
+    expect(cassetteMode()).toBe("update");
 
-      // Inject a MockLanguageModelV3 that returns a valid aligned response.
-      const makeRealModel = (): LanguageModel =>
-        new MockLanguageModelV3({
-          doGenerate: async () => mockModelResult(),
-        }) as unknown as LanguageModel;
+    const tmpDir = mkdtempSync(join(tmpdir(), "radar-rt-"));
 
-      const deps = cassetteDeps("conformance", "__rt", tmpDir, makeRealModel);
+    // Inject a MockLanguageModelV3 that returns a valid aligned response.
+    const makeRealModel = (): LanguageModel =>
+      new MockLanguageModelV3({
+        doGenerate: async () => mockModelResult(),
+      }) as unknown as LanguageModel;
 
-      // deps should have finalize (record/update branch)
-      expect(typeof deps.finalize).toBe("function");
+    const deps = cassetteDeps("conformance", "__rt", tmpDir, makeRealModel);
 
-      // Drive the real cmdConformance — recordingModel wraps makeRealModel(),
-      // recordingTools wraps buildTools(root). The single ADR-0006-C1 constraint
-      // fires one model call (no tool round needed for an aligned response).
-      const code = await cmdConformance(
-        [
-          "--diff", FIXTURE_DIFF,
-          "--adr-dir", ADR_DIR,
-          "--root", process.cwd(),
-        ],
-        deps,
-      );
-      expect(code).toBe(0);
+    // deps should have finalize (record/update branch)
+    expect(typeof deps.finalize).toBe("function");
 
-      // Trigger finalize to write the cassette file to tmpDir.
-      deps.finalize!();
+    // Drive the real cmdConformance — recordingModel wraps makeRealModel(),
+    // recordingTools wraps buildTools(root). The single ADR-0006-C1 constraint
+    // fires one model call (no tool round needed for an aligned response).
+    const code = await cmdConformance(
+      [
+        "--diff", FIXTURE_DIFF,
+        "--adr-dir", ADR_DIR,
+        "--root", process.cwd(),
+      ],
+      deps,
+    );
+    expect(code).toBe(0);
 
-      // Now read it back and verify structure.
-      const cassette = loadCassette("conformance", "__rt", tmpDir);
-      expect(cassette.meta.op).toBe("conformance");
-      expect(cassette.meta.case).toBe("__rt");
-      expect(cassette.modelCalls.length).toBeGreaterThanOrEqual(1);
+    // Trigger finalize to write the cassette file to tmpDir.
+    deps.finalize!();
 
-      // Each modelCall must have a 16-hex inputDigest (real digest, not "synthetic").
-      for (const mc of cassette.modelCalls) {
-        expect(mc.inputDigest).toMatch(/^[0-9a-f]{16}$/);
-      }
-    } finally {
-      if (prev === undefined) {
-        delete process.env.RADAR_CASSETTE;
-      } else {
-        process.env.RADAR_CASSETTE = prev;
-      }
+    // Now read it back and verify structure.
+    const cassette = loadCassette("conformance", "__rt", tmpDir);
+    expect(cassette.meta.op).toBe("conformance");
+    expect(cassette.meta.case).toBe("__rt");
+    expect(cassette.modelCalls.length).toBeGreaterThanOrEqual(1);
+
+    // Each modelCall must have a 16-hex inputDigest (real digest, not "synthetic").
+    for (const mc of cassette.modelCalls) {
+      expect(mc.inputDigest).toMatch(/^[0-9a-f]{16}$/);
     }
   });
 });

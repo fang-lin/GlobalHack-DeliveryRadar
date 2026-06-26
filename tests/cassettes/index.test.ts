@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -6,10 +6,14 @@ import { cassetteMode, cassetteDeps } from "./index.ts";
 import { saveCassette, type Cassette } from "./cassette.ts";
 
 describe("cassetteMode", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it("defaults to replay when RADAR_CASSETTE is unset", () => {
-    const prev = process.env.RADAR_CASSETTE;
-    delete process.env.RADAR_CASSETTE;
-    try { expect(cassetteMode()).toBe("replay"); } finally { if (prev) process.env.RADAR_CASSETTE = prev; }
+    vi.stubEnv("RADAR_CASSETTE", "");
+    // stubEnv sets the key to ""; cassetteMode treats any non-record/update value as "replay"
+    expect(cassetteMode()).toBe("replay");
   });
 });
 
