@@ -20,7 +20,7 @@ export interface CassetteDeps {
   finalize?: () => void; // record/update mode — writes the cassette
 }
 
-export function cassetteDeps(op: string, caseName: string, dir = DIR): CassetteDeps {
+export function cassetteDeps(op: string, caseName: string, dir = DIR, makeRealModel?: () => LanguageModel): CassetteDeps {
   const mode = cassetteMode();
   const path = join(dir, `${op}-${caseName}.json`);
   if (mode === "replay" || (mode === "record" && existsSync(path))) {
@@ -38,7 +38,7 @@ export function cassetteDeps(op: string, caseName: string, dir = DIR): CassetteD
   const modelCalls: ModelCall[] = [];
   const toolCalls: ToolCall[] = [];
   return {
-    makeModel: () => recordingModel(selectModel(process.env), modelCalls),
+    makeModel: () => recordingModel(makeRealModel ? makeRealModel() : selectModel(process.env), modelCalls),
     makeTools: (root: string) => recordingTools(root, toolCalls),
     finalize: () => {
       const c: Cassette = {
