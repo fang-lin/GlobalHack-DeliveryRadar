@@ -1,3 +1,21 @@
+# [1.7.0](https://github.com/fang-lin/GlobalHack-DeliveryRadar/compare/v1.6.0...v1.7.0) (2026-06-26)
+
+
+### Bug Fixes
+
+* **agent:** grep + git tools silence stderr so path-not-found doesn't leak to the log (ST-0024) ([94be455](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/94be455c155141498a274f02decc4183c58ef32a))
+* **cassette:** consistent makeTools signature + friendly missing-cassette error (ST-0024) ([189ec40](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/189ec409780aab19428843300af5a7f34834de6b))
+* **cassette:** normalize hyphenated + windows tmp paths in digestInput (ST-0024) ([5b08a40](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/5b08a40f33bc8da130a8028572c5ebec602d02bc))
+* **cassette:** replay records input mismatches into a verifiable stale gate, not a swallowed throw (ST-0024) ([062ebcb](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/062ebcb7af4ed791c9f91789e1652e784d8b014c))
+* **cassette:** replay tools use the real tool inputSchema so zod defaults match the recording (ST-0024) ([ae80b63](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/ae80b6371aa3db5d4cc5cbd1a61d26732abd90d1))
+* **cassette:** warn on record-mode reuse + isolate RADAR_CASSETTE env in tests (ST-0024) ([5405c53](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/5405c53a64aaa50d8a1d35ad5456b291a943c122))
+
+
+### Features
+
+* **cassette:** recording entrypoint + injectable record model + recorded-cassette test (ST-0024) ([339f6bc](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/339f6bcc7110f80bbc69220c322c3a32b0e91a8c))
+* **cli:** optional model+tools injection seam for cassette tests (ST-0024, ADR-0010-C1 preserved) ([b9a74eb](https://github.com/fang-lin/GlobalHack-DeliveryRadar/commit/b9a74eb25a8a0b6e58e0fcad37e410404092c1f7))
+
 # [1.6.0](https://github.com/fang-lin/GlobalHack-DeliveryRadar/compare/v1.5.1...v1.6.0) (2026-06-25)
 
 
