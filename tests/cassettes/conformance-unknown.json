@@ -1,0 +1,26 @@
+{
+  "meta": {
+    "op": "conformance",
+    "case": "unknown",
+    "recordedAt": "2026-06-26",
+    "model": "synthetic",
+    "jsonMode": "json_object"
+  },
+  "modelCalls": [
+    {
+      "inputDigest": "synthetic",
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"result\":\"unknown\",\"confidence\":0.3,\"explanation\":\"Insufficient context to determine whether the diff violates or satisfies ADR-0006-C1 — cannot confidently assess platform coupling from the diff alone\",\"evidence_file\":null,\"evidence_line_start\":null,\"evidence_line_end\":null,\"fix_locality\":\"none\",\"fix_direction\":null}"
+          }
+        ],
+        "finishReason": { "unified": "stop", "raw": null },
+        "usage": { "inputTokens": { "total": 1 }, "outputTokens": { "total": 1 } },
+        "warnings": []
+      }
+    }
+  ],
+  "toolCalls": []
+}

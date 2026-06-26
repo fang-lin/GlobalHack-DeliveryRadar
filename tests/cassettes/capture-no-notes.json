@@ -1,0 +1,26 @@
+{
+  "meta": {
+    "op": "capture",
+    "case": "no-notes",
+    "recordedAt": "2026-06-26",
+    "model": "synthetic",
+    "jsonMode": "json_object"
+  },
+  "modelCalls": [
+    {
+      "inputDigest": "synthetic",
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"notes\":[]}"
+          }
+        ],
+        "finishReason": { "unified": "stop", "raw": null },
+        "usage": { "inputTokens": { "total": 1 }, "outputTokens": { "total": 1 } },
+        "warnings": []
+      }
+    }
+  ],
+  "toolCalls": []
+}

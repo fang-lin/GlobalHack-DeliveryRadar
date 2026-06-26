@@ -1,0 +1,23 @@
+diff --git a/src/core/checker.ts b/src/core/checker.ts
+index 1234abc..5678def 100644
+--- a/src/core/checker.ts
++++ b/src/core/checker.ts
+@@ -1,6 +1,8 @@
++import { execFileSync } from "node:child_process";
++
+ /**
+  * Semantic conformance checker — pure functions only (ADR-0006 / ADR-0010).
+  */
+ import { type Constraint, type Verdict, type SemanticCheckOutput } from "./models.ts";
+ import type { FileDiff } from "../io/diff.ts";
+
+@@ -10,6 +12,11 @@ export function buildUserPrompt(
+   driverContext = "",
+ ): string {
++  // VIOLATION: shelling out to git from the pure core
++  const head = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
++  console.error(`building prompt at ${head}`);
++
+   const examples = constraint.check.examples;
+   const parts = [
+     `## Constraint ${constraint.id} (from ${constraint.adr})`,

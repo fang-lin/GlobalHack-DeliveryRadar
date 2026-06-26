@@ -41,8 +41,12 @@ export function buildTools(root: string): Record<string, Tool> {
           // -F: fixed-string (literal) match — the pattern is an arbitrary
           // model-supplied string, so treat metacharacters like ( ) literally
           // rather than as a regex (which errors on e.g. "fetch(").
+          // stdio: silence stderr — grep writes "No such file or directory"
+          // there when the model greps a path that doesn't exist, which would
+          // otherwise leak into the terminal/CI log. We only need stdout.
           return execFileSync("grep", ["-rnIF", "--", pattern, abs], {
             encoding: "utf8", maxBuffer: 4 * MAX, cwd: root, timeout: 10000,
+            stdio: ["ignore", "pipe", "ignore"],
           }).slice(0, MAX);
         } catch {
           return "no matches"; // grep exits non-zero on no match
@@ -58,8 +62,10 @@ export function buildTools(root: string): Record<string, Tool> {
           return `only read-only git subcommands are allowed: ${[...GIT_READONLY].join(", ")}`;
         }
         try {
-          return execFileSync("git", args, { encoding: "utf8", maxBuffer: 4 * MAX, cwd: root, timeout: 10000 })
-            .slice(0, MAX);
+          return execFileSync("git", args, {
+            encoding: "utf8", maxBuffer: 4 * MAX, cwd: root, timeout: 10000,
+            stdio: ["ignore", "pipe", "ignore"], // silence stderr — don't leak git errors to the log
+          }).slice(0, MAX);
         } catch (e) {
           return `git failed: ${(e as Error).message}`;
         }

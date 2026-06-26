@@ -44,3 +44,6 @@ coverage/
 # Node / TypeScript
 node_modules/
 dist/
+
+# superpowers skill scratch (ledger, briefs, review diffs) — not source
+.superpowers/

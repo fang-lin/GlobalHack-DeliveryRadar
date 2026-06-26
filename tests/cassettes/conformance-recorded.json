@@ -1,0 +1,390 @@
+{
+  "meta": {
+    "op": "conformance",
+    "case": "recorded",
+    "recordedAt": "2026-06-26",
+    "model": "vercel/deepseek/deepseek-v4-pro",
+    "jsonMode": "json_schema"
+  },
+  "modelCalls": [
+    {
+      "inputDigest": "5ab4c74b948e9b5d",
+      "result": {
+        "content": [
+          {
+            "type": "reasoning",
+            "text": "The diff shows a new import of `execFileSync` from `node:child_process` and a call to `git rev-parse HEAD` inside `src/core/checker.ts`. This is a clear violation of ADR-0006-C1, which prohibits platform/VCS/host tooling calls within `src/core/`. The rule explicitly states: \"no child_process/exec of `gh` or `git`\". The business driver is to keep the core testable and portable, free of platform coupling. Shelling out to `git` directly violates both the letter and the reason.\n\nNow, I need to provide the JSON output with:\n\n- result: \"violated\"\n- confidence: very high, it's clear-cut. I'll say 1.0.\n- explanation: concise, citing the import and git call.\n- evidence_file: \"src/core/checker.ts\"\n- evidence_line_start and evidence_line_end: the lines that contain the violation. The diff shows the import line (added line 1) and the git call lines (added lines 14-15). I'll need to map to post-change file line numbers. The diff shows:\n\n```\n@@ -1,6 +1,8 @@\n+import { execFileSync } from \"node:child_process\";\n+\n /**\n  * Semantic conformance checker — pure functions only (ADR-0006 / ADR-0010).\n  */\n import { type Constraint, type Verdict, type SemanticCheckOutput } from \"./models.ts\";\n import type { FileDiff } from \"../io/diff.ts\";\n\n@@ -10,6 +12,11 @@ export function buildUserPrompt(\n   driverContext = \"\",\n ): string {\n+  // VIOLATION: shelling out to git from the pure core\n+  const head = execFileSync(\"git\", [\"rev-parse\", \"HEAD\"], { encoding: \"utf8\" }).trim();\n+  console.error(`building prompt at ${head}`);\n+\n   const examples = constraint.check.examples;\n```\n\nThe added lines are lines 1 (import), 13 (blank line?), 14 (const head...), 15 (console.error...). Let's compute line numbers carefully. The original file had 1-6 lines removed and replaced with 1-8 lines. So the post-change file starts with import at line 1. Then a blank line? Actually the diff shows after the import there's a blank line? The diff is:\n\n```\n@@ -1,6 +1,8 @@\n+import { execFileSync } from \"node:child_process\";\n+\n /**\n  * Semantic conformance checker — pure functions only (ADR-0006 / ADR-0010).\n  */\n import { type Constraint, type Verdict, type SemanticCheckOutput } from \"./models.ts\";\n import type { FileDiff } from \"../io/diff.ts\";\n```\n\nSo post-change lines 1-8: line 1 is the import, line 2 is blank, line 3 is the comment \"/** ... */\", line 4 is \" */\", line 5 is the import, line 6 is the other import, lines 7 and 8 are probably blank and the next import? Actually the diff shows that lines 1-6 were context removed and replaced. Let's look at the second hunk:\n\n```\n@@ -10,6 +12,11 @@ export function buildUserPrompt(\n   driverContext = \"\",\n ): string {\n+  // VIOLATION: shelling out to git from the pure core\n+  const head = execFileSync(\"git\", [\"rev-parse\", \"HEAD\"], { encoding: \"utf8\" }).trim();\n+  console.error(`building prompt at ${head}`);\n+\n   const examples = constraint.check.examples;\n```\n\nSo in the post-change file, after line 11 (which is likely `): string {`), lines 12-16 are added. Specifically, line 12 (blank?), wait, the @@ line says @@ -10,6 +12,11 @@, meaning the old file had 6 lines starting at line 10, the new file has 11 lines starting at line 12. So the new file has lines 12-22. The added lines are at the start: line 12: \"  // VIOLATION: shelling out to git from the pure core\", line 13: \"  const head = execFileSync(\"git\", [\"rev-parse\", \"HEAD\"], { encoding: \"utf8\" }).trim();\", line 14: \"  console.error(`building prompt at ${head}`);\", line 15: blank. Then line 16: \"  const examples = constraint.check.examples;\".\n\nI need to provide evidence_line_start and evidence_line_end. I'll point to the most specific violation lines: the import and the git call. I could provide a range from the import line to the git call line, but that would span across the file. It might be better to highlight the git call line specifically, as it's the direct violation. The explanation can mention the import. I'll give evidence_line_start: 1, evidence_line_end: 1 for the import, but that would only cover the import, not the call. The schema says evidence_line_start and evidence_line_end can be numbers or null. I'll provide a range that covers the import and the git call. For simplicity, I'll put evidence_line_start: 1 and evidence_line_end: 14 (covering the import and the call). But the call is at line 13 (the const head line). Actually line 13 is the git call. Line 14 is the console. I'll set evidence_line_start: 1, evidence_line_end: 14. That seems reasonable. However, I need to ensure the lines exist. Let's verify: line 1: import, line 2: blank, line 3: comment, etc. The console.error is at line 14. So the range 1-14 includes the import, blank, comment block, other imports, blank, function signature, and the violating lines. That's fine.\n\nfix_locality: The fix is local: remove the import and the git call. So \"local\".\n\nfix_direction: \"Remove the execFileSync import and the git rev-parse call; the core must remain free of platform-specific shell commands per ADR-0006. Consider passing the current HEAD as a parameter or retrieving it in an outer layer.\"\n\nConfidence: 1.0.\n\nNow, I'll output JSON."
+          },
+          {
+            "type": "text",
+            "text": "{\n  \"result\": \"violated\",\n  \"confidence\": 1.0,\n  \"explanation\": \"The diff adds an import of execFileSync from node:child_process and a call to git rev-parse HEAD inside src/core/checker.ts, which directly violates the prohibition against platform/VCS/host tooling calls in the core domain.\",\n  \"evidence_file\": \"src/core/checker.ts\",\n  \"evidence_line_start\": 1,\n  \"evidence_line_end\": 14,\n  \"fix_locality\": \"local\",\n  \"fix_direction\": \"Remove the execFileSync import and the git rev-parse call; the core must remain free of platform-specific shell commands per ADR-0006. Consider passing the current HEAD as a parameter or retrieving it in an outer layer.\"\n}"
+          }
+        ],
+        "finishReason": {
+          "unified": "stop",
+          "raw": "stop"
+        },
+        "usage": {
+          "inputTokens": {
+            "total": 1763,
+            "noCache": 611,
+            "cacheRead": 1152
+          },
+          "outputTokens": {
+            "total": 1528,
+            "text": 170,
+            "reasoning": 1358
+          },
+          "raw": {
+            "prompt_tokens": 1763,
+            "completion_tokens": 1528,
+            "prompt_cache_hit_tokens": 1152,
+            "prompt_cache_miss_tokens": 611,
+            "total_tokens": 3291,
+            "completion_tokens_details": {
+              "reasoning_tokens": 1358
+            }
+          }
+        },
+        "providerMetadata": {
+          "deepseek": {
+            "promptCacheHitTokens": 1152,
+            "promptCacheMissTokens": 611
+          },
+          "gateway": {
+            "routing": {
+              "originalModelId": "deepseek/deepseek-v4-pro",
+              "resolvedProvider": "deepseek",
+              "fallbacksAvailable": [
+                "baseten",
+                "fireworks",
+                "togetherai",
+                "azure",
+                "novita",
+                "deepinfra"
+              ],
+              "planningReasoning": "System credentials planned for: deepseek, baseten, fireworks, togetherai, azure, novita, deepinfra. Total execution order: deepseek(system) → baseten(system) → fireworks(system) → togetherai(system) → azure(system) → novita(system) → deepinfra(system)",
+              "canonicalSlug": "deepseek/deepseek-v4-pro",
+              "finalProvider": "deepseek",
+              "modelAttemptCount": 1,
+              "modelAttempts": [
+                {
+                  "canonicalSlug": "deepseek/deepseek-v4-pro",
+                  "success": true,
+                  "providerAttemptCount": 1,
+                  "providerAttempts": [
+                    {
+                      "provider": "deepseek",
+                      "credentialType": "system",
+                      "success": true,
+                      "startTime": 1782453658963,
+                      "endTime": 1782453682024,
+                      "statusCode": 200
+                    }
+                  ]
+                }
+              ],
+              "totalProviderAttemptCount": 1
+            },
+            "cost": "0.001599321",
+            "marketCost": "0.001599321",
+            "surchargeCost": "0",
+            "gatewayCost": "0.001599321",
+            "inferenceCost": "0.001599321",
+            "inputInferenceCost": "0.000269961",
+            "outputInferenceCost": "0.00132936",
+            "generationId": "gen_01KW188S9PXX95T4FJK7KPDET1"
+          }
+        },
+        "warnings": [],
+        "request": {
+          "body": {
+            "maxOutputTokens": 16000,
+            "tools": [
+              {
+                "type": "function",
+                "name": "read_file",
+                "description": "Read a UTF-8 file from the repository (read-only).",
+                "inputSchema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "description": "repo-relative path",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "path"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              {
+                "type": "function",
+                "name": "grep",
+                "description": "Search the repository for a LITERAL substring (not a regex); returns matching lines with file:line.",
+                "inputSchema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "pattern": {
+                      "type": "string"
+                    },
+                    "path": {
+                      "default": ".",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "pattern"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              {
+                "type": "function",
+                "name": "git",
+                "description": "Run a READ-ONLY git command for history/blame (e.g. log, blame, show, diff).",
+                "inputSchema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "args": {
+                      "description": "git args, e.g. ['log','-p','file']",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "args"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            ],
+            "toolChoice": {
+              "type": "auto"
+            },
+            "responseFormat": {
+              "type": "json",
+              "schema": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "properties": {
+                  "result": {
+                    "type": "string",
+                    "enum": [
+                      "aligned",
+                      "violated",
+                      "unknown"
+                    ]
+                  },
+                  "confidence": {
+                    "type": "number"
+                  },
+                  "explanation": {
+                    "type": "string"
+                  },
+                  "evidence_file": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "evidence_line_start": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "evidence_line_end": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "fix_locality": {
+                    "type": "string",
+                    "enum": [
+                      "local",
+                      "structural",
+                      "none"
+                    ]
+                  },
+                  "fix_direction": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "result",
+                  "confidence",
+                  "explanation",
+                  "evidence_file",
+                  "evidence_line_start",
+                  "evidence_line_end",
+                  "fix_locality",
+                  "fix_direction"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "prompt": [
+              {
+                "role": "system",
+                "content": "---\nname: conformance\ndescription: Judge whether a PR diff conforms to ONE architectural constraint extracted from an ADR — against both the letter of the rule and the business reason (driver) behind it. Investigate beyond the diff when the evidence is insufficient, rather than guessing.\nlicense: same as repository\n---\n\n# Conformance check\n\nYou are Delivery Radar's conformance checker. You evaluate whether a pull-request\ndiff conforms to ONE architectural constraint extracted from an Architecture\nDecision Record (ADR).\n\nJudge the diff against both the LETTER of the rule and the REASON behind it (the\nbusiness driver). A change can honor the letter while defeating the reason — that\nis a violation.\n\n## Rules of judgement\n- Only judge what the evidence shows. Do not invent code that is not present.\n- The diff is your primary evidence. When the diff alone is insufficient to decide,\n  INVESTIGATE before answering: read the enclosing file, grep for how the pattern is\n  used elsewhere, inspect git history of the touched files. Use your tools rather than\n  guessing.\n- If, after investigating, the evidence is still insufficient, emit result \"unknown\"\n  with low confidence. `unknown` is a valid, first-class result — never guess.\n- \"aligned\" means the changed code is compatible with the constraint.\n- Evidence lines refer to the post-change file (the \"+\" side of the diff).\n- fix_locality: \"local\" if a small in-place edit fixes it, \"structural\" if the fix\n  requires changing the approach, \"none\" if no fix is needed.\n- fix_direction: one or two sentences pointing at the direction of the required change\n  (cite the ADR's intent), or null when result is \"aligned\".\n- Keep explanation to one or two sentences.\n\n## Output contract\nReturn a JSON object: { \"result\": \"aligned\"|\"violated\"|\"unknown\", \"confidence\": 0..1,\n\"explanation\": string, \"evidence_file\": string|null, \"evidence_line_start\": number|null,\n\"evidence_line_end\": number|null, \"fix_locality\": \"local\"|\"structural\"|\"none\",\n\"fix_direction\": string|null }.\n"
+              },
+              {
+                "role": "user",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "## Constraint ADR-0006-C1 (from ADR-0006)\n\nTitle: radar core stays platform-agnostic (no git/host/VCS calls in src/core/)\n\nPolarity: prohibition\n\nRule: Domain code under src/core/ (the pure domain) MUST NOT invoke or import platform / VCS / host tooling — no child_process/exec of `gh` or `git`, no GitHub/GitLab API or Octokit client, no posting/editing of reviews, comments, labels or status. Adding such a call to src/core/ is a violation.\n\nBusiness driver: ADR-0006 — testable, host-portable core; separation of check from publish\n\nDriver rationale (ADR Context section):\nThe radar core reads recorded intent (ADRs → constraints), checks a diff against it,\nand renders the verdict projection. Domain code under src/core/ must remain free of\nplatform/VCS coupling so it stays testable without network or auth.\n\nExamples of compliant code patterns: [\"comment.ts renders markdown from verdicts and prints it; the workflow posts it via gh api\"]\nExamples of violating code patterns: [\"src/ calls execFileSync('gh', ['api', ...]) to post or edit a review\",\"src/ imports an Octokit/GitHub client or shells out to git\"]\n\n## Pull-request diff (in-scope files only)\n```diff\ndiff --git a/src/core/checker.ts b/src/core/checker.ts\nindex 1234abc..5678def 100644\n--- a/src/core/checker.ts\n+++ b/src/core/checker.ts\n@@ -1,6 +1,8 @@\n+import { execFileSync } from \"node:child_process\";\n+\n /**\n  * Semantic conformance checker — pure functions only (ADR-0006 / ADR-0010).\n  */\n import { type Constraint, type Verdict, type SemanticCheckOutput } from \"./models.ts\";\n import type { FileDiff } from \"../io/diff.ts\";\n\n@@ -10,6 +12,11 @@ export function buildUserPrompt(\n   driverContext = \"\",\n ): string {\n+  // VIOLATION: shelling out to git from the pure core\n+  const head = execFileSync(\"git\", [\"rev-parse\", \"HEAD\"], { encoding: \"utf8\" }).trim();\n+  console.error(`building prompt at ${head}`);\n+\n   const examples = constraint.check.examples;\n   const parts = [\n     `## Constraint ${constraint.id} (from ${constraint.adr})`,\n```\n\nEvaluate the diff against this single constraint and return the verdict."
+                  }
+                ]
+              }
+            ],
+            "headers": {
+              "user-agent": "ai/6.0.208"
+            }
+          }
+        },
+        "response": {
+          "headers": {
+            "access-control-allow-headers": "Content-Type, Authorization, ai-gateway-auth-method, ai-gateway-protocol-version, ai-model-id, ai-language-model-id, ai-language-model-specification-version, ai-image-model-specification-version, ai-embedding-model-specification-version, ai-language-model-streaming, ai-reporting-tags, ai-reporting-user, http-referer, x-title, anthropic-beta, x-vercel-ai-gateway-team",
+            "access-control-allow-methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+            "access-control-allow-origin": "*",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "br",
+            "content-type": "application/json",
+            "date": "Fri, 26 Jun 2026 06:01:22 GMT",
+            "server": "Vercel",
+            "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+            "transfer-encoding": "chunked",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-matched-path": "/v3/ai/language-model",
+            "x-vercel-cache": "MISS",
+            "x-vercel-id": "fra1::fra1::89pg4-1782453658920-c1f0fcf40ae0"
+          },
+          "body": {
+            "content": [
+              {
+                "type": "reasoning",
+                "text": "The diff shows a new import of `execFileSync` from `node:child_process` and a call to `git rev-parse HEAD` inside `src/core/checker.ts`. This is a clear violation of ADR-0006-C1, which prohibits platform/VCS/host tooling calls within `src/core/`. The rule explicitly states: \"no child_process/exec of `gh` or `git`\". The business driver is to keep the core testable and portable, free of platform coupling. Shelling out to `git` directly violates both the letter and the reason.\n\nNow, I need to provide the JSON output with:\n\n- result: \"violated\"\n- confidence: very high, it's clear-cut. I'll say 1.0.\n- explanation: concise, citing the import and git call.\n- evidence_file: \"src/core/checker.ts\"\n- evidence_line_start and evidence_line_end: the lines that contain the violation. The diff shows the import line (added line 1) and the git call lines (added lines 14-15). I'll need to map to post-change file line numbers. The diff shows:\n\n```\n@@ -1,6 +1,8 @@\n+import { execFileSync } from \"node:child_process\";\n+\n /**\n  * Semantic conformance checker — pure functions only (ADR-0006 / ADR-0010).\n  */\n import { type Constraint, type Verdict, type SemanticCheckOutput } from \"./models.ts\";\n import type { FileDiff } from \"../io/diff.ts\";\n\n@@ -10,6 +12,11 @@ export function buildUserPrompt(\n   driverContext = \"\",\n ): string {\n+  // VIOLATION: shelling out to git from the pure core\n+  const head = execFileSync(\"git\", [\"rev-parse\", \"HEAD\"], { encoding: \"utf8\" }).trim();\n+  console.error(`building prompt at ${head}`);\n+\n   const examples = constraint.check.examples;\n```\n\nThe added lines are lines 1 (import), 13 (blank line?), 14 (const head...), 15 (console.error...). Let's compute line numbers carefully. The original file had 1-6 lines removed and replaced with 1-8 lines. So the post-change file starts with import at line 1. Then a blank line? Actually the diff shows after the import there's a blank line? The diff is:\n\n```\n@@ -1,6 +1,8 @@\n+import { execFileSync } from \"node:child_process\";\n+\n /**\n  * Semantic conformance checker — pure functions only (ADR-0006 / ADR-0010).\n  */\n import { type Constraint, type Verdict, type SemanticCheckOutput } from \"./models.ts\";\n import type { FileDiff } from \"../io/diff.ts\";\n```\n\nSo post-change lines 1-8: line 1 is the import, line 2 is blank, line 3 is the comment \"/** ... */\", line 4 is \" */\", line 5 is the import, line 6 is the other import, lines 7 and 8 are probably blank and the next import? Actually the diff shows that lines 1-6 were context removed and replaced. Let's look at the second hunk:\n\n```\n@@ -10,6 +12,11 @@ export function buildUserPrompt(\n   driverContext = \"\",\n ): string {\n+  // VIOLATION: shelling out to git from the pure core\n+  const head = execFileSync(\"git\", [\"rev-parse\", \"HEAD\"], { encoding: \"utf8\" }).trim();\n+  console.error(`building prompt at ${head}`);\n+\n   const examples = constraint.check.examples;\n```\n\nSo in the post-change file, after line 11 (which is likely `): string {`), lines 12-16 are added. Specifically, line 12 (blank?), wait, the @@ line says @@ -10,6 +12,11 @@, meaning the old file had 6 lines starting at line 10, the new file has 11 lines starting at line 12. So the new file has lines 12-22. The added lines are at the start: line 12: \"  // VIOLATION: shelling out to git from the pure core\", line 13: \"  const head = execFileSync(\"git\", [\"rev-parse\", \"HEAD\"], { encoding: \"utf8\" }).trim();\", line 14: \"  console.error(`building prompt at ${head}`);\", line 15: blank. Then line 16: \"  const examples = constraint.check.examples;\".\n\nI need to provide evidence_line_start and evidence_line_end. I'll point to the most specific violation lines: the import and the git call. I could provide a range from the import line to the git call line, but that would span across the file. It might be better to highlight the git call line specifically, as it's the direct violation. The explanation can mention the import. I'll give evidence_line_start: 1, evidence_line_end: 1 for the import, but that would only cover the import, not the call. The schema says evidence_line_start and evidence_line_end can be numbers or null. I'll provide a range that covers the import and the git call. For simplicity, I'll put evidence_line_start: 1 and evidence_line_end: 14 (covering the import and the call). But the call is at line 13 (the const head line). Actually line 13 is the git call. Line 14 is the console. I'll set evidence_line_start: 1, evidence_line_end: 14. That seems reasonable. However, I need to ensure the lines exist. Let's verify: line 1: import, line 2: blank, line 3: comment, etc. The console.error is at line 14. So the range 1-14 includes the import, blank, comment block, other imports, blank, function signature, and the violating lines. That's fine.\n\nfix_locality: The fix is local: remove the import and the git call. So \"local\".\n\nfix_direction: \"Remove the execFileSync import and the git rev-parse call; the core must remain free of platform-specific shell commands per ADR-0006. Consider passing the current HEAD as a parameter or retrieving it in an outer layer.\"\n\nConfidence: 1.0.\n\nNow, I'll output JSON."
+              },
+              {
+                "type": "text",
+                "text": "{\n  \"result\": \"violated\",\n  \"confidence\": 1.0,\n  \"explanation\": \"The diff adds an import of execFileSync from node:child_process and a call to git rev-parse HEAD inside src/core/checker.ts, which directly violates the prohibition against platform/VCS/host tooling calls in the core domain.\",\n  \"evidence_file\": \"src/core/checker.ts\",\n  \"evidence_line_start\": 1,\n  \"evidence_line_end\": 14,\n  \"fix_locality\": \"local\",\n  \"fix_direction\": \"Remove the execFileSync import and the git rev-parse call; the core must remain free of platform-specific shell commands per ADR-0006. Consider passing the current HEAD as a parameter or retrieving it in an outer layer.\"\n}"
+              }
+            ],
+            "finishReason": {
+              "unified": "stop",
+              "raw": "stop"
+            },
+            "usage": {
+              "inputTokens": {
+                "total": 1763,
+                "noCache": 611,
+                "cacheRead": 1152
+              },
+              "outputTokens": {
+                "total": 1528,
+                "text": 170,
+                "reasoning": 1358
+              },
+              "raw": {
+                "prompt_tokens": 1763,
+                "completion_tokens": 1528,
+                "prompt_cache_hit_tokens": 1152,
+                "prompt_cache_miss_tokens": 611,
+                "total_tokens": 3291,
+                "completion_tokens_details": {
+                  "reasoning_tokens": 1358
+                }
+              }
+            },
+            "providerMetadata": {
+              "deepseek": {
+                "promptCacheHitTokens": 1152,
+                "promptCacheMissTokens": 611
+              },
+              "gateway": {
+                "routing": {
+                  "originalModelId": "deepseek/deepseek-v4-pro",
+                  "resolvedProvider": "deepseek",
+                  "fallbacksAvailable": [
+                    "baseten",
+                    "fireworks",
+                    "togetherai",
+                    "azure",
+                    "novita",
+                    "deepinfra"
+                  ],
+                  "planningReasoning": "System credentials planned for: deepseek, baseten, fireworks, togetherai, azure, novita, deepinfra. Total execution order: deepseek(system) → baseten(system) → fireworks(system) → togetherai(system) → azure(system) → novita(system) → deepinfra(system)",
+                  "canonicalSlug": "deepseek/deepseek-v4-pro",
+                  "finalProvider": "deepseek",
+                  "modelAttemptCount": 1,
+                  "modelAttempts": [
+                    {
+                      "canonicalSlug": "deepseek/deepseek-v4-pro",
+                      "success": true,
+                      "providerAttemptCount": 1,
+                      "providerAttempts": [
+                        {
+                          "provider": "deepseek",
+                          "credentialType": "system",
+                          "success": true,
+                          "startTime": 1782453658963,
+                          "endTime": 1782453682024,
+                          "statusCode": 200
+                        }
+                      ]
+                    }
+                  ],
+                  "totalProviderAttemptCount": 1
+                },
+                "cost": "0.001599321",
+                "marketCost": "0.001599321",
+                "surchargeCost": "0",
+                "gatewayCost": "0.001599321",
+                "inferenceCost": "0.001599321",
+                "inputInferenceCost": "0.000269961",
+                "outputInferenceCost": "0.00132936",
+                "generationId": "gen_01KW188S9PXX95T4FJK7KPDET1"
+              }
+            },
+            "warnings": [
+              {
+                "type": "compatibility",
+                "feature": "responseFormat JSON schema",
+                "details": "JSON response schema is injected into the system message."
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "toolCalls": []
+}
